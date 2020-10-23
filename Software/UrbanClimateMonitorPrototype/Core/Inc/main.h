@@ -60,6 +60,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define VCP_TX_Pin GPIO_PIN_2
 #define VCP_TX_GPIO_Port GPIOA
+#define RFM95_IRQ_Pin GPIO_PIN_0
+#define RFM95_IRQ_GPIO_Port GPIOB
+#define RFM95_RST_Pin GPIO_PIN_11
+#define RFM95_RST_GPIO_Port GPIOA
+#define RFM95_CS_Pin GPIO_PIN_12
+#define RFM95_CS_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
