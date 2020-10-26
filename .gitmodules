@@ -1,9 +1,9 @@
-[submodule "Software/Embedded/UrbanClimateMonitorPrototype/Drivers/MCU/stdio2uart"]
-	path = Software/Embedded/UrbanClimateMonitorPrototype/Drivers/MCU/stdio2uart
+[submodule "Software/Embedded/PrototypeNode/Drivers/MCU/stdio2uart"]
+	path = Software/Embedded/PrototypeNode/Drivers/MCU/stdio2uart
 	url = https://github.com/henriheimann/stm32-stdio2uart.git
-[submodule "Software/Embedded/UrbanClimateMonitorPrototype/Drivers/Components/sht3x"]
-	path = Software/Embedded/UrbanClimateMonitorPrototype/Drivers/Components/sht3x
+[submodule "Software/Embedded/PrototypeNode/Drivers/Components/sht3x"]
+	path = Software/Embedded/PrototypeNode/Drivers/Components/sht3x
 	url = https://github.com/henriheimann/stm32-sht3x.git
-[submodule "Software/Embedded/UrbanClimateMonitorPrototype/Drivers/Components/rfm95"]
-	path = Software/Embedded/UrbanClimateMonitorPrototype/Drivers/Components/rfm95
+[submodule "Software/Embedded/PrototypeNode/Drivers/Components/rfm95"]
+	path = Software/Embedded/PrototypeNode/Drivers/Components/rfm95
 	url = https://github.com/henriheimann/stm32-rfm95
