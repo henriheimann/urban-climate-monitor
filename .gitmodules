@@ -1,9 +1,6 @@
 [submodule "Software/UrbanClimateMonitorPrototype/Drivers/Components/sht3x"]
 	path = Software/UrbanClimateMonitorPrototype/Drivers/Components/sht3x
 	url = https://github.com/henriheimann/stm32-sht3x.git
-[submodule "Software/UrbanClimateMonitorPrototype/Drivers/Components/rfm9x"]
-	path = Software/UrbanClimateMonitorPrototype/Drivers/Components/rfm9x
-	url = https://github.com/henriheimann/stm32-rfm9x.git
 [submodule "Software/UrbanClimateMonitorPrototype/Drivers/MCU/stdio2uart"]
 	path = Software/UrbanClimateMonitorPrototype/Drivers/MCU/stdio2uart
 	url = https://github.com/henriheimann/stm32-stdio2uart.git

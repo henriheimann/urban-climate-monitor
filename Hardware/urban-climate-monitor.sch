@@ -374,17 +374,6 @@ F 3 "" H 2000 9050 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Sensor_Humidity:SHT30-DIS U3
-U 1 1 5F8B7348
-P 3000 2250
-F 0 "U3" H 3350 2700 50  0000 C CNN
-F 1 "SHT30-DIS" H 3350 2600 50  0000 C CNN
-F 2 "Sensor_Humidity:Sensirion_DFN-8-1EP_2.5x2.5mm_P0.5mm_EP1.1x1.7mm" H 3000 2300 50  0001 C CNN
-F 3 "https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/2_Humidity_Sensors/Datasheets/Sensirion_Humidity_Sensors_SHT3x_Datasheet_digital.pdf" H 3000 2300 50  0001 C CNN
-	1    3000 2250
-	1    0    0    -1  
-$EndComp
-$Comp
 L Device:C C2
 U 1 1 5F8C8613
 P 1450 2150
@@ -1415,4 +1404,15 @@ F 3 "" H 3150 5100 50  0001 C CNN
 $EndComp
 Text GLabel 3650 5450 2    50   Input ~ 0
 RFM95_IRQ
+$Comp
+L Sensor_Humidity:SHT31-DIS U?
+U 1 1 5FAE73AC
+P 3000 2250
+F 0 "U?" H 3300 2650 50  0000 C CNN
+F 1 "SHT31-DIS" H 3300 2550 50  0000 C CNN
+F 2 "Sensor_Humidity:Sensirion_DFN-8-1EP_2.5x2.5mm_P0.5mm_EP1.1x1.7mm" H 3000 2300 50  0001 C CNN
+F 3 "https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/2_Humidity_Sensors/Datasheets/Sensirion_Humidity_Sensors_SHT3x_Datasheet_digital.pdf" H 3000 2300 50  0001 C CNN
+	1    3000 2250
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
