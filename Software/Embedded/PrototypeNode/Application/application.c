@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <i2c.h>
 #include <spi.h>
+#include <adc.h>
 #include <stdio2uart/stdio2uart.h>
 
 static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter);
@@ -64,6 +65,37 @@ static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter)
 	eeprom_write_bytes(&eeprom_handle, 0x00, buffer, sizeof(buffer));
 }
 
+void test_photo_sense()
+{
+	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_RESET);
+	HAL_Delay(10);
+
+	uint32_t adc_value_1 = 0;
+	for (int i = 0; i < 50; i++) {
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		adc_value_1 += HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Stop(&hadc1);
+		HAL_Delay(1);
+	}
+	adc_value_1 /= 50;
+
+	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_SET);
+	HAL_Delay(10);
+
+	uint32_t adc_value_2 = 0;
+	for (int i = 0; i < 50; i++) {
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		adc_value_2 += HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Stop(&hadc1);
+		HAL_Delay(1);
+	}
+	adc_value_2 /= 50;
+
+	printf("Photo ADC readings: %lu %lu\n\r", adc_value_1, adc_value_2);
+}
+
 _Noreturn void application_main()
 {
 	stdio2uart_init(&huart2);
@@ -88,5 +120,6 @@ _Noreturn void application_main()
 		HAL_Delay(1000);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 		HAL_Delay(1000);
+		test_photo_sense();
 	}
 }
