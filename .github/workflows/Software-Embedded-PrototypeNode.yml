@@ -1,6 +1,9 @@
 name: Software/Embedded/PrototypeNode
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'Software/Embedded/PrototypeNode/**'
 
 env:
   BUILD_TYPE: Release
