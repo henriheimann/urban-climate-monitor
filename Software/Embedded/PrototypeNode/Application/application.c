@@ -21,8 +21,8 @@ rfm95_handle_t rfm95_handle = {
 		.nss_pin = RFM95_NSS_Pin,
 		.nrst_port = RFM95_NRST_GPIO_Port,
 		.nrst_pin = RFM95_NRST_Pin,
-		.irq_port = RFM95_IRQ_GPIO_Port,
-		.irq_pin = RFM95_IRQ_Pin,
+		.irq_port = RFM95_DIO0_GPIO_Port,
+		.irq_pin = RFM95_DIO0_Pin,
 		.dio5_port = RFM95_DIO5_GPIO_Port,
 		.dio5_pin = RFM95_DIO5_Pin,
 		.device_address = {0x26, 0x01, 0x16, 0xCE},
@@ -67,6 +67,7 @@ static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter)
 
 void test_photo_sense()
 {
+	HAL_GPIO_WritePin(PHOTO_ENABLE_GPIO_Port, PHOTO_ENABLE_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
 
@@ -93,6 +94,8 @@ void test_photo_sense()
 	}
 	adc_value_2 /= 50;
 
+	HAL_GPIO_WritePin(PHOTO_ENABLE_GPIO_Port, PHOTO_ENABLE_Pin, GPIO_PIN_RESET);
+
 	printf("Photo ADC readings: %lu %lu\n\r", adc_value_1, adc_value_2);
 }
 
@@ -115,11 +118,12 @@ _Noreturn void application_main()
 	result = rfm95_send_data(&rfm95_handle, (uint8_t*)dataToSend, 12);
 	printf("Send success: %d\n\r", result);
 
+	test_photo_sense();
+
 	while (1) {
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
 		HAL_Delay(1000);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 		HAL_Delay(1000);
-		test_photo_sense();
 	}
 }

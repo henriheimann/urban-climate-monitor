@@ -66,8 +66,10 @@ void Error_Handler(void);
 #define PHOTO_SWITCH_GPIO_Port GPIOA
 #define RFM95_DIO5_Pin GPIO_PIN_7
 #define RFM95_DIO5_GPIO_Port GPIOA
-#define RFM95_IRQ_Pin GPIO_PIN_0
-#define RFM95_IRQ_GPIO_Port GPIOB
+#define RFM95_DIO0_Pin GPIO_PIN_0
+#define RFM95_DIO0_GPIO_Port GPIOB
+#define PHOTO_ENABLE_Pin GPIO_PIN_8
+#define PHOTO_ENABLE_GPIO_Port GPIOA
 #define RFM95_NRST_Pin GPIO_PIN_11
 #define RFM95_NRST_GPIO_Port GPIOA
 #define RFM95_NSS_Pin GPIO_PIN_12
