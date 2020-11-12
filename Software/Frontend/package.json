@@ -1,5 +1,5 @@
 {
-  "name": "urban-climate-monitor-frontend",
+  "name": "ucm-frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",

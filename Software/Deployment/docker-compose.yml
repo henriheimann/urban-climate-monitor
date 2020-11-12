@@ -7,6 +7,7 @@ services:
     container_name: reverse-proxy
     depends_on:
       - grafana
+      - ucm-frontend
     ports:
       - 80:80
       - 443:443
@@ -16,9 +17,9 @@ services:
     env_file:
       - .env
     networks:
-      - tig-backend
-      - tig-frontend
-      - ucm-frontend
+      - tig-backend-net
+      - tig-frontend-net
+      - ucm-frontend-net
 
   influxdb:
     image: influxdb:latest
@@ -30,8 +31,8 @@ services:
     environment:
       - INFLUXDB_HTTP_AUTH_ENABLED=true
     networks:
-      - tig-backend
-      - tig-frontend
+      - tig-backend-net
+      - tig-frontend-net
 
   telegraf:
     image: telegraf:latest
@@ -45,7 +46,7 @@ services:
     env_file:
       - .env
     networks:
-      - tig-backend
+      - tig-backend-net
 
   grafana:
     image: grafana/grafana:latest
@@ -62,9 +63,15 @@ services:
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     networks:
-      - tig-frontend
+      - tig-frontend-net
+
+  ucm-frontend:
+    image: ucm-frontend
+    container_name: ucm-frontend
+    networks:
+      - ucm-frontend-net
 
 networks:
-  tig-backend:
-  tig-frontend:
-  ucm-frontend:
+  tig-backend-net:
+  tig-frontend-net:
+  ucm-frontend-net:
