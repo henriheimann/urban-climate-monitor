@@ -1,11 +1,28 @@
 version: "2"
 
 services:
+
+  reverse-proxy:
+    image: nginx:latest
+    container_name: reverse-proxy
+    depends_on:
+      - grafana
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/certs:/etc/ssl/private
+    env_file:
+      - .env
+    networks:
+      - tig-backend
+      - tig-frontend
+      - ucm-frontend
+
   influxdb:
     image: influxdb:latest
     container_name: influxdb
-    ports:
-      - ${INFLUXDB_PORT}:${INFLUXDB_PORT}
     volumes:
       - ./influxdb/data:/var/lib/influxdb
     env_file:
@@ -13,6 +30,7 @@ services:
     networks:
       - tig-backend
       - tig-frontend
+
   telegraf:
     image: telegraf:latest
     container_name: telegraf
@@ -32,16 +50,19 @@ services:
     container_name: grafana
     depends_on:
       - influxdb
-    ports:
-      - ${GRAFANA_PORT}:${GRAFANA_PORT}
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
     env_file:
       - .env
+    environment:
+      - GF_SERVER_DOMAIN=localhost:3000
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     networks:
       - tig-frontend
 
 networks:
   tig-backend:
   tig-frontend:
+  ucm-frontend:
