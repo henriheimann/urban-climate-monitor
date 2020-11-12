@@ -99,6 +99,14 @@ void test_photo_sense()
 	printf("Photo ADC readings: %lu %lu\n\r", adc_value_1, adc_value_2);
 }
 
+typedef struct {
+	int16_t temperature;
+	uint16_t humidity;
+	int16_t ir_temperature;
+	uint16_t brightness;
+	uint8_t battery_voltage;
+} data_packet_t;
+
 _Noreturn void application_main()
 {
 	stdio2uart_init(&huart2);
@@ -113,9 +121,12 @@ _Noreturn void application_main()
 	result = rfm95_init(&rfm95_handle);
 	printf("Transceiver RFM95 initialisation: %d\n\r", result);
 
-	char *dataToSend = "Hello World!";
+	data_packet_t data_packet = {0};
 
-	result = rfm95_send_data(&rfm95_handle, (uint8_t*)dataToSend, 12);
+	data_packet.temperature = (int16_t)(temperature * 100);
+	data_packet.humidity = (uint16_t)(humidity * 100);
+
+	result = rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 	printf("Send success: %d\n\r", result);
 
 	test_photo_sense();
