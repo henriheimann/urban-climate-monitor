@@ -28,12 +28,12 @@ if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
     scp ucm-frontend.tar "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
     rm ucm-frontend.tar
 else
-    echo "Skipping frontend build..."
+    echo "skipping frontend build..."
 fi
 
 # upload compose and configuration
 cd ../Deployment/
-rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
+rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning ssl_renew.sh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
 
 # load frontend
 if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
@@ -45,3 +45,10 @@ ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'if [ ! -d ~/ucm/dhparam ]; then mkd
 
 # run compose
 ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'cd ~/ucm && docker-compose up -d && docker image prune -f'
+
+# add crontab if not exits
+grep_result=$(ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" "crontab -l | grep '~/ucm/ssl_renew.sh'" 2>&1) || true
+if [ -z "${grep_result}" ]; then
+    echo "creating crontab entry..."
+    ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" '(crontab -l ; echo "0 12 * * * ~/ucm/ssl_renew.sh >> ~/ucm/ssl_renew.log 2>&1") | crontab -'
+fi

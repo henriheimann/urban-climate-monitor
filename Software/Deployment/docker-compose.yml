@@ -23,6 +23,7 @@ services:
       - tig-backend-net
       - tig-frontend-net
       - ucm-frontend-net
+    restart: unless-stopped
 
   certbot:
     image: certbot/certbot
@@ -49,6 +50,7 @@ services:
     networks:
       - tig-backend-net
       - tig-frontend-net
+    restart: unless-stopped
 
   telegraf:
     image: telegraf:latest
@@ -63,6 +65,7 @@ services:
       - .env
     networks:
       - tig-backend-net
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -80,12 +83,14 @@ services:
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     networks:
       - tig-frontend-net
+    restart: unless-stopped
 
   ucm-frontend:
     image: ucm-frontend
     container_name: ucm-frontend
     networks:
       - ucm-frontend-net
+    restart: unless-stopped
 
 networks:
   tig-backend-net:
