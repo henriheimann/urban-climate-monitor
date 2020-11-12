@@ -1,5 +1,5 @@
 ### Make sure to fix ufw with docker
-`sudo nano /etc/default/docker` and add `DOCKER_OPTS="--iptables=false`
+`sudo nano /etc/default/docker`, add `DOCKER_OPTS="--iptables=false"` and restart docker daemon via `sudo systemctl restart docker`
 
 ### Create an .env file including the following content
 ```
@@ -25,4 +25,12 @@ GRAFANA_PASSWORD=<Grafana admin password>
 TTN_REGION=<TTN region>
 TTN_APP_ID=<TTN application id>
 TTN_APP_ACCESS_KEY=<TTN application access key>
+
+# Urban Climate Monitor Frontend
+UCM_FRONTEND_HOST=ucm-frontend
+UCM_FRONTEND_PORT=80
+
+# Deployment Info
+DEPLOYMENT_USER=<User on deployment destination>
+DEPLOYMENT_HOST=<IP / URL of deployment destination>
 ```
