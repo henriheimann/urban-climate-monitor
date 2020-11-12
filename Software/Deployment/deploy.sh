@@ -33,14 +33,15 @@ fi
 
 # upload compose and configuration
 cd ../Deployment/
-scp docker-compose.yml telegraf.conf .env "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
-scp -r nginx "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm/nginx"
-scp -r grafana-provisioning "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm/grafana-provisioning"
+rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
 
 # load frontend
 if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
     ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'cd ~/ucm && docker load < ucm-frontend.tar && rm ucm-frontend.tar'
 fi
+
+# create dh keys if they don't exist
+ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'if [ ! -d ~/ucm/dhparam ]; then mkdir -p ~/ucm/dhparam && openssl dhparam -out ~/ucm/dhparam/dhparam-2048.pem 2048; fi'
 
 # run compose
 ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'cd ~/ucm && docker-compose up -d && docker image prune -f'

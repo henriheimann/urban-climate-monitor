@@ -16,10 +16,10 @@ INFLUXDB_USER_PASSWORD=<InfluxDB user password>
 TELEGRAF_HOST=telegraf
 
 # Grafana
-GRAFANA_HOST=grafana
-GRAFANA_PORT=3000
-GRAFANA_USER=<Grafana admin username>
-GRAFANA_PASSWORD=<Grafana admin password>
+GF_HOST=grafana
+GF_PORT=3000
+GF_SECURITY_ADMIN_USER=<Grafana admin username>
+GF_SECURITY_ADMIN_PASSWORD=<Grafana admin password>
 
 # The Things Network
 TTN_REGION=<TTN region>
@@ -33,4 +33,7 @@ UCM_FRONTEND_PORT=80
 # Deployment Info
 DEPLOYMENT_USER=<User on deployment destination>
 DEPLOYMENT_HOST=<IP / URL of deployment destination>
+
+# Let's Encrypt Certification
+LETS_ENCRYPT_MAIL=<Email for Let's Encrypt>
 ```

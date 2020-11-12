@@ -13,13 +13,29 @@ services:
       - 443:443
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - ./nginx/certs:/etc/ssl/private
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+      - ./dhparam:/etc/ssl/certs
     env_file:
       - .env
     networks:
       - tig-backend-net
       - tig-frontend-net
       - ucm-frontend-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    depends_on:
+      - reverse-proxy
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    env_file:
+      - .env
+    command: certonly --webroot --webroot-path=/var/www/html --email $LETS_ENCRYPT_MAIL --agree-tos --no-eff-email --force-renewal -d $DEPLOYMENT_HOST -d www.$DEPLOYMENT_HOST
 
   influxdb:
     image: influxdb:latest
@@ -79,3 +95,6 @@ networks:
 volumes:
   grafana-data:
   influxdb-data:
+  certbot-etc:
+  certbot-var:
+  web-root:
