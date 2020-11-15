@@ -1,10 +1,10 @@
-name: Hardware/SensorNode
+name: hardware/sensor-node
 
 on:
   push:
     paths:
-    - 'Hardware/SensorNode/**.sch'
-    - 'Hardware/SensorNode/**.kicad_pcb'
+    - 'hardware/sensor-node/**.sch'
+    - 'hardware/sensor-node/**.kicad_pcb'
 
 jobs:
   generate-pdfs:
@@ -19,11 +19,11 @@ jobs:
       with:
         config: docs.kibot.yaml
         dir: docs
-        schema: 'Hardware/SensorNode/*.sch'
-        board: 'Hardware/SensorNode/*.kicad_pcb'
+        schema: 'hardware/sensor-node/*.sch'
+        board: 'hardware/sensor-node/*.kicad_pcb'
         
     - name: upload results
       uses: actions/upload-artifact@v2
       with:
-        name: hardware-sensornode-docs
+        name: hardware_sensor-node_docs
         path: docs/docs/*.pdf

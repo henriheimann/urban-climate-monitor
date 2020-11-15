@@ -22,7 +22,7 @@ ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'mkdir -p ~/ucm'
 
 # build and upload frontend if not skipped
 if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
-    cd ../Frontend/
+    cd ../frontend/
     docker build -t ucm-frontend .
     docker save ucm-frontend > ucm-frontend.tar
     scp ucm-frontend.tar "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
@@ -32,7 +32,7 @@ else
 fi
 
 # upload compose and configuration
-cd ../Deployment/
+cd ../deployment/
 rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning ssl_renew.sh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
 
 # load frontend

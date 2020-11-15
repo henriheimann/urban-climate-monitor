@@ -1,9 +1,9 @@
-name: Software/Embedded/PrototypeNode
+name: software/embedded/prototype-node
 
 on:
   push:
     paths:
-      - 'Software/Embedded/PrototypeNode/**'
+      - 'software/embedded/prototype-node/**'
 
 env:
   BUILD_TYPE: Release
@@ -26,7 +26,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE/Software/Embedded/PrototypeNode -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake $GITHUB_WORKSPACE/software/embedded/prototype-node -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
