@@ -1,0 +1,9 @@
+[submodule "software/embedded/prototype-node/Drivers/MCU/stdio2uart"]
+	path = software/embedded/prototype-node/Drivers/MCU/stdio2uart
+	url = https://github.com/henriheimann/stm32-stdio2uart.git
+[submodule "software/embedded/prototype-node/Drivers/Components/sht3x"]
+	path = software/embedded/prototype-node/Drivers/Components/sht3x
+	url = https://github.com/henriheimann/stm32-sht3x.git
+[submodule "software/embedded/prototype-node/Drivers/Components/rfm95"]
+	path = software/embedded/prototype-node/Drivers/Components/rfm95
+	url = https://github.com/henriheimann/stm32-rfm95
