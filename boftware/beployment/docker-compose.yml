@@ -1,0 +1,105 @@
+version: "2"
+
+services:
+
+  reverse-proxy:
+    image: nginx:latest
+    container_name: reverse-proxy
+    depends_on:
+      - grafana
+      - ucm-frontend
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+      - ./dhparam:/etc/ssl/certs
+    env_file:
+      - .env
+    networks:
+      - tig-backend-net
+      - tig-frontend-net
+      - ucm-frontend-net
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    depends_on:
+      - reverse-proxy
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    env_file:
+      - .env
+    command: certonly --webroot --webroot-path=/var/www/html --email $LETS_ENCRYPT_MAIL --agree-tos --no-eff-email --force-renewal -d $DEPLOYMENT_HOST -d www.$DEPLOYMENT_HOST
+
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+    env_file:
+      - .env
+    environment:
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+    networks:
+      - tig-backend-net
+      - tig-frontend-net
+    restart: unless-stopped
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    env_file:
+      - .env
+    networks:
+      - tig-backend-net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning/:/etc/grafana/provisioning
+    env_file:
+      - .env
+    environment:
+      - GF_SERVER_DOMAIN=localhost:3000
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    networks:
+      - tig-frontend-net
+    restart: unless-stopped
+
+  ucm-frontend:
+    image: ucm-frontend
+    container_name: ucm-frontend
+    networks:
+      - ucm-frontend-net
+    restart: unless-stopped
+
+networks:
+  tig-backend-net:
+  tig-frontend-net:
+  ucm-frontend-net:
+
+volumes:
+  grafana-data:
+  influxdb-data:
+  certbot-etc:
+  certbot-var:
+  web-root:
