@@ -11,4 +11,4 @@ extern eeprom_handle_t eeprom_handle;
 /**
  * Application main called by the STM32Cube init code.
  */
-_Noreturn void application_main();
+void application_main();

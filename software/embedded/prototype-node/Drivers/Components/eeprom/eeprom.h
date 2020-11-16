@@ -36,7 +36,7 @@
  * The timeout for EEPROM write cycle completion
  */
 #ifndef EEPROM_WRITE_TIMEOUT
-#define EEPROM_WRITE_TIMEOUT 100
+#define EEPROM_WRITE_TIMEOUT 1000
 #endif
 
 /**

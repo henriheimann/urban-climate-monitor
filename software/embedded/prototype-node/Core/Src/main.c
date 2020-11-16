@@ -21,6 +21,7 @@
 #include "main.h"
 #include "adc.h"
 #include "i2c.h"
+#include "rtc.h"
 #include "spi.h"
 #include "usart.h"
 #include "gpio.h"
@@ -83,8 +84,13 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
+  /* USER CODE BEGIN SysInit
+  // Check and handle if the system was resumed from StandBy mode */
+  if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+	// Clear Standby flag
+	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  }
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -93,8 +99,26 @@ int main(void)
   MX_I2C1_Init();
   MX_SPI1_Init();
   MX_ADC1_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   application_main();
+
+  // TODO: Enable ultra low power BOR and PVD supply monitoring?
+  HAL_PWREx_EnableBORPVD_ULP();
+
+  // Disable all used wakeup sources
+  HAL_RTCEx_DeactivateWakeUpTimer(&hrtc);
+
+  // Clear all related wakeup flags
+  __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
+
+  // Setting the Wake up time 1s * 0x0E10 = 1h
+  // 10min = 0x0258
+  HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x0258, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
+
+  // Enter the Standby mode
+  HAL_PWR_EnterSTANDBYMode();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -131,8 +155,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_LSE
+                              |RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_10;
@@ -154,10 +180,11 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_ADC;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();

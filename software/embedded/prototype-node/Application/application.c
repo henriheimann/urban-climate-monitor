@@ -62,79 +62,85 @@ static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter)
 	uint8_t buffer[6] = {
 			0x1A, 0xA1, (uint8_t)(tx_counter >> 8u) & 0xffu, tx_counter & 0xffu, (uint8_t)(rx_counter >> 8u) & 0xffu, rx_counter & 0xffu
 	};
-	eeprom_write_bytes(&eeprom_handle, 0x00, buffer, sizeof(buffer));
+	if (!eeprom_write_bytes(&eeprom_handle, 0x00, buffer, sizeof(buffer))) {
+		printf("EEPROM write error\n\r");
+	}
 }
 
-void test_photo_sense()
+static uint32_t adc_get_sample(int num_samples, uint32_t delay_between)
 {
+	uint32_t adc_value = 0;
+	for (int i = 0; i < num_samples; i++) {
+		HAL_ADC_Start(&hadc1);
+		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+		adc_value += HAL_ADC_GetValue(&hadc1);
+		HAL_ADC_Stop(&hadc1);
+		HAL_Delay(delay_between);
+	}
+	return adc_value / num_samples;
+}
+
+static float adc_sample_to_photo_diode_current(uint32_t adc_sample, uint32_t amplification)
+{
+	float voltage = ((float)adc_sample * 3.3f) / 4096.0f  - 97e-3f;
+	return voltage / (float)(amplification) * 10e9f;
+}
+
+static float read_photo_diode_current()
+{
+	HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+
 	HAL_GPIO_WritePin(PHOTO_ENABLE_GPIO_Port, PHOTO_ENABLE_Pin, GPIO_PIN_SET);
+
 	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_RESET);
 	HAL_Delay(10);
+	uint32_t adc_value_low_amp = adc_get_sample(10, 1);
+	uint32_t adc_value_high_amp = 0;
+	float photo_diode_current = adc_sample_to_photo_diode_current(adc_value_low_amp, 33000);
 
-	uint32_t adc_value_1 = 0;
-	for (int i = 0; i < 50; i++) {
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		adc_value_1 += HAL_ADC_GetValue(&hadc1);
-		HAL_ADC_Stop(&hadc1);
-		HAL_Delay(1);
+	if (adc_value_low_amp < 252) {
+		HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_SET);
+		HAL_Delay(10);
+		adc_value_high_amp = adc_get_sample(20, 1);
+		photo_diode_current = adc_sample_to_photo_diode_current(adc_value_high_amp, 1000000);
 	}
-	adc_value_1 /= 50;
 
-	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
-
-	uint32_t adc_value_2 = 0;
-	for (int i = 0; i < 50; i++) {
-		HAL_ADC_Start(&hadc1);
-		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-		adc_value_2 += HAL_ADC_GetValue(&hadc1);
-		HAL_ADC_Stop(&hadc1);
-		HAL_Delay(1);
+	if (photo_diode_current < 0) {
+		photo_diode_current = 0;
 	}
-	adc_value_2 /= 50;
 
 	HAL_GPIO_WritePin(PHOTO_ENABLE_GPIO_Port, PHOTO_ENABLE_Pin, GPIO_PIN_RESET);
-
-	printf("Photo ADC readings: %lu %lu\n\r", adc_value_1, adc_value_2);
+	return photo_diode_current;
 }
 
 typedef struct {
 	int16_t temperature;
 	uint16_t humidity;
 	int16_t ir_temperature;
-	uint16_t brightness;
+	uint32_t brightness_current;
 	uint8_t battery_voltage;
-} data_packet_t;
+} __packed data_packet_t;
 
-_Noreturn void application_main()
+void application_main()
 {
-	stdio2uart_init(&huart2);
-
-	bool result = sht3x_init(&sht3x_handle);
-	printf("Sensor SHT31 initialisation: %d\n\r", result);
+	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
+	HAL_Delay(1000);
+	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 
 	float temperature, humidity;
+	float photo_diode_current;
+
+	stdio2uart_init(&huart2);
+
+	sht3x_init(&sht3x_handle);
 	sht3x_read_temperature_and_humidity(&sht3x_handle, &temperature, &humidity);
-	printf("Initial temperature: %.2fC, humidity: %.2f%%RH\n\r", temperature, humidity);
 
-	result = rfm95_init(&rfm95_handle);
-	printf("Transceiver RFM95 initialisation: %d\n\r", result);
+	photo_diode_current = read_photo_diode_current();
 
+	rfm95_init(&rfm95_handle);
 	data_packet_t data_packet = {0};
-
 	data_packet.temperature = (int16_t)(temperature * 100);
 	data_packet.humidity = (uint16_t)(humidity * 100);
-
-	result = rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
-	printf("Send success: %d\n\r", result);
-
-	test_photo_sense();
-
-	while (1) {
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-		HAL_Delay(1000);
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
-		HAL_Delay(1000);
-	}
+	data_packet.brightness_current = (uint32_t)photo_diode_current;
+	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 }

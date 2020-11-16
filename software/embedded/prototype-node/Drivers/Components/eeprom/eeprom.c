@@ -56,7 +56,7 @@ bool eeprom_write_bytes(eeprom_handle_t *handle, uint16_t address, uint8_t *sour
 		count -= bytes_to_write;
 	}
 
-	return false;
+	return true;
 }
 
 bool eeprom_read_bytes(eeprom_handle_t *handle, uint16_t address, uint8_t *dest, size_t count)
