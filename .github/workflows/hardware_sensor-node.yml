@@ -26,6 +26,8 @@ jobs:
       with:
         config: plot.kibot.yaml
         dir: docs
+        schema: 'hardware/sensor-node/*.sch'
+        board: 'hardware/sensor-node/*.kicad_pcb'
         
     - name: upload results
       uses: actions/upload-artifact@v2
