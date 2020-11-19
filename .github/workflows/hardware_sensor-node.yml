@@ -21,6 +21,12 @@ jobs:
         dir: docs
         schema: 'hardware/sensor-node/*.sch'
         board: 'hardware/sensor-node/*.kicad_pcb'
+
+    - name: upload schematic
+      uses: actions/upload-artifact@v2
+      with:
+        name: hardware_sensor-node_docs
+        path: docs/docs/*Schematic*.pdf
         
     - uses: nerdyscout/kicad-exports@v2.1
       with:
@@ -29,8 +35,8 @@ jobs:
         schema: 'hardware/sensor-node/*.sch'
         board: 'hardware/sensor-node/*.kicad_pcb'
         
-    - name: upload results
+    - name: upload board plots
       uses: actions/upload-artifact@v2
       with:
         name: hardware_sensor-node_docs
-        path: docs/
+        path: docs/docs/img/*.svg
