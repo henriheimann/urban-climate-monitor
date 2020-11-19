@@ -22,8 +22,13 @@ jobs:
         schema: 'hardware/sensor-node/*.sch'
         board: 'hardware/sensor-node/*.kicad_pcb'
         
+    - uses: nerdyscout/kicad-exports@v2.1
+      with:
+        config: plot.kibot.yaml
+        dir: docs
+        
     - name: upload results
       uses: actions/upload-artifact@v2
       with:
         name: hardware_sensor-node_docs
-        path: docs/docs/*.pdf
+        path: docs/
