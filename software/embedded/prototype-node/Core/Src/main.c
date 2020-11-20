@@ -114,6 +114,7 @@ int main(void)
 
   // Setting the Wake up time 1s * 0x0E10 = 1h
   // 10min = 0x0258
+  // 10 sec = 0x000a
   HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x0258, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
 
   // Enter the Standby mode

@@ -1218,7 +1218,6 @@ Wire Wire Line
 Connection ~ 9050 1850
 Wire Wire Line
 	9050 2500 9050 2700
-NoConn ~ 8600 2350
 Text GLabel 8600 2150 2    50   Input ~ 0
 SDA
 Text GLabel 8600 2250 2    50   Input ~ 0
@@ -2025,4 +2024,17 @@ Wire Notes Line
 	13950 7250 11100 7250
 Text Notes 12300 7400 0    50   ~ 0
 I2C Bus Control
+$Comp
+L power:GND #PWR?
+U 1 1 6002A3D1
+P 8600 2700
+F 0 "#PWR?" H 8600 2450 50  0001 C CNN
+F 1 "GND" H 8605 2527 50  0000 C CNN
+F 2 "" H 8600 2700 50  0001 C CNN
+F 3 "" H 8600 2700 50  0001 C CNN
+	1    8600 2700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8600 2350 8600 2700
 $EndSCHEMATC

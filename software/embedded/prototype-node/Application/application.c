@@ -44,8 +44,7 @@ static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter)
 {
 	uint8_t buffer[6];
 
-	if (!eeprom_read_bytes(&eeprom_handle, 0x00, buffer, sizeof(buffer))) {
-		printf("EEPROM read error\n\r");
+	if (!eeprom_read_bytes(&eeprom_handle, 0x20, buffer, sizeof(buffer))) {
 		return false;
 	}
 
@@ -53,9 +52,9 @@ static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter)
 		*tx_counter = (uint16_t)((uint16_t)buffer[2] << 8u) | (uint16_t)buffer[3];
 		*rx_counter = (uint16_t)((uint16_t)buffer[4] << 8u) | (uint16_t)buffer[5];
 	} else {
-		*tx_counter = 0;
-		*rx_counter = 0;
+		return false;
 	}
+
 	return true;
 }
 
@@ -64,9 +63,7 @@ static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter)
 	uint8_t buffer[6] = {
 			0x1A, 0xA1, (uint8_t)(tx_counter >> 8u) & 0xffu, tx_counter & 0xffu, (uint8_t)(rx_counter >> 8u) & 0xffu, rx_counter & 0xffu
 	};
-	if (!eeprom_write_bytes(&eeprom_handle, 0x00, buffer, sizeof(buffer))) {
-		printf("EEPROM write error\n\r");
-	}
+	eeprom_write_bytes(&eeprom_handle, 0x20, buffer, sizeof(buffer));
 }
 
 static uint32_t adc_get_sample(int num_samples, uint32_t delay_between)
@@ -132,8 +129,6 @@ void application_main()
 
 	stdio2uart_init(&huart2);
 
-	printf("Wakeup\n\r");
-
 	sht3x_init(&sht3x_handle);
 	sht3x_read_temperature_and_humidity(&sht3x_handle, &temperature, &humidity);
 
@@ -146,12 +141,7 @@ void application_main()
 	data_packet.brightness_current = (uint32_t)photo_diode_current;
 	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 
-	RTC_TimeTypeDef time;
-	uint32_t wut = HAL_RTCEx_GetWakeUpTimer(&hrtc);
-	HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
-	printf("WUT: %lu H: %d M: %d S: %d\n\r", wut, time.Hours, time.Minutes, time.Seconds);
-
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 		HAL_Delay(1000);
 		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
@@ -159,6 +149,4 @@ void application_main()
 	}
 	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
 	HAL_Delay(1000);
-
-	printf("Sleep\n\r");
 }

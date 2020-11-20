@@ -5,13 +5,11 @@
 
 static bool eeprom_wait_for_write_completion(eeprom_handle_t *handle)
 {
-	uint32_t timeout = HAL_GetTick() + EEPROM_WRITE_TIMEOUT;
+	uint32_t tick_start = HAL_GetTick();
 
 	while (HAL_I2C_Master_Transmit(handle->i2c_handle, (handle->device_address << 1u), NULL, 0, EEPROM_I2C_TIMEOUT) != HAL_OK) {
-		if (HAL_GetTick() > timeout) {
+		if ((HAL_GetTick() - tick_start) >= EEPROM_WRITE_TIMEOUT) {
 			return false;
-		} else {
-			HAL_Delay(1);
 		}
 	}
 
