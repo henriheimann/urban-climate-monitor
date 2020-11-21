@@ -246,7 +246,7 @@ U 1 1 5F915BB5
 P 9750 9100
 F 0 "J2" H 9307 9146 50  0000 R CNN
 F 1 "Conn_ARM_JTAG_SWD_10" H 9307 9055 50  0000 R CNN
-F 2 "my-footprints-library:Amphenol_FCI_ShroudedSocket_2x05_P1.27mm_Vertical_SMD" H 9750 9100 50  0001 C CNN
+F 2 "my-footprints-library:SHF-105-01-L-D-TH" H 9750 9100 50  0001 C CNN
 F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 9400 7850 50  0001 C CNN
 	1    9750 9100
 	1    0    0    -1  
@@ -466,7 +466,7 @@ L Device:Ferrite_Bead_Small FB1
 U 1 1 5FC319BD
 P 6950 8050
 F 0 "FB1" V 6713 8050 50  0000 C CNN
-F 1 "Ferrite_Bead_Small" V 6804 8050 50  0000 C CNN
+F 1 "WE 742792040" V 6804 8050 50  0000 C CNN
 F 2 "Inductor_SMD:L_0805_2012Metric_Pad1.05x1.20mm_HandSolder" V 6880 8050 50  0001 C CNN
 F 3 "~" H 6950 8050 50  0001 C CNN
 	1    6950 8050
@@ -484,8 +484,6 @@ Wire Notes Line
 	8100 7250 8100 10650
 Wire Notes Line
 	1050 7250 8100 7250
-NoConn ~ 4850 9050
-NoConn ~ 4850 8950
 Wire Wire Line
 	4950 9050 4850 9050
 Wire Wire Line
@@ -495,7 +493,7 @@ Wire Wire Line
 Wire Wire Line
 	5950 9150 6050 9150
 Wire Wire Line
-	4350 9350 4950 9350
+	4850 9350 4950 9350
 Wire Wire Line
 	5950 8750 6050 8750
 Wire Wire Line
@@ -556,9 +554,9 @@ Wire Wire Line
 	4950 9650 4850 9650
 Wire Wire Line
 	4950 9550 4850 9550
-Text GLabel 6050 9350 2    50   Input ~ 0
+Text GLabel 4850 9850 0    50   Input ~ 0
 SDA
-Text GLabel 6050 9250 2    50   Input ~ 0
+Text GLabel 4850 9750 0    50   Input ~ 0
 SCL
 Wire Wire Line
 	3400 10250 3400 9700
@@ -1586,17 +1584,17 @@ Wire Notes Line
 	5250 6800 15500 6800
 Wire Notes Line
 	5250 3550 5250 6800
-Text GLabel 4350 9350 0    50   Input ~ 0
+Text GLabel 4850 9350 0    50   Input ~ 0
 PHOTO_SENSE
-Text GLabel 4850 9850 0    50   Input ~ 0
+Text GLabel 6050 9550 2    50   Input ~ 0
 PHOTO_SWITCH
-Text GLabel 4850 9750 0    50   Input ~ 0
+Text GLabel 6050 9450 2    50   Input ~ 0
 PHOTO_ENABLE
-Text GLabel 6050 8450 2    50   Input ~ 0
+Text GLabel 4850 9250 0    50   Input ~ 0
 RFM95_IRQ
 Text GLabel 6050 8550 2    50   Input ~ 0
 RFM95_DIO5
-Text GLabel 4350 9250 0    50   Input ~ 0
+Text GLabel 6450 8350 2    50   Input ~ 0
 VIN_SENSE
 Connection ~ 5900 8050
 Wire Wire Line
@@ -1643,36 +1641,29 @@ RFM95_NSS
 $Comp
 L Mechanical:MountingHole H1
 U 1 1 5FA37933
-P 14400 7900
-F 0 "H1" H 14500 7946 50  0000 L CNN
-F 1 "MountingHole" H 14500 7855 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 14400 7900 50  0001 C CNN
-F 3 "~" H 14400 7900 50  0001 C CNN
-	1    14400 7900
+P 14350 8350
+F 0 "H1" H 14450 8396 50  0000 L CNN
+F 1 "MountingHole" H 14450 8305 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 14350 8350 50  0001 C CNN
+F 3 "~" H 14350 8350 50  0001 C CNN
+	1    14350 8350
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H2
 U 1 1 5FA3863F
-P 14400 8150
-F 0 "H2" H 14500 8196 50  0000 L CNN
-F 1 "MountingHole" H 14500 8105 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 14400 8150 50  0001 C CNN
-F 3 "~" H 14400 8150 50  0001 C CNN
-	1    14400 8150
+P 14350 8600
+F 0 "H2" H 14450 8646 50  0000 L CNN
+F 1 "MountingHole" H 14450 8555 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 14350 8600 50  0001 C CNN
+F 3 "~" H 14350 8600 50  0001 C CNN
+	1    14350 8600
 	1    0    0    -1  
 $EndComp
 Text Label 9650 4200 0    50   ~ 0
 PHOTO_VCC
 Wire Wire Line
 	5950 8350 6050 8350
-NoConn ~ 4850 9450
-NoConn ~ 4850 9550
-NoConn ~ 4850 9650
-NoConn ~ 6050 9850
-NoConn ~ 6050 9550
-NoConn ~ 6050 9450
-NoConn ~ 6050 8350
 $Comp
 L power:PWR_FLAG #FLG02
 U 1 1 5FAD5982
@@ -1722,13 +1713,13 @@ Connection ~ 10000 1800
 $Comp
 L Device:R R13
 U 1 1 5FAFF1B9
-P 4600 9250
-F 0 "R13" H 4670 9296 50  0000 L CNN
-F 1 "100" H 4670 9205 50  0000 L CNN
-F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 4530 9250 50  0001 C CNN
-F 3 "~" H 4600 9250 50  0001 C CNN
-	1    4600 9250
-	0    -1   -1   0   
+P 6200 8350
+F 0 "R13" H 6270 8396 50  0000 L CNN
+F 1 "100" H 6270 8305 50  0000 L CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.15x1.40mm_HandSolder" V 6130 8350 50  0001 C CNN
+F 3 "~" H 6200 8350 50  0001 C CNN
+	1    6200 8350
+	0    1    -1   0   
 $EndComp
 $Comp
 L power:GND #PWR048
@@ -1775,9 +1766,9 @@ Connection ~ 2900 8350
 Text GLabel 2650 8350 0    50   Input ~ 0
 NRST
 Wire Wire Line
-	4750 9250 4950 9250
+	4850 9250 4950 9250
 Wire Wire Line
-	4450 9250 4350 9250
+	6350 8350 6450 8350
 Wire Wire Line
 	3200 5550 3650 5550
 $Comp
@@ -1810,14 +1801,14 @@ Wire Wire Line
 	5950 9250 6050 9250
 Wire Wire Line
 	4600 1800 4600 1950
-Text GLabel 6050 9150 2    50   Input ~ 0
+Text GLabel 4850 9650 0    50   Input ~ 0
 I2C_ENABLE
 $Comp
 L Device:Q_PMOS_GSD Q1
 U 1 1 5FD2DC52
 P 12600 8400
 F 0 "Q1" H 12806 8446 50  0000 L CNN
-F 1 "Q_PMOS_DGS" H 12806 8355 50  0000 L CNN
+F 1 "PMV250EPEA" H 12806 8355 50  0000 L CNN
 F 2 "Package_TO_SOT_SMD:SOT-23" H 12800 8500 50  0001 C CNN
 F 3 "~" H 12600 8400 50  0001 C CNN
 	1    12600 8400
@@ -1919,33 +1910,33 @@ Connection ~ 3650 6200
 $Comp
 L Connector:Conn_Coaxial J1
 U 1 1 600181AF
-P 3000 6000
-F 0 "J1" H 2928 6238 50  0000 C CNN
-F 1 "Conn_Coaxial" H 2928 6147 50  0000 C CNN
-F 2 "my-footprints-library:CONUFL001-SMD" H 3000 6000 50  0001 C CNN
-F 3 " ~" H 3000 6000 50  0001 C CNN
-	1    3000 6000
+P 2950 6000
+F 0 "J1" H 2950 6250 50  0000 C CNN
+F 1 "CONUFL001-SMD-T" H 2878 6147 50  0000 C CNN
+F 2 "my-footprints-library:CONUFL001-SMD" H 2950 6000 50  0001 C CNN
+F 3 " ~" H 2950 6000 50  0001 C CNN
+	1    2950 6000
 	-1   0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR023
 U 1 1 60030CB8
-P 3000 6350
-F 0 "#PWR023" H 3000 6100 50  0001 C CNN
-F 1 "GND" H 3005 6177 50  0000 C CNN
-F 2 "" H 3000 6350 50  0001 C CNN
-F 3 "" H 3000 6350 50  0001 C CNN
-	1    3000 6350
+P 2950 6350
+F 0 "#PWR023" H 2950 6100 50  0001 C CNN
+F 1 "GND" H 2955 6177 50  0000 C CNN
+F 2 "" H 2950 6350 50  0001 C CNN
+F 3 "" H 2950 6350 50  0001 C CNN
+	1    2950 6350
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	3000 6200 3000 6350
+	2950 6200 2950 6350
 Wire Wire Line
 	3650 5700 3450 5700
 Wire Wire Line
 	3450 5700 3450 6000
 Wire Wire Line
-	3450 6000 3200 6000
+	3450 6000 3150 6000
 $Comp
 L my-symbols-library:VI2C #PWR02
 U 1 1 600789E0
@@ -2025,10 +2016,10 @@ Wire Notes Line
 Text Notes 12300 7400 0    50   ~ 0
 I2C Bus Control
 $Comp
-L power:GND #PWR?
+L power:GND #PWR0101
 U 1 1 6002A3D1
 P 8600 2700
-F 0 "#PWR?" H 8600 2450 50  0001 C CNN
+F 0 "#PWR0101" H 8600 2450 50  0001 C CNN
 F 1 "GND" H 8605 2527 50  0000 C CNN
 F 2 "" H 8600 2700 50  0001 C CNN
 F 3 "" H 8600 2700 50  0001 C CNN
@@ -2037,4 +2028,13 @@ F 3 "" H 8600 2700 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	8600 2350 8600 2700
+NoConn ~ 6050 9150
+NoConn ~ 6050 8450
+NoConn ~ 6050 9250
+NoConn ~ 6050 9350
+NoConn ~ 6050 9850
+NoConn ~ 4850 9450
+NoConn ~ 4850 9550
+NoConn ~ 4850 8950
+NoConn ~ 4850 9050
 $EndSCHEMATC
