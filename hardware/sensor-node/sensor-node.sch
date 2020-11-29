@@ -1191,32 +1191,8 @@ Wire Notes Line
 	9600 1050 6950 1050
 Wire Notes Line
 	6950 3100 9600 3100
-$Comp
-L Analog_Switch:ADG633YCP U6
-U 3 1 5FD12151
-P 10250 4750
-F 0 "U6" H 10250 4992 50  0000 C CNN
-F 1 "ADG633YCP" H 10250 4901 50  0000 C CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 10250 4750 50  0001 C CNN
-F 3 "" H 10250 4750 50  0001 C CNN
-	3    10250 4750
-	-1   0    0    -1  
-$EndComp
-$Comp
-L Analog_Switch:ADG633YCP U6
-U 1 1 5FD14D71
-P 13500 4000
-F 0 "U6" H 13500 4242 50  0000 C CNN
-F 1 "ADG633YCP" H 13500 4151 50  0000 C CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 13500 4000 50  0001 C CNN
-F 3 "" H 13500 4000 50  0001 C CNN
-	1    13500 4000
-	-1   0    0    -1  
-$EndComp
 Wire Wire Line
 	9600 4750 9850 4750
-Wire Wire Line
-	9950 4950 9700 4950
 Wire Wire Line
 	9300 5150 9300 5500
 Wire Wire Line
@@ -1254,17 +1230,6 @@ Wire Wire Line
 	9100 6300 8850 6300
 Wire Wire Line
 	8600 6200 8600 6300
-$Comp
-L Analog_Switch:ADG633YCP U6
-U 2 1 5FD0FC3F
-P 9300 4750
-F 0 "U6" H 9300 4992 50  0000 C CNN
-F 1 "ADG633YCP" H 9300 4901 50  0000 C CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 9300 4750 50  0001 C CNN
-F 3 "" H 9300 4750 50  0001 C CNN
-	2    9300 4750
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	10550 4850 10850 4850
 Wire Wire Line
@@ -1273,8 +1238,6 @@ Connection ~ 9700 4950
 Wire Wire Line
 	9700 4950 9600 4950
 Connection ~ 9850 4750
-Wire Wire Line
-	9850 4750 9950 4750
 Connection ~ 7850 6300
 Wire Wire Line
 	7850 6300 7600 6300
@@ -1380,9 +1343,6 @@ Wire Wire Line
 	14050 4100 13800 4100
 Text Notes 9600 3800 0    50   ~ 0
 10nA when disabled
-NoConn ~ 14250 5950
-Wire Wire Line
-	14250 5850 14250 5950
 Wire Wire Line
 	14150 5950 14150 5850
 Connection ~ 14150 5950
@@ -1444,17 +1404,6 @@ F 1 "100nF" H 15165 5005 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" H 15088 4900 50  0001 C CNN
 F 3 "~" H 15050 5050 50  0001 C CNN
 	1    15050 5050
-	1    0    0    -1  
-$EndComp
-$Comp
-L Analog_Switch:ADG633YCP U6
-U 4 1 5FD16603
-P 14050 5350
-F 0 "U6" H 14380 5396 50  0000 L CNN
-F 1 "ADG633YCP" H 14380 5305 50  0000 L CNN
-F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 14050 5350 50  0001 C CNN
-F 3 "" H 14050 5350 50  0001 C CNN
-	4    14050 5350
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -2041,4 +1990,52 @@ $EndComp
 Wire Wire Line
 	13050 8800 13050 8900
 Connection ~ 13050 8900
+$Comp
+L Analog_Switch:ADG633YRU U6
+U 2 1 5FC55E5A
+P 9300 4750
+F 0 "U6" H 9300 4992 50  0000 C CNN
+F 1 "ADG633YRU" H 9300 4901 50  0000 C CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 9300 4750 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG633.pdf" H 9300 4750 50  0001 C CNN
+	2    9300 4750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Analog_Switch:ADG633YRU U6
+U 1 1 5FC51273
+P 13500 4000
+F 0 "U6" H 13500 4242 50  0000 C CNN
+F 1 "ADG633YRU" H 13500 4151 50  0000 C CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 13500 4000 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG633.pdf" H 13500 4000 50  0001 C CNN
+	1    13500 4000
+	-1   0    0    -1  
+$EndComp
+Wire Wire Line
+	9850 4750 9950 4750
+Wire Wire Line
+	9950 4950 9700 4950
+$Comp
+L Analog_Switch:ADG633YRU U6
+U 3 1 5FC5A7C5
+P 10250 4750
+F 0 "U6" H 10250 4992 50  0000 C CNN
+F 1 "ADG633YRU" H 10250 4901 50  0000 C CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 10250 4750 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG633.pdf" H 10250 4750 50  0001 C CNN
+	3    10250 4750
+	-1   0    0    -1  
+$EndComp
+$Comp
+L Analog_Switch:ADG633YRU U6
+U 4 1 5FC64747
+P 14050 5350
+F 0 "U6" H 14380 5396 50  0000 L CNN
+F 1 "ADG633YRU" H 14380 5305 50  0000 L CNN
+F 2 "Package_SO:TSSOP-16_4.4x5mm_P0.65mm" H 14050 5350 50  0001 C CNN
+F 3 "https://www.analog.com/media/en/technical-documentation/data-sheets/ADG633.pdf" H 14050 5350 50  0001 C CNN
+	4    14050 5350
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
