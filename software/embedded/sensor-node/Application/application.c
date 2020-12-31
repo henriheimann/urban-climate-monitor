@@ -38,6 +38,11 @@ eeprom_handle_t eeprom_handle = {
 		.page_size = EEPROM_24LC32A_PAGE_SIZE
 };
 
+mlx90614_handle_t mlx90614_handle = {
+		.i2c_handle = &hi2c1,
+		.device_address = MLX90614_DEFAULT_ADDRESS
+};
+
 static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter)
 {
 	uint8_t buffer[6];
@@ -120,29 +125,32 @@ typedef struct {
 
 void application_main()
 {
-	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-
 	float temperature, humidity;
+	float am_temp, obj_temp;
 	float photo_diode_current;
 
-	sht3x_init(&sht3x_handle);
-	sht3x_read_temperature_and_humidity(&sht3x_handle, &temperature, &humidity);
+	//photo_diode_current = read_photo_diode_current();
 
-	photo_diode_current = read_photo_diode_current();
+	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_RESET);
+
+	// MLX90614 required 250ms to be ready
+	HAL_Delay(300);
+	mlx90614_read_ambient_temperature(&mlx90614_handle, &am_temp);
+	mlx90614_read_object_temperature(&mlx90614_handle, &obj_temp);
+
+	/*sht3x_init(&sht3x_handle);
+	sht3x_read_temperature_and_humidity(&sht3x_handle, &temperature, &humidity);
 
 	rfm95_init(&rfm95_handle);
 	data_packet_t data_packet = {0};
 	data_packet.temperature = (int16_t)(temperature * 100);
 	data_packet.humidity = (uint16_t)(humidity * 100);
 	data_packet.brightness_current = (uint32_t)photo_diode_current;
-	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
+	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));*/
 
-	for (int i = 0; i < 5; i++) {
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
-		HAL_Delay(1000);
-		HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_SET);
-		HAL_Delay(1000);
+	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_SET);
+
+	while (1) {
+
 	}
-	HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, GPIO_PIN_RESET);
-	HAL_Delay(1000);
 }
