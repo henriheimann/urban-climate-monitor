@@ -68,7 +68,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -94,9 +93,17 @@ int main(void)
   MX_RTC_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  application_main();
 
-  // TODO: Enable ultra low power BOR and PVD supply monitoring?
+  application_main();
+  HAL_Delay(5000);
+
+  HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_12); // PHOTO_SWITCH
+  HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_7); // MOSI
+  HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_5); // SCK
+  HAL_PWREx_EnableGPIOPullUp(PWR_GPIO_A, PWR_GPIO_BIT_3); // NRST
+  HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_4); // NSS
+  HAL_PWREx_EnablePullUpPullDownConfig();
+  HAL_PWREx_DisableSRAM2ContentRetention();
   HAL_PWREx_EnableBORPVD_ULP();
 
   // Disable all used wakeup sources
@@ -108,7 +115,7 @@ int main(void)
   // Setting the Wake up time 1s * 0x0E10 = 1h
   // 10min = 0x0258
   // 10 sec = 0x000a
-  HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x0258, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
+  HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x000a, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
 
   // Enter the Standby mode
   HAL_PWR_EnterSTANDBYMode();

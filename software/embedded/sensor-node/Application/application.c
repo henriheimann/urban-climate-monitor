@@ -4,7 +4,6 @@
 #include <i2c.h>
 #include <spi.h>
 #include <adc.h>
-#include <rtc.h>
 
 static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter);
 static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter);
@@ -24,9 +23,9 @@ rfm95_handle_t rfm95_handle = {
 		.irq_pin = RFM95_DIO0_Pin,
 		.dio5_port = RFM95_DIO5_GPIO_Port,
 		.dio5_pin = RFM95_DIO5_Pin,
-		.device_address = {0x26, 0x01, 0x16, 0xCE},
-		.application_session_key = {0xB3, 0xFC, 0x86, 0xAD, 0xB7, 0xD3, 0x72, 0x1A, 0x61, 0x74, 0x4F, 0x4B, 0xFF, 0xE7, 0xE7, 0x33},
-		.network_session_key = {0x8E, 0xCE, 0xE3, 0x9E, 0x21, 0x84, 0x33, 0x69, 0xA8, 0x3A, 0xA6, 0x12, 0x3D, 0xB1, 0x73, 0x48},
+		.device_address = {0x26, 0x01, 0x18, 0xE6},
+		.application_session_key = {0xF7, 0x41, 0xE7, 0x89, 0xF6, 0x24, 0x22, 0x15, 0xDD, 0x80, 0x75, 0xCD, 0x4D, 0xE3, 0x47, 0x5E},
+		.network_session_key = {0xD0, 0xA5, 0x8D, 0x38, 0x9B, 0x1D, 0xA9, 0x22, 0x1B, 0xF2, 0xBC, 0xDE, 0xC4, 0xC2, 0xAF, 0x08},
 		.reload_frame_counter = reload_frame_counter,
 		.save_frame_counter = save_frame_counter
 };
@@ -88,20 +87,47 @@ static float adc_sample_to_photo_diode_current(uint32_t adc_sample, uint32_t amp
 	return voltage / (float)(amplification) * 10e9f;
 }
 
+static float read_input_voltage()
+{
+	ADC_ChannelConfTypeDef config;
+	config.Channel = ADC_CHANNEL_5;
+	config.Rank = ADC_REGULAR_RANK_1;
+	config.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	config.SingleDiff = ADC_SINGLE_ENDED;
+	config.OffsetNumber = ADC_OFFSET_NONE;
+	config.Offset = 0;
+
+	if (HAL_ADC_ConfigChannel(&hadc1, &config) != HAL_OK) {
+		Error_Handler();
+	}
+
+	return (float)(adc_get_sample(3, 3) * 3.3f) / 4096.0f;
+}
+
 static float read_photo_diode_current()
 {
-	HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+	ADC_ChannelConfTypeDef config;
+	config.Channel = ADC_CHANNEL_16;
+	config.Rank = ADC_REGULAR_RANK_1;
+	config.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	config.SingleDiff = ADC_SINGLE_ENDED;
+	config.OffsetNumber = ADC_OFFSET_NONE;
+	config.Offset = 0;
+
+	if (HAL_ADC_ConfigChannel(&hadc1, &config) != HAL_OK) {
+		Error_Handler();
+	}
 
 	HAL_GPIO_WritePin(PHOTO_ENABLE_GPIO_Port, PHOTO_ENABLE_Pin, GPIO_PIN_SET);
 
-	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_SET);
 	HAL_Delay(10);
 	uint32_t adc_value_low_amp = adc_get_sample(10, 1);
-	uint32_t adc_value_high_amp = 0;
+	uint32_t adc_value_high_amp;
 	float photo_diode_current = adc_sample_to_photo_diode_current(adc_value_low_amp, 33000);
 
 	if (adc_value_low_amp < 252) {
-		HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(PHOTO_SWITCH_GPIO_Port, PHOTO_SWITCH_Pin, GPIO_PIN_RESET);
 		HAL_Delay(10);
 		adc_value_high_amp = adc_get_sample(20, 1);
 		photo_diode_current = adc_sample_to_photo_diode_current(adc_value_high_amp, 1000000);
@@ -125,32 +151,72 @@ typedef struct {
 
 void application_main()
 {
-	float temperature, humidity;
-	float am_temp, obj_temp;
+	float input_voltage;
 	float photo_diode_current;
 
-	//photo_diode_current = read_photo_diode_current();
+	bool sht3x_success = false;
+	float sht3x_temperature, sht3x_humidity;
 
+	bool mlx90614_success = false;
+	float  mlx90614_object_temperature, mlx90614_ambient_temperature;
+
+	HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);
+	input_voltage = read_input_voltage();
+
+	// For too low input voltages, return to sleep directly (2 batteries with 1V cutoff)
+	if (input_voltage < 2.0f) {
+		rfm95_init(&rfm95_handle);
+		return;
+	}
+
+	uint32_t i2c_enable_tick = HAL_GetTick();
 	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_RESET);
 
-	// MLX90614 required 250ms to be ready
-	HAL_Delay(300);
-	mlx90614_read_ambient_temperature(&mlx90614_handle, &am_temp);
-	mlx90614_read_object_temperature(&mlx90614_handle, &obj_temp);
+	// Take photo diode measurements, this takes some time. I2C devices can boot in the meantime.
+	photo_diode_current = read_photo_diode_current();
 
-	/*sht3x_init(&sht3x_handle);
-	sht3x_read_temperature_and_humidity(&sht3x_handle, &temperature, &humidity);
+	// SHT3x requires only 1ms to be ready
+	uint32_t elapsed_ticks = HAL_GetTick() - i2c_enable_tick;
+	if (elapsed_ticks == 0) {
+		HAL_Delay(1);
+	}
+
+	if (sht3x_init(&sht3x_handle) && sht3x_read_temperature_and_humidity(&sht3x_handle, &sht3x_temperature, &sht3x_humidity)) {
+		sht3x_success = true;
+	}
+
+	// MLX90614 required 250ms to be ready
+	elapsed_ticks = HAL_GetTick() - i2c_enable_tick;
+	if (elapsed_ticks > 250) {
+		HAL_Delay(250 - elapsed_ticks);
+	}
+
+	if (mlx90614_read_object_temperature(&mlx90614_handle, &mlx90614_object_temperature) &&
+		mlx90614_read_ambient_temperature(&mlx90614_handle, &mlx90614_ambient_temperature)) {
+		mlx90614_success = true;
+	}
+
+	data_packet_t data_packet = {0};
+
+	if (sht3x_success) {
+		data_packet.temperature = (int16_t)(sht3x_temperature * 100);
+		data_packet.humidity = (uint16_t)(sht3x_humidity * 100);
+	} else {
+		data_packet.temperature = UINT16_MAX;
+		data_packet.humidity = INT16_MAX;
+	}
+
+	if (mlx90614_success) {
+		data_packet.ir_temperature = (int16_t)(mlx90614_object_temperature * 100);
+	} else {
+		data_packet.ir_temperature = UINT16_MAX;
+	}
+
+	data_packet.brightness_current = (uint32_t)photo_diode_current;
+	data_packet.battery_voltage = (uint8_t)(input_voltage * 10);
 
 	rfm95_init(&rfm95_handle);
-	data_packet_t data_packet = {0};
-	data_packet.temperature = (int16_t)(temperature * 100);
-	data_packet.humidity = (uint16_t)(humidity * 100);
-	data_packet.brightness_current = (uint32_t)photo_diode_current;
-	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));*/
+	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 
 	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_SET);
-
-	while (1) {
-
-	}
 }
