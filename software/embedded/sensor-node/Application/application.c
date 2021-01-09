@@ -165,12 +165,14 @@ void application_main()
 
 	// For too low input voltages, return to sleep directly (2 batteries with 1V cutoff)
 	if (input_voltage < 2.0f) {
-		rfm95_init(&rfm95_handle);
 		return;
 	}
 
 	uint32_t i2c_enable_tick = HAL_GetTick();
 	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_RESET);
+	HAL_Delay(1);
+
+	rfm95_init(&rfm95_handle);
 
 	// Take photo diode measurements, this takes some time. I2C devices can boot in the meantime.
 	photo_diode_current = read_photo_diode_current();
@@ -215,7 +217,6 @@ void application_main()
 	data_packet.brightness_current = (uint32_t)photo_diode_current;
 	data_packet.battery_voltage = (uint8_t)(input_voltage * 10);
 
-	rfm95_init(&rfm95_handle);
 	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 
 	HAL_GPIO_WritePin(I2C_ENABLE_GPIO_Port, I2C_ENABLE_Pin, GPIO_PIN_SET);

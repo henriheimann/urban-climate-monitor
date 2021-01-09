@@ -83,7 +83,12 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  // Check and handle if the system was resumed from StandBy mode */
+  if(__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET)
+  {
+  	// Clear Standby flag
+  	__HAL_PWR_CLEAR_FLAG(PWR_FLAG_SB);
+  }
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -95,7 +100,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   application_main();
-  HAL_Delay(5000);
 
   HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_12); // PHOTO_SWITCH
   HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_A, PWR_GPIO_BIT_7); // MOSI
@@ -115,7 +119,7 @@ int main(void)
   // Setting the Wake up time 1s * 0x0E10 = 1h
   // 10min = 0x0258
   // 10 sec = 0x000a
-  HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x000a, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
+  HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 0x0258, RTC_WAKEUPCLOCK_CK_SPRE_16BITS, 0);
 
   // Enter the Standby mode
   HAL_PWR_EnterSTANDBYMode();
