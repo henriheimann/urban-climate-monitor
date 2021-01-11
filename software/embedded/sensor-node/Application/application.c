@@ -4,6 +4,7 @@
 #include <i2c.h>
 #include <spi.h>
 #include <adc.h>
+#include <math.h>
 
 static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter);
 static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter);
@@ -187,10 +188,10 @@ void application_main()
 		sht3x_success = true;
 	}
 
-	// MLX90614 required 250ms to be ready
+	// MLX90614 required around 250ms to be ready
 	elapsed_ticks = HAL_GetTick() - i2c_enable_tick;
-	if (elapsed_ticks > 250) {
-		HAL_Delay(250 - elapsed_ticks);
+	if (elapsed_ticks < 300) {
+		HAL_Delay(300 - elapsed_ticks);
 	}
 
 	if (mlx90614_read_object_temperature(&mlx90614_handle, &mlx90614_object_temperature) &&
@@ -201,21 +202,21 @@ void application_main()
 	data_packet_t data_packet = {0};
 
 	if (sht3x_success) {
-		data_packet.temperature = (int16_t)(sht3x_temperature * 100);
-		data_packet.humidity = (uint16_t)(sht3x_humidity * 100);
+		data_packet.temperature = (int16_t)roundf(sht3x_temperature * 100);
+		data_packet.humidity = (uint16_t)roundf(sht3x_humidity * 100);
 	} else {
 		data_packet.temperature = UINT16_MAX;
 		data_packet.humidity = INT16_MAX;
 	}
 
 	if (mlx90614_success) {
-		data_packet.ir_temperature = (int16_t)(mlx90614_object_temperature * 100);
+		data_packet.ir_temperature = (int16_t)roundf(mlx90614_object_temperature * 100);
 	} else {
-		data_packet.ir_temperature = UINT16_MAX;
+		data_packet.ir_temperature = INT16_MAX;
 	}
 
 	data_packet.brightness_current = (uint32_t)photo_diode_current;
-	data_packet.battery_voltage = (uint8_t)(input_voltage * 10);
+	data_packet.battery_voltage = (uint8_t)roundf(input_voltage * 10);
 
 	rfm95_send_data(&rfm95_handle, (uint8_t*)(&data_packet), sizeof(data_packet));
 
