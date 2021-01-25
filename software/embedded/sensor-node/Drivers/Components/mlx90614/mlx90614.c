@@ -1,7 +1,3 @@
-//
-// Created by henri on 31/12/2020.
-//
-
 #include "mlx90614.h"
 
 typedef enum {
