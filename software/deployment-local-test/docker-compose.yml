@@ -2,63 +2,46 @@ version: "2"
 
 services:
 
-  reverse-proxy:
+  ucm-reverse-proxy:
     image: nginx:latest
-    container_name: reverse-proxy
+    container_name: ucm-reverse-proxy
     depends_on:
-      - grafana
+      - ucm-grafana
       - ucm-frontend
     ports:
       - 80:80
-      - 443:443
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
-      - ./dhparam:/etc/ssl/certs
     env_file:
       - .env
     networks:
       - tig-backend-net
       - tig-frontend-net
-      - ucm-frontend-net
+      - frontend-net
     restart: unless-stopped
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    depends_on:
-      - reverse-proxy
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
-    env_file:
-      - .env
-    command: certonly --webroot --webroot-path=/var/www/html --email $LETS_ENCRYPT_MAIL --agree-tos --no-eff-email --force-renewal -d $DEPLOYMENT_HOST -d www.$DEPLOYMENT_HOST
-
-  influxdb:
+  ucm-influxdb:
     image: influxdb:1.8
-    container_name: influxdb
+    container_name: ucm-influxdb
     volumes:
       - influxdb-data:/var/lib/influxdb
     env_file:
       - .env
     environment:
+      - DOCKER_INFLUXDB_INIT_USERNAME=
       - INFLUXDB_HTTP_AUTH_ENABLED=true
     networks:
       - tig-backend-net
       - tig-frontend-net
     restart: unless-stopped
 
-  telegraf:
+  ucm-telegraf:
     image: telegraf:latest
-    container_name: telegraf
+    container_name: ucm-telegraf
     depends_on:
-      - influxdb
+      - ucm-influxdb
     links:
-      - influxdb
+      - ucm-influxdb
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
     env_file:
@@ -67,11 +50,11 @@ services:
       - tig-backend-net
     restart: unless-stopped
 
-  grafana:
+  ucm-grafana:
     image: grafana/grafana:latest
-    container_name: grafana
+    container_name: ucm-grafana
     depends_on:
-      - influxdb
+      - ucm-influxdb
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
@@ -89,17 +72,15 @@ services:
     image: ucm-frontend
     container_name: ucm-frontend
     networks:
-      - ucm-frontend-net
+      - frontend-net
     restart: unless-stopped
 
 networks:
   tig-backend-net:
   tig-frontend-net:
-  ucm-frontend-net:
+  frontend-net:
 
 volumes:
   grafana-data:
   influxdb-data:
-  certbot-etc:
-  certbot-var:
-  web-root:
+  
