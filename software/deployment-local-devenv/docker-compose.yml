@@ -1,0 +1,51 @@
+version: "2"
+
+services:
+  ucm-influxdb:
+    image: influxdb:1.8
+    container_name: ucm-influxdb
+    ports:
+      - 8086:8086
+    volumes:
+      - influxdb-data:/var/lib/influxdb
+    env_file:
+      - .env
+    environment:
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+    networks:
+      - tig-backend-net
+    restart: unless-stopped
+
+  ucm-telegraf:
+    image: telegraf:latest
+    container_name: ucm-telegraf
+    depends_on:
+      - ucm-influxdb
+    links:
+      - ucm-influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    env_file:
+      - .env
+    networks:
+      - tig-backend-net
+    restart: unless-stopped
+
+  ucm-postgres:
+    image: postgres:latest
+    container_name: ucm-postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+networks:
+  tig-backend-net:
+
+volumes:
+  grafana-data:
+  influxdb-data:
+  postgres-data:

@@ -5,12 +5,14 @@ set -e
 
 # default variable values
 SKIP_FRONTEND_BUILD=0
+SKIP_BACKEND_BUILD=0
 
 # parse opts
-while getopts s option
+while getopts sb option
 do
     case "${option}" in
         s) SKIP_FRONTEND_BUILD=1;;
+        b) SKIP_BACKEND_BUILD=1;;
     esac
 done
 
@@ -31,6 +33,17 @@ else
     echo "skipping frontend build..."
 fi
 
+# build and upload backend if not skipped
+if [ "${SKIP_BACKEND_BUILD}" = "0" ]; then
+    cd ../backend/
+    docker build -t ucm-backend .
+    docker save ucm-backend > ucm-backend.tar
+    scp ucm-backend.tar "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
+    rm ucm-backend.tar
+else
+    echo "skipping backend build..."
+fi
+
 # upload compose and configuration
 cd ../deployment/
 rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning ssl_renew.sh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
@@ -38,6 +51,11 @@ rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning ssl_r
 # load frontend
 if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
     ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'cd ~/ucm && docker load < ucm-frontend.tar && rm ucm-frontend.tar'
+fi
+
+# load backend
+if [ "${SKIP_BACKEND_BUILD}" = "0" ]; then
+    ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'cd ~/ucm && docker load < ucm-backend.tar && rm ucm-backend.tar'
 fi
 
 # create dh keys if they don't exist
