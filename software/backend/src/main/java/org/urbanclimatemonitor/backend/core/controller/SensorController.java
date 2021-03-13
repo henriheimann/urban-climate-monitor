@@ -4,26 +4,26 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.urbanclimatemonitor.backend.core.dto.DeviceDTO;
-import org.urbanclimatemonitor.backend.core.services.DeviceService;
+import org.urbanclimatemonitor.backend.core.dto.SensorDTO;
+import org.urbanclimatemonitor.backend.core.services.SensorService;
 
 import java.util.List;
 
 @RestController
-public class DeviceController
+public class SensorController
 {
-	private final DeviceService deviceService;
+	private final SensorService sensorService;
 
-	public DeviceController(DeviceService deviceService)
+	public SensorController(SensorService sensorService)
 	{
-		this.deviceService = deviceService;
+		this.sensorService = sensorService;
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN')")
 	@GetMapping("/devices")
-	public List<DeviceDTO> all()
+	public List<SensorDTO> all()
 	{
-		return deviceService.loadAllDevices();
+		return sensorService.loadAllDevices();
 	}
 
 	@RequestMapping("/")

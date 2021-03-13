@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class DeviceDTO
+public class SensorDTO
 {
-	private String id;
-	private String locationId;
+
 }

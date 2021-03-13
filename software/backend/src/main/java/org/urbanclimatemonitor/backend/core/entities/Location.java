@@ -12,9 +12,20 @@ import java.util.List;
 public class Location
 {
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
+
+	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
 	@ToString.Exclude
-	private List<Device> devices;
+	private List<Sensor> sensors;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "icon_id", referencedColumnName = "id")
+	private Upload icon;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "model3d_id", referencedColumnName = "id")
+	private Upload model3d;
 }
