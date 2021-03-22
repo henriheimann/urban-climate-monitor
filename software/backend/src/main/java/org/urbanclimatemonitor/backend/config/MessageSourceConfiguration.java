@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.core.config;
+package org.urbanclimatemonitor.backend.config;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

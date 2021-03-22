@@ -1,6 +1,5 @@
 package org.urbanclimatemonitor.backend.security;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,6 +10,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.urbanclimatemonitor.backend.config.properties.OAuthConfigurationProperties;
 import org.urbanclimatemonitor.backend.security.exception.CustomWebResponseExceptionTranslator;
 
 @Configuration
@@ -25,38 +25,27 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
 	private final CustomWebResponseExceptionTranslator customWebResponseExceptionTranslator;
 
+	private final OAuthConfigurationProperties properties;
+
 	public AuthorizationServerConfiguration(AuthenticationManager authenticationManager,
 	                                        PasswordEncoder passwordEncoder, CustomUserDetailsService userService,
-	                                        CustomWebResponseExceptionTranslator customWebResponseExceptionTranslator)
+	                                        CustomWebResponseExceptionTranslator customWebResponseExceptionTranslator,
+	                                        OAuthConfigurationProperties properties)
 	{
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
 		this.userService = userService;
 		this.customWebResponseExceptionTranslator = customWebResponseExceptionTranslator;
+		this.properties = properties;
 	}
-
-	@Value("${oauth.jwt.clientId}")
-	private String clientId;
-
-	@Value("${oauth.jwt.clientSecret}")
-	private String clientSecret;
-
-	@Value("${oauth.jwt.signingKey}")
-	private String signingKey;
-
-	@Value("${oauth.jwt.tokenValiditySeconds}")
-	private int accessTokenValiditySeconds;
-
-	@Value("${oauth.jwt.refreshTokenValiditySeconds}")
-	private int refreshTokenValiditySeconds;
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
-				.withClient(clientId)
-				.secret(passwordEncoder.encode(clientSecret))
-				.accessTokenValiditySeconds(accessTokenValiditySeconds)
-				.refreshTokenValiditySeconds(refreshTokenValiditySeconds)
+				.withClient(properties.getJwt().getClientId())
+				.secret(passwordEncoder.encode(properties.getJwt().getClientSecret()))
+				.accessTokenValiditySeconds(properties.getJwt().getTokenValiditySeconds())
+				.refreshTokenValiditySeconds(properties.getJwt().getRefreshTokenValiditySeconds())
 				.authorizedGrantTypes("password")
 				.scopes("all");
 	}
@@ -74,7 +63,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	JwtAccessTokenConverter accessTokenConverter()
 	{
 		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
-		accessTokenConverter.setSigningKey(signingKey);
+		accessTokenConverter.setSigningKey(properties.getJwt().getSigningKey());
 		return accessTokenConverter;
 	}
 }

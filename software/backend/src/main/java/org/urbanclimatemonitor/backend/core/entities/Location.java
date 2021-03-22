@@ -18,7 +18,6 @@ public class Location
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
-	@ToString.Exclude
 	private List<Sensor> sensors;
 
 	@OneToOne(fetch = FetchType.LAZY)

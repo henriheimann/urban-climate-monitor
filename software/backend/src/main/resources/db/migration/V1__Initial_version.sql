@@ -9,12 +9,11 @@ CREATE TABLE uploads
 
 CREATE TABLE users
 (
-    id                  SERIAL UNIQUE NOT NULL,
-    email               VARCHAR(255) UNIQUE NOT NULL,
+    username            VARCHAR(255) UNIQUE NOT NULL,
     password            VARCHAR(255) NOT NULL,
     role                VARCHAR(255) NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (username)
 );
 
 CREATE TABLE locations
@@ -32,7 +31,8 @@ CREATE TABLE locations
 CREATE TABLE sensors
 (
     id                  SERIAL UNIQUE NOT NULL,
-    ttn_id              VARCHAR(255) UNIQUE NOT NULL,
+    name                VARCHAR(255),
+    ttn_id              VARCHAR(255) UNIQUE,
     location_id         BIGINT DEFAULT NULL,
 
     PRIMARY KEY (id),
@@ -41,10 +41,10 @@ CREATE TABLE sensors
 
 CREATE TABLE user_locations_with_permission
 (
-    user_id             BIGINT,
-    location_id         BIGINT,
+    user_username       VARCHAR(255) NOT NULL,
+    location_id         BIGINT NOT NULL,
 
-    PRIMARY KEY (user_id, location_id),
-    FOREIGN KEY (user_id) REFERENCES users (id),
+    PRIMARY KEY (user_username, location_id),
+    FOREIGN KEY (user_username) REFERENCES users (username),
     FOREIGN KEY (location_id) REFERENCES locations (id)
 );

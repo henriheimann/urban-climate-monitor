@@ -1,19 +1,23 @@
 package org.urbanclimatemonitor.backend.ttn;
 
 import feign.RequestInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
 
 @Component
 public class TTNClientConfiguration
 {
-	@Value("${TTN_APP_ACCESS_KEY}")
-	private String appAccessKey;
+	private final TTNConfigurationProperties properties;
+
+	public TTNClientConfiguration(TTNConfigurationProperties properties)
+	{
+		this.properties = properties;
+	}
 
 	@Bean
 	public RequestInterceptor basicAuthRequestInterceptor()
 	{
-		return requestTemplate -> requestTemplate.header("Authorization", "Key " + appAccessKey);
+		return requestTemplate -> requestTemplate.header("Authorization", "Key " + properties.getAppAccessKey());
 	}
 }

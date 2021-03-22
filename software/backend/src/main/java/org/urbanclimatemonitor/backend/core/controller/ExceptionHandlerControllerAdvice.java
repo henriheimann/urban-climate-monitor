@@ -12,7 +12,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.urbanclimatemonitor.backend.core.exception.CustomLocalizedException;
+import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public class ExceptionHandlerControllerAdvice
 	public ResponseEntity<Map<String, Object>> localizedExceptionHandler(CustomLocalizedException e, Locale locale)
 	{
 		String message = messageSource.getMessage(e.getId(), e.getArguments(), locale);
-		return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, message, null);
+		return buildResponseEntity(e.getHttpStatus(), message, null);
 	}
 
 	@ExceptionHandler({ MethodArgumentNotValidException.class })

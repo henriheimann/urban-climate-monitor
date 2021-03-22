@@ -4,33 +4,30 @@ import lombok.extern.log4j.Log4j2;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
+import org.urbanclimatemonitor.backend.config.properties.InfluxDBConfigurationProperties;
 
 import javax.annotation.PostConstruct;
 
 @Service
+@EnableConfigurationProperties(InfluxDBConfigurationProperties.class)
 @Log4j2
 public class InfluxDBService
 {
-	@Value("http://${INFLUXDB_HOST}:${INFLUXDB_PORT}")
-	private String databaseUrl;
-
-	@Value("${INFLUXDB_USER}")
-	private String databaseUser;
-
-	@Value("${INFLUXDB_USER_PASSWORD}")
-	private String databaseUserPassword;
-
-	@Value("${INFLUXDB_DB}")
-	private String databaseName;
+	private final InfluxDBConfigurationProperties properties;
 
 	private InfluxDB influxDB;
+
+	public InfluxDBService(InfluxDBConfigurationProperties properties)
+	{
+		this.properties = properties;
+	}
 
 	@PostConstruct
 	public void postConstruct()
 	{
-		influxDB = InfluxDBFactory.connect(databaseUrl, databaseUser, databaseUserPassword);
+		influxDB = InfluxDBFactory.connect(properties.getUrl(), properties.getUsername(), properties.getPassword());
 
 		Pong response = this.influxDB.ping();
 		if (response.getVersion().equalsIgnoreCase("unknown")) {

@@ -2,8 +2,10 @@ package org.urbanclimatemonitor.backend.core.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.urbanclimatemonitor.backend.core.dto.CreateUserDTO;
-import org.urbanclimatemonitor.backend.core.dto.UserDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.CreateUserDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.UpdatePasswordDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.UpdateUserDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.UserDTO;
 import org.urbanclimatemonitor.backend.core.services.UserService;
 
 import javax.validation.Valid;
@@ -23,41 +25,41 @@ public class UserController
 	@PreAuthorize("hasRole('ADMIN')")
 	public List<UserDTO> getAllUsers()
 	{
-		return null;
+		return userService.getAllUsers();
 	}
 
 	@PostMapping("/users")
 	@PreAuthorize("hasRole('ADMIN')")
-	public void createUser(@Valid @RequestBody CreateUserDTO createUserDTO)
+	public UserDTO createUser(@Valid @RequestBody CreateUserDTO createUserDTO)
 	{
-		userService.createUser(createUserDTO);
+		return userService.createUser(createUserDTO);
 	}
 
-	@GetMapping("/users/{userEmail}")
-	@PreAuthorize("hasRole('ADMIN') || #userEmail == authentication.principal.username")
-	public UserDTO getUser(@PathVariable String userEmail)
+	@GetMapping("/users/{username}")
+	@PreAuthorize("hasRole('ADMIN') || #username == authentication.name")
+	public UserDTO getUser(@PathVariable String username)
 	{
-		return null;
+		return userService.getUser(username);
 	}
 
-	@DeleteMapping("/users/{userEmail}")
+	@DeleteMapping("/users/{username}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public void deleteUser(@PathVariable String userEmail)
+	public void deleteUser(@PathVariable String username)
 	{
-
+		userService.deleteUser(username);
 	}
 
-	@PutMapping("/users/{userEmail}")
+	@PutMapping("/users/{username}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public void updateUser(@PathVariable String userEmail)
+	public UserDTO updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO)
 	{
-
+		return userService.updateUser(username, updateUserDTO);
 	}
 
-	@PutMapping("/users/{userEmail}/password")
-	@PreAuthorize("#userEmail == authentication.principal.username")
-	public void updateUserPassword(@PathVariable String userEmail)
+	@PostMapping("/users/{username}/password")
+	@PreAuthorize("#username == authentication.name")
+	public void updateUserPassword(@PathVariable String username, @Valid @RequestBody UpdatePasswordDTO updatePasswordDTO)
 	{
-
+		userService.updateUserPassword(username, updatePasswordDTO);
 	}
 }

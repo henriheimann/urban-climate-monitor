@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.core.util;
+package org.urbanclimatemonitor.backend.util;
 
 import lombok.experimental.UtilityClass;
 

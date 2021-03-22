@@ -18,11 +18,8 @@ import java.util.Set;
 public class User
 {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-
 	@NotNull
-	private String email;
+	private String username;
 
 	@NotNull
 	private String password;
@@ -32,12 +29,12 @@ public class User
 	private Role role;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_locations_with_permission", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "location_id") })
+	@JoinTable(name = "user_locations_with_permission", joinColumns = { @JoinColumn(name = "user_username") }, inverseJoinColumns = { @JoinColumn(name = "location_id") })
 	private Set<Location> locationsWithPermission = new HashSet<>();
 
-	public User(String email, String password, Role role, Set<Location> locationsWithPermission)
+	public User(String username, String password, Role role, Set<Location> locationsWithPermission)
 	{
-		this.email = email;
+		this.username = username;
 		this.password = password;
 		this.role = role;
 		this.locationsWithPermission = locationsWithPermission;
