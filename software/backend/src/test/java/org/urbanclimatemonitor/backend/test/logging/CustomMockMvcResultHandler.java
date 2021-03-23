@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.logging;
+package org.urbanclimatemonitor.backend.test.logging;
 
 import org.apache.logging.log4j.Logger;
 import org.springframework.mock.web.MockHttpServletRequest;

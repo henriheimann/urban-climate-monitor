@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.core.controller;
+package org.urbanclimatemonitor.backend.integration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

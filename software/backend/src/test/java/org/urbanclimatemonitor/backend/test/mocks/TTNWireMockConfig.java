@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.mocks;
+package org.urbanclimatemonitor.backend.test.mocks;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.springframework.beans.factory.annotation.Autowired;

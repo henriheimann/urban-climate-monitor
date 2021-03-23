@@ -19,6 +19,8 @@ import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
 import org.urbanclimatemonitor.backend.util.Streams;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,9 +31,6 @@ public class SensorService
 	private final LocationRepository locationRepository;
 
 	private final TTNService ttnService;
-
-	@Autowired
-	private PlatformTransactionManager transactionManager;
 
 	public SensorService(SensorRepository sensorRepository, LocationRepository locationRepository, TTNService ttnService)
 	{
@@ -55,13 +54,17 @@ public class SensorService
 					sensorRepository.save(sensor);
 				});
 
-		// Remove sensors with no matching TTN device
-		Streams.stream(sensorRepository.findAll())
-				.filter(senor -> ttnDevices.stream()
-						.noneMatch(ttnDevice -> ttnDevice.getDeviceId().equals(senor.getTtnId())))
-				.forEach(sensorRepository::delete);
-
+		// Remove sensors with no matching TTN device and return others
 		return Streams.stream(sensorRepository.findAll())
+				.map(sensor -> {
+					if (ttnDevices.stream().noneMatch(ttnDevice -> ttnDevice.getDeviceId().equals(sensor.getTtnId()))) {
+						sensorRepository.delete(sensor);
+						return null;
+					} else {
+						return sensor;
+					}
+				})
+				.filter(Objects::nonNull)
 				.map(sensor -> new SensorDTO(
 						sensor.getId(),
 						sensor.getName(),

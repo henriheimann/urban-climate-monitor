@@ -1,23 +1,18 @@
-package org.urbanclimatemonitor.backend.core.controller;
+package org.urbanclimatemonitor.backend.integration;
 
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
-import org.urbanclimatemonitor.backend.core.repositories.UserRepository;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.urbanclimatemonitor.backend.logging.CustomMockMvcResultHandler.log;
+import static org.urbanclimatemonitor.backend.test.logging.CustomMockMvcResultHandler.log;
 
 @SpringBootTest
 @AutoConfigureMockMvc

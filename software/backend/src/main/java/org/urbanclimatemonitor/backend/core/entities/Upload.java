@@ -11,7 +11,7 @@ public class Upload
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	private String filename;
 

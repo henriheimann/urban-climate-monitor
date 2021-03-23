@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.core.controller;
+package org.urbanclimatemonitor.backend.integration;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
@@ -10,13 +10,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
-import org.urbanclimatemonitor.backend.mocks.TTNWireMockConfig;
+import org.urbanclimatemonitor.backend.test.mocks.TTNWireMockConfig;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.urbanclimatemonitor.backend.logging.CustomMockMvcResultHandler.log;
+import static org.urbanclimatemonitor.backend.test.logging.CustomMockMvcResultHandler.log;
 
 @SpringBootTest
 @AutoConfigureMockMvc

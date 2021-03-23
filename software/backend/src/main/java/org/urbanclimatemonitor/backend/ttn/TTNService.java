@@ -8,12 +8,9 @@ import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationPropert
 import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNLorawanDeviceDTO;
 
-import java.net.http.HttpClient;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Log4j2

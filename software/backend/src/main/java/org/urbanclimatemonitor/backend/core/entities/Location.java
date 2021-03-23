@@ -1,6 +1,7 @@
 package org.urbanclimatemonitor.backend.core.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -13,7 +14,7 @@ public class Location
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 
 	private String name;
 

@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.core.controller;
+package org.urbanclimatemonitor.backend.integration;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.urbanclimatemonitor.backend.logging.CustomMockMvcResultHandler.log;
+import static org.urbanclimatemonitor.backend.test.logging.CustomMockMvcResultHandler.log;
 
 @SpringBootTest
 @AutoConfigureMockMvc

@@ -1,4 +1,5 @@
 #include "application.h"
+#include "ttn_keys.h"
 
 #include <usart.h>
 #include <stdio.h>
@@ -26,9 +27,9 @@ rfm95_handle_t rfm95_handle = {
 		.irq_pin = RFM95_DIO0_Pin,
 		.dio5_port = RFM95_DIO5_GPIO_Port,
 		.dio5_pin = RFM95_DIO5_Pin,
-		.device_address = {0x26, 0x01, 0x16, 0xCE},
-		.application_session_key = {0xB3, 0xFC, 0x86, 0xAD, 0xB7, 0xD3, 0x72, 0x1A, 0x61, 0x74, 0x4F, 0x4B, 0xFF, 0xE7, 0xE7, 0x33},
-		.network_session_key = {0x8E, 0xCE, 0xE3, 0x9E, 0x21, 0x84, 0x33, 0x69, 0xA8, 0x3A, 0xA6, 0x12, 0x3D, 0xB1, 0x73, 0x48},
+		.device_address = TTN_KEYS_DEVICE_ADDRESS,
+		.application_session_key = TTN_KEYS_APPLICATION_SESSION_KEY,
+		.network_session_key = TTN_KEYS_NETWORK_SESSION_KEY,
 		.reload_frame_counter = reload_frame_counter,
 		.save_frame_counter = save_frame_counter
 };

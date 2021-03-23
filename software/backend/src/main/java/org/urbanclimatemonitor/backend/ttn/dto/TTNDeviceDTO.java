@@ -1,7 +1,9 @@
 package org.urbanclimatemonitor.backend.ttn.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class TTNDeviceDTO

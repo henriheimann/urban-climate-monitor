@@ -1,10 +1,9 @@
-package org.urbanclimatemonitor.backend.core.controller;
+package org.urbanclimatemonitor.backend.integration;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateSensorDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.SensorDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.UserDTO;
 import org.urbanclimatemonitor.backend.core.services.SensorService;
 
 import javax.validation.Valid;
