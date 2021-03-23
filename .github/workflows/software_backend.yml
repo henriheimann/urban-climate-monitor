@@ -35,7 +35,9 @@ jobs:
 
     - name: Start Development Environment
       working-directory: ./software/deployment-local-devenv
-      run: ./deploy-local-devenv.sh
+      run: |
+          chmod +x deploy-local-devenv.sh
+          ./deploy-local-devenv.sh
 
     - name: Execute Maven Tests
       working-directory: ./software/backend
