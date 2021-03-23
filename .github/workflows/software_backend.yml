@@ -33,6 +33,22 @@ jobs:
       with:
         java-version: 13
 
+    - name: Write .env File
+      working-directory: ./software/deployment-local-devenv
+      run: |
+          echo "INFLUXDB_HOST=${INFLUXDB_HOST}" >> .env
+          echo "INFLUXDB_PORT=${INFLUXDB_PORT}" >> .env
+          echo "INFLUXDB_DB=${INFLUXDB_DB}" >> .env
+          echo "INFLUXDB_ADMIN_USER=${INFLUXDB_ADMIN_USER}" >> .env
+          echo "INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_ADMIN_PASSWORD}" >> .env
+          echo "INFLUXDB_USER=${INFLUXDB_USER}" >> .env
+          echo "INFLUXDB_USER_PASSWORD=${INFLUXDB_USER_PASSWORD}" >> .env
+          echo "POSTGRES_HOST=${POSTGRES_HOST}" >> .env
+          echo "POSTGRES_USER=${POSTGRES_USER}" >> .env
+          echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> .env
+          echo "POSTGRES_DB=${POSTGRES_DB}" >> .env
+          echo "POSTGRES_TEST_DB=${POSTGRES_TEST_DB}" >> .env
+
     - name: Start Development Environment
       working-directory: ./software/deployment-local-devenv
       run: |
