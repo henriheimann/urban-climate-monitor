@@ -13,7 +13,7 @@ env:
   INFLUXDB_ADMIN_PASSWORD: inlufxdb-admin-test-pass
   INFLUXDB_USER: user
   INFLUXDB_USER_PASSWORD: inlufxdb-user-test-pass
-  POSTGRES_HOST: "::1"
+  POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
   POSTGRES_USER: user
   POSTGRES_PASSWORD: postgres-user-test-pass
@@ -59,6 +59,6 @@ jobs:
 
     - name: Execute Maven Tests
       working-directory: ./software/backend
-      run: mvn test
+      run: mvn test --no-transfer-progress
       
 
