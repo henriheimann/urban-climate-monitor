@@ -1,0 +1,43 @@
+name: software/backend
+
+on:
+  push:
+    paths:
+      - 'software/backend/**'
+
+env:
+  INFLUXDB_HOST: ucm-influxdb
+  INFLUXDB_PORT: 8086
+  INFLUXDB_DB: metrics
+  INFLUXDB_ADMIN_USER: admin
+  INFLUXDB_ADMIN_PASSWORD: inlufxdb-admin-test-pass
+  INFLUXDB_USER: user
+  INFLUXDB_USER_PASSWORD: inlufxdb-user-test-pass
+  POSTGRES_USER: user
+  POSTGRES_PASSWORD: postgres-user-test-pass
+  POSTGRES_DB: ucm
+  POSTGRES_TEST_DB: ucmtest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Set up JDK 13
+      uses: actions/setup-java@v1
+      with:
+        java-version: 13
+
+    - name: Start Development Environment
+      working-directory: ${GITHUB_WORKSPACE}/software/deployment-local-devenv
+      run: deploy-local-devenv.sh
+
+    - name: Execute Maven Tests
+      working-directory: ${GITHUB_WORKSPACE}/software/backend
+      run: mvn test
+      
+
