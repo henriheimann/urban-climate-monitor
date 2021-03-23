@@ -1,11 +1,25 @@
 #include "application.h"
-#include "ttn_keys.h"
 
 #include <stdio.h>
 #include <i2c.h>
 #include <spi.h>
 #include <adc.h>
 #include <math.h>
+
+#ifndef TTN_KEYS_DEVICE_ADDRESS
+#warning "TTN_KEYS_DEVICE_ADDRESS not defined, using default"
+#define TTN_KEYS_DEVICE_ADDRESS {0x00, 0x00, 0x00, 0x00}
+#endif
+
+#ifndef TTN_KEYS_APPLICATION_SESSION_KEY
+#warning "TTN_KEYS_APPLICATION_SESSION_KEY not defined, using default"
+#define TTN_KEYS_APPLICATION_SESSION_KEY {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+#endif
+
+#ifndef TTN_KEYS_NETWORK_SESSION_KEY
+#warning "TTN_KEYS_NETWORK_SESSION_KEY not defined, using default"
+#define TTN_KEYS_NETWORK_SESSION_KEY {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+#endif
 
 static bool reload_frame_counter(uint16_t *tx_counter, uint16_t *rx_counter);
 static void save_frame_counter(uint16_t tx_counter, uint16_t rx_counter);

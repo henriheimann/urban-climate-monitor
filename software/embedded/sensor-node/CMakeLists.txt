@@ -1,7 +1,7 @@
 #THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.19)
 
 # specify cross compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -28,6 +28,10 @@ set(CMAKE_C_STANDARD 11)
 
 add_compile_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
+
+add_definitions("-DTTN_KEYS_DEVICE_ADDRESS=$ENV{TTN_KEYS_DEVICE_ADDRESS}")
+add_definitions("-DTTN_KEYS_APPLICATION_SESSION_KEY=$ENV{TTN_KEYS_APPLICATION_SESSION_KEY}")
+add_definitions("-DTTN_KEYS_NETWORK_SESSION_KEY=$ENV{TTN_KEYS_NETWORK_SESSION_KEY}")
 
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
