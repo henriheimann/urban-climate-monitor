@@ -7,3 +7,6 @@
 [submodule "software/embedded/Drivers/Components/eeprom"]
 	path = software/embedded/Drivers/Components/eeprom
 	url = https://github.com/henriheimann/stm32-hal-eeprom
+[submodule "software/embedded/Drivers/Components/mlx90614"]
+	path = software/embedded/Drivers/Components/mlx90614
+	url = https://github.com/henriheimann/stm32-hal-mlx90614.git
