@@ -1,21 +1,9 @@
-[submodule "software/embedded/prototype-node/Drivers/MCU/stdio2uart"]
-	path = software/embedded/prototype-node/Drivers/MCU/stdio2uart
-	url = https://github.com/henriheimann/stm32-hal-stdio2uart.git
-[submodule "software/embedded/prototype-node/Drivers/Components/sht3x"]
-	path = software/embedded/prototype-node/Drivers/Components/sht3x
-	url = https://github.com/henriheimann/stm32-hal-sht3x.git
-[submodule "software/embedded/prototype-node/Drivers/Components/rfm95"]
-	path = software/embedded/prototype-node/Drivers/Components/rfm95
+[submodule "software/embedded/Drivers/Components/rfm95"]
+	path = software/embedded/Drivers/Components/rfm95
 	url = https://github.com/henriheimann/stm32-hal-rfm95
-[submodule "software/embedded/sensor-node/Drivers/Components/rfm95"]
-	path = software/embedded/sensor-node/Drivers/Components/rfm95
-	url = https://github.com/henriheimann/stm32-hal-rfm95
-[submodule "software/embedded/sensor-node/Drivers/Components/sht3x"]
-	path = software/embedded/sensor-node/Drivers/Components/sht3x
-	url = https://github.com/henriheimann/stm32-hal-sht3x.git
-[submodule "software/embedded/prototype-node/Drivers/Components/eeprom"]
-	path = software/embedded/prototype-node/Drivers/Components/eeprom
-	url = https://github.com/henriheimann/stm32-hal-eeprom
-[submodule "software/embedded/sensor-node/Drivers/Components/eeprom"]
-	path = software/embedded/sensor-node/Drivers/Components/eeprom
+[submodule "software/embedded/Drivers/Components/sht3x"]
+	path = software/embedded/Drivers/Components/sht3x
+	url = https://github.com/henriheimann/stm32-hal-sht3x
+[submodule "software/embedded/Drivers/Components/eeprom"]
+	path = software/embedded/Drivers/Components/eeprom
 	url = https://github.com/henriheimann/stm32-hal-eeprom
