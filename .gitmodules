@@ -1,0 +1,9 @@
+[submodule "software/embedded/Drivers/Components/rfm95"]
+	path = software/embedded/Drivers/Components/rfm95
+	url = https://github.com/henriheimann/stm32-hal-rfm95
+[submodule "software/embedded/Drivers/Components/sht3x"]
+	path = software/embedded/Drivers/Components/sht3x
+	url = https://github.com/henriheimann/stm32-hal-sht3x
+[submodule "software/embedded/Drivers/Components/eeprom"]
+	path = software/embedded/Drivers/Components/eeprom
+	url = https://github.com/henriheimann/stm32-hal-eeprom
