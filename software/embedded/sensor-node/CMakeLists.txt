@@ -29,10 +29,6 @@ set(CMAKE_C_STANDARD 11)
 add_compile_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 
-add_definitions("-DTTN_KEYS_DEVICE_ADDRESS=$ENV{TTN_KEYS_DEVICE_ADDRESS}")
-add_definitions("-DTTN_KEYS_APPLICATION_SESSION_KEY=$ENV{TTN_KEYS_APPLICATION_SESSION_KEY}")
-add_definitions("-DTTN_KEYS_NETWORK_SESSION_KEY=$ENV{TTN_KEYS_NETWORK_SESSION_KEY}")
-
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
 
@@ -63,6 +59,18 @@ add_link_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
+
+add_subdirectory("Components/eeprom")
+target_link_libraries(${PROJECT_NAME}.elf stm32-hal-eeprom)
+
+add_subdirectory("Components/mlx90614")
+target_link_libraries(${PROJECT_NAME}.elf stm32-hal-mlx90614)
+
+add_subdirectory("Components/rfm95")
+target_link_libraries(${PROJECT_NAME}.elf stm32-hal-rfm95)
+
+add_subdirectory("Components/sht3x")
+target_link_libraries(${PROJECT_NAME}.elf stm32-hal-sht3x)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)

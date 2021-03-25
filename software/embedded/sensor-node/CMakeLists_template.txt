@@ -59,6 +59,18 @@ add_link_options(-T $${LINKER_SCRIPT})
 
 add_executable($${PROJECT_NAME}.elf $${SOURCES} $${LINKER_SCRIPT})
 
+add_subdirectory("Components/eeprom")
+target_link_libraries($${PROJECT_NAME}.elf stm32-hal-eeprom)
+
+add_subdirectory("Components/mlx90614")
+target_link_libraries($${PROJECT_NAME}.elf stm32-hal-mlx90614)
+
+add_subdirectory("Components/rfm95")
+target_link_libraries($${PROJECT_NAME}.elf stm32-hal-rfm95)
+
+add_subdirectory("Components/sht3x")
+target_link_libraries($${PROJECT_NAME}.elf stm32-hal-sht3x)
+
 set(HEX_FILE $${PROJECT_BINARY_DIR}/$${PROJECT_NAME}.hex)
 set(BIN_FILE $${PROJECT_BINARY_DIR}/$${PROJECT_NAME}.bin)
 
