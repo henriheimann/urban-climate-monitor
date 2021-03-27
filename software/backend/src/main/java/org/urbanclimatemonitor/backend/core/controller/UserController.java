@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.integration;
+package org.urbanclimatemonitor.backend.core.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

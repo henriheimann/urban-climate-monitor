@@ -1,12 +1,15 @@
-package org.urbanclimatemonitor.backend.integration;
+package org.urbanclimatemonitor.backend.core.controller;
 
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.urbanclimatemonitor.backend.test.BaseIntegrationTest;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -22,18 +25,22 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 	@Test
 	public void createUser_succeeds() throws Exception
 	{
-		createUser("user", "testPassword1234#", "USER")
+		String content = createLocation("testlocation", "prosperIII.png", "cube.obj")
+				.andDo(log(log))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		int locationId = JsonPath.read(content, "$.id");
+
+		createUser("user", "testPassword1234#", "USER", (long)locationId)
 				.andDo(log(log))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.username", is("user")))
-				.andExpect(jsonPath("$.role", is("USER")));
+				.andExpect(jsonPath("$.role", is("USER")))
+				.andExpect(jsonPath("$.locationsWithPermission[*]", containsInAnyOrder(locationId)));
 	}
-
-	/*@Test
-	public void createUserWithLocationsWithPermission_succeeds() throws Exception
-	{
-		fail("Not yet implemented, depends on Location controller");
-	}*/
 
 	@Test
 	public void getAllUsers_succeeds() throws Exception

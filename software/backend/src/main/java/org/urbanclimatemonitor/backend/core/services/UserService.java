@@ -142,4 +142,14 @@ public class UserService
 		user.setPassword(passwordEncoder.encode(newPassword));
 		userRepository.save(user);
 	}
+
+	@Transactional
+	public boolean checkUserLocationPermission(String username, long locationId)
+	{
+		User user = userRepository.findById(username)
+				.orElseThrow(() -> new CustomLocalizedException("user-not-found", HttpStatus.NOT_FOUND));
+
+		return user.getLocationsWithPermission()
+				.stream().anyMatch(location -> location.getId().equals(locationId));
+	}
 }

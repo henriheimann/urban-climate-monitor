@@ -65,7 +65,7 @@ class SensorServiceTest
 		when(sensorRepository.save(argThat(sensor -> sensor.getTtnId().equals("device-00000029"))))
 				.thenAnswer(new SaveSensorAnswer(29L));
 
-		List<SensorDTO> sensorDTOList = sensorService.loadAllSensors();
+		List<SensorDTO> sensorDTOList = sensorService.getAllSensors();
 
 		verify(sensorRepository).save(argThat(sensor -> sensor.getTtnId().equals("device-00000029")));
 		assertThat(sensorDTOList).hasSize(2);
@@ -89,7 +89,7 @@ class SensorServiceTest
 		when(sensorRepository.findByTtnId("device-00000029")).thenReturn(Optional.of(sensor2));
 		when(sensorRepository.findAll()).thenReturn(sensorList);
 
-		List<SensorDTO> sensorDTOList = sensorService.loadAllSensors();
+		List<SensorDTO> sensorDTOList = sensorService.getAllSensors();
 
 		verify(sensorRepository).delete(argThat(sensor -> sensor.getId() == 32L));
 		assertThat(sensorDTOList).hasSize(2);

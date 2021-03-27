@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.integration;
+package org.urbanclimatemonitor.backend.core.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
+import org.urbanclimatemonitor.backend.test.BaseIntegrationTest;
 import org.urbanclimatemonitor.backend.test.mocks.TTNWireMockConfig;
 
 import static org.hamcrest.Matchers.*;

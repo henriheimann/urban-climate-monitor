@@ -1,4 +1,4 @@
-package org.urbanclimatemonitor.backend.integration;
+package org.urbanclimatemonitor.backend.test;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
@@ -15,18 +15,25 @@ import org.urbanclimatemonitor.backend.config.properties.InitialisationConfigura
 import org.urbanclimatemonitor.backend.config.properties.OAuthConfigurationProperties;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateUserDTO;
 import org.urbanclimatemonitor.backend.core.entities.Role;
+import org.urbanclimatemonitor.backend.core.repositories.LocationRepository;
 import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
 import org.urbanclimatemonitor.backend.core.repositories.UserRepository;
 import org.urbanclimatemonitor.backend.core.services.UserService;
+import org.urbanclimatemonitor.backend.test.mocks.TTNWireMockConfig;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.util.StreamUtils.copyToByteArray;
+import static org.springframework.util.StreamUtils.copyToString;
 import static org.urbanclimatemonitor.backend.test.logging.CustomMockMvcResultHandler.log;
 
 @SpringBootTest
@@ -48,6 +55,9 @@ public class BaseIntegrationTest
 
 	@Autowired
 	SensorRepository sensorRepository;
+
+	@Autowired
+	LocationRepository locationRepository;
 
 	@Autowired
 	UserService userService;
@@ -72,6 +82,7 @@ public class BaseIntegrationTest
 	{
 		userRepository.deleteAll();
 		sensorRepository.deleteAll();
+		locationRepository.deleteAll();
 	}
 
 	protected void clearTokenForUsername(String username)
@@ -134,5 +145,33 @@ public class BaseIntegrationTest
 					"name": "%s"
 				}
 				""".formatted(name)));
+	}
+
+	private String loadUploadBase64Encoded(String folder, String filename) throws IOException
+	{
+		byte[] data = copyToByteArray(BaseIntegrationTest.class.getClassLoader().getResourceAsStream(
+				"uploads/" + folder + "/" + filename));
+		return Base64.getEncoder().encodeToString(data);
+	}
+
+	protected ResultActions createLocation(String name, String iconFilename, String model3dFilename) throws Exception
+	{
+		return this.mockMvc.perform(post("/locations")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+				{
+					"name": "%s",
+					"icon": {
+						"filename": "%s",
+						"data": "%s"
+					},
+					"model3d": {
+						"filename": "%s",
+						"data": "%s"
+					}
+				}
+				""".formatted(name, iconFilename, loadUploadBase64Encoded("icons", iconFilename), model3dFilename,
+						loadUploadBase64Encoded("models", model3dFilename))));
 	}
 }
