@@ -147,7 +147,7 @@ public class BaseIntegrationTest
 				""".formatted(name)));
 	}
 
-	private String loadUploadBase64Encoded(String folder, String filename) throws IOException
+	protected String loadUploadBase64Encoded(String folder, String filename) throws IOException
 	{
 		byte[] data = copyToByteArray(BaseIntegrationTest.class.getClassLoader().getResourceAsStream(
 				"uploads/" + folder + "/" + filename));

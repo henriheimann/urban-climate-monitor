@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSensorWithoutLocationDTO
+public class UpdateLocationSensor
 {
 	@NotNull
 	@NotBlank

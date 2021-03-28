@@ -2,6 +2,7 @@ package org.urbanclimatemonitor.backend.core.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.log4j.Log4j2;
+import org.hamcrest.core.IsNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,7 +43,8 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(2)))
 				.andExpect(jsonPath("$[*].ttnId", containsInAnyOrder("device-001", "device-002")))
-				.andExpect(jsonPath("$[*].name", containsInAnyOrder("Unnamed", "Unnamed")));
+				.andExpect(jsonPath("$[*].name", containsInAnyOrder("Unnamed", "Unnamed")))
+				.andExpect(jsonPath("$[*].locationId", containsInAnyOrder(IsNull.nullValue(), IsNull.nullValue())));
 	}
 
 	@Test

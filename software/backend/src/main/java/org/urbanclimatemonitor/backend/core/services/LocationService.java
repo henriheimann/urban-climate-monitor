@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.core.dto.shared.UploadDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateLocationDTO;
-import org.urbanclimatemonitor.backend.core.dto.request.UpdateSensorWithoutLocationDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensor;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDataDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorDTO;
@@ -19,6 +19,7 @@ import org.urbanclimatemonitor.backend.util.Streams;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,17 +126,19 @@ public class LocationService
 	public LocationSensorDTO getLocationSensor(long id, long sensorId)
 	{
 		Sensor sensor = sensorRepository.findById(sensorId)
-				.filter(potentialSensor -> potentialSensor.getLocation().getId().equals(id))
+				.filter(potentialSensor -> Optional.ofNullable(potentialSensor.getLocation())
+						.map(location -> location.getId().equals(id)).orElse(false))
 				.orElseThrow(() -> new CustomLocalizedException("sensor-not-found", HttpStatus.NOT_FOUND));
 
 		return entityToLocationSensorDTO(sensor);
 	}
 
 	@Transactional
-	public LocationSensorDTO updateLocationSensor(long id, long sensorId, UpdateSensorWithoutLocationDTO updateSensorDTO)
+	public LocationSensorDTO updateLocationSensor(long id, long sensorId, UpdateLocationSensor updateSensorDTO)
 	{
 		Sensor sensor = sensorRepository.findById(sensorId)
-				.filter(potentialSensor -> potentialSensor.getLocation().getId().equals(id))
+				.filter(potentialSensor -> Optional.ofNullable(potentialSensor.getLocation())
+						.map(location -> location.getId().equals(id)).orElse(false))
 				.orElseThrow(() -> new CustomLocalizedException("sensor-not-found", HttpStatus.NOT_FOUND));
 
 		sensor.setName(updateSensorDTO.getName());

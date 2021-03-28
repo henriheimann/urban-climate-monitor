@@ -56,7 +56,8 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 		this.mockMvc.perform(get("/users")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
-				.andExpect(status().isOk());
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[*].username", containsInAnyOrder("admin", "user1", "admin1")));
 	}
 
 	@Test

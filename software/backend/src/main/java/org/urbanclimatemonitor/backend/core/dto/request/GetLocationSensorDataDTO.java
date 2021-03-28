@@ -5,15 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetLocationDataDTO
+public class GetLocationSensorDataDTO
 {
-	private LocalDateTime from;
+	private ZonedDateTime from;
 
-	private LocalDateTime to;
+	private ZonedDateTime to;
 
 	private String type;
 

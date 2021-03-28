@@ -1,6 +1,6 @@
 package org.urbanclimatemonitor.backend.core.dto.enums;
 
-public enum LocationDataType
+public enum SensorDataType
 {
 	TEMPERATURE, HUMIDITY, BRIGHTNESS
 }

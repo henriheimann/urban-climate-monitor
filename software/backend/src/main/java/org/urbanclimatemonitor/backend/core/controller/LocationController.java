@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateLocationDTO;
-import org.urbanclimatemonitor.backend.core.dto.request.GetLocationDataDTO;
-import org.urbanclimatemonitor.backend.core.dto.request.UpdateSensorWithoutLocationDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.GetLocationSensorDataDTO;
+import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensor;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDataDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorDTO;
@@ -76,7 +76,7 @@ public class LocationController
 	}
 
 	@PutMapping("/locations/{id}/sensors/{sensorId}")
-	public LocationSensorDTO updateLocationSensor(@PathVariable long id, @PathVariable long sensorId, @Valid @RequestBody UpdateSensorWithoutLocationDTO updateSensorDTO, Principal principal)
+	public LocationSensorDTO updateLocationSensor(@PathVariable long id, @PathVariable long sensorId, @Valid @RequestBody UpdateLocationSensor updateSensorDTO, Principal principal)
 	{
 		if (!userService.checkUserLocationPermission(principal.getName(), id)) {
 			throw new CustomLocalizedException("user-has-no-location-permission", HttpStatus.UNAUTHORIZED);
@@ -86,7 +86,7 @@ public class LocationController
 	}
 
 	@GetMapping("/locations/{id}/data")
-	public LocationDataDTO getLocationData(@PathVariable long id, @Valid @RequestBody GetLocationDataDTO getLocationDataDTO)
+	public LocationDataDTO getLocationData(@PathVariable long id, @Valid @RequestBody GetLocationSensorDataDTO getLocationSensorDataDTO)
 	{
 		return locationService.getLocationData(id);
 	}
