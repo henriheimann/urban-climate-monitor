@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 public class SensorController
 {
 	private final SensorService sensorService;

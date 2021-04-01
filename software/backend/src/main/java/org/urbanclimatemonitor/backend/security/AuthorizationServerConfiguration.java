@@ -9,9 +9,13 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.urbanclimatemonitor.backend.config.properties.OAuthConfigurationProperties;
 import org.urbanclimatemonitor.backend.security.exception.CustomWebResponseExceptionTranslator;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableAuthorizationServer
@@ -27,16 +31,19 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 
 	private final OAuthConfigurationProperties properties;
 
+	private final DataSource dataSource;
+
 	public AuthorizationServerConfiguration(AuthenticationManager authenticationManager,
 	                                        PasswordEncoder passwordEncoder, CustomUserDetailsService userService,
 	                                        CustomWebResponseExceptionTranslator customWebResponseExceptionTranslator,
-	                                        OAuthConfigurationProperties properties)
+	                                        OAuthConfigurationProperties properties, DataSource dataSource)
 	{
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
 		this.userService = userService;
 		this.customWebResponseExceptionTranslator = customWebResponseExceptionTranslator;
 		this.properties = properties;
+		this.dataSource = dataSource;
 	}
 
 	@Override
@@ -46,24 +53,43 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 				.secret(passwordEncoder.encode(properties.getJwt().getClientSecret()))
 				.accessTokenValiditySeconds(properties.getJwt().getTokenValiditySeconds())
 				.refreshTokenValiditySeconds(properties.getJwt().getRefreshTokenValiditySeconds())
-				.authorizedGrantTypes("password")
+				.authorizedGrantTypes("password", "refresh_token")
 				.scopes("all");
 	}
 
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints)
 	{
-		endpoints.accessTokenConverter(accessTokenConverter())
+		endpoints
+				.accessTokenConverter(accessTokenConverter())
+				.tokenStore(tokenStore())
 				.userDetailsService(userService)
 				.authenticationManager(authenticationManager)
 				.exceptionTranslator(customWebResponseExceptionTranslator);
 	}
 
 	@Bean
-	JwtAccessTokenConverter accessTokenConverter()
+	public JwtAccessTokenConverter accessTokenConverter()
 	{
 		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
 		accessTokenConverter.setSigningKey(properties.getJwt().getSigningKey());
 		return accessTokenConverter;
+	}
+
+	@Bean
+	public ManageableJwtTokenStore tokenStore()
+	{
+		return new ManageableJwtTokenStore(accessTokenConverter(), jdbcTokenStore());
+	}
+
+	@Bean
+	public InMemoryTokenStore inMemoryTokenStore()
+	{
+		return new InMemoryTokenStore();
+	}
+
+	@Bean
+	public JdbcTokenStore jdbcTokenStore() {
+		return new JdbcTokenStore(dataSource);
 	}
 }

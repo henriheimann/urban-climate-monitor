@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 public class UserController
 {
 	private final UserService userService;
@@ -35,7 +36,7 @@ public class UserController
 		return userService.createUser(createUserDTO);
 	}
 
-	@GetMapping("/users/{username}")
+	@GetMapping("/user/{username}")
 	@PreAuthorize("hasRole('ADMIN') || #username == authentication.name")
 	public UserDTO getUser(@PathVariable String username)
 	{

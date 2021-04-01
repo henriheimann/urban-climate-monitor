@@ -1,0 +1,22 @@
+// Global
+$enable-rounded: true;
+$enable-shadows: true;
+$enable-print-styles: false;
+$enable-transitions: true;
+
+// Fonts
+$font-size-base: 14;
+$font-family-base: 'Jost', Helvetica, sans-serif;
+$font-weight-bold: 500;
+
+// Colors
+$light: #F6F6F6;
+$body-color: #111111;
+
+// Navbar
+$navbar-light-color: #7f7f7f;
+$navbar-light-active-color: $body-color;
+$navbar-padding-y: 0;
+$nav-link-padding-x: 25px !important;
+$nav-link-padding-y: 20px;
+$navbar-brand-padding-y: 0;

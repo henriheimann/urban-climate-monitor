@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {VisualisationService} from './visualisation.service';
 
 @Component({
-  selector: 'app-visualisation',
+  selector: 'ucm-visualisation',
   templateUrl: './visualisation.component.html',
   styleUrls: ['./visualisation.component.scss']
 })

@@ -67,7 +67,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/users/user1")
+		this.mockMvc.perform(get("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -82,7 +82,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/users/user1")
+		this.mockMvc.perform(get("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -101,7 +101,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/users/user")
+		this.mockMvc.perform(get("/user/user")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isForbidden());
@@ -119,7 +119,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/users/user1")
+		this.mockMvc.perform(get("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isNotFound());
@@ -168,7 +168,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 
 		clearTokenForUsername("user1");
 
-		this.mockMvc.perform(get("/users/user1")
+		this.mockMvc.perform(get("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "newPassword5678!")))
 				.andDo(log(log))
 				.andExpect(status().isOk());

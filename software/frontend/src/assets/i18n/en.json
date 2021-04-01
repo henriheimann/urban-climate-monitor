@@ -1,0 +1,21 @@
+{
+  "NAVIGATION": {
+    "VISUALIZATION": "Visualization",
+    "SENSOR_LIST": "Sensor List",
+    "LOGIN": "Login"
+  },
+  "ADMIN": {
+    "USERS": {
+      "USERS": "Users",
+      "LOADING_USERS": "Loading users ...",
+      "USERNAME": "Username",
+      "PERMISSIONS": "Permissions",
+      "ADMINISTRATOR": "Administrator"
+    }
+  },
+  "LOGIN": {
+    "LOGIN": "Login",
+    "USERNAME": "Username",
+    "PASSWORD": "Password"
+  }
+}

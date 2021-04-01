@@ -1,0 +1,11 @@
+@import "../../../assets/scss/variables.scss";
+
+.navbar {
+  font-size: 1.15rem;
+  font-weight: 500;
+  justify-content: space-between;
+}
+
+.nav-item.active {
+  border-bottom: 4px solid $body-color;
+}

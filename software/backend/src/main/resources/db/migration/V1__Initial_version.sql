@@ -48,3 +48,9 @@ CREATE TABLE user_locations_with_permission
     FOREIGN KEY (user_username) REFERENCES users (username),
     FOREIGN KEY (location_id) REFERENCES locations (id)
 );
+
+CREATE TABLE oauth_refresh_token (
+    token_id            VARCHAR(255),
+    token               BYTEA,
+    authentication      BYTEA
+);

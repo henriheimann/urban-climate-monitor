@@ -32,7 +32,10 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.antMatcher("/**").authorizeRequests().anyRequest().authenticated().and()
+				.authorizeRequests()
+				.antMatchers("/oauth/revoke").permitAll().and()
+				.authorizeRequests()
+				.antMatchers("/**").authenticated().and()
 				.exceptionHandling()
 				.authenticationEntryPoint(securityExceptionHandler);
 	}

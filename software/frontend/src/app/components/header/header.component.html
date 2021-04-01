@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand navbar-light bg-white shadow-sm">
+  <a class="navbar-brand" href="#">
+    <img src="assets/images/logo.png" height="50" alt="Urban Climate Monitor">
+  </a>
+
+  <ul class="navbar-nav">
+    <li class="nav-item active">
+      <a class="nav-link">{{ 'NAVIGATION.VISUALIZATION' | translate }}</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link">{{ 'NAVIGATION.SENSOR_LIST' | translate }}</a>
+    </li>
+  </ul>
+
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <button type="button" class="btn btn-link" (click)="openLoginModal()">{{ 'NAVIGATION.LOGIN' | translate }}</button>
+    </li>
+  </ul>
+</nav>

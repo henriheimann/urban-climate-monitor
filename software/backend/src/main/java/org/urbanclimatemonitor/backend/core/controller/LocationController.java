@@ -18,6 +18,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
+@PreAuthorize("isAuthenticated()")
 public class LocationController
 {
 	private final LocationService locationService;
