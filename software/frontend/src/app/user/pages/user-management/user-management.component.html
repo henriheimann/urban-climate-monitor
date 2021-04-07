@@ -1,20 +1,20 @@
-<h1>{{ 'ADMIN.USERS.USERS' | translate }}</h1>
+<h1>{{ 'admin.users.users' | translate }}</h1>
 
-<div *ngIf="loading$ | async">{{ 'ADMIN.USERS.LOADING_USERS' | translate }}</div>
+<div *ngIf="loading$ | async">{{ 'admin.users.loading_users' | translate }}</div>
 
 <div *ngIf="!(loading$ | async)">
   <table *ngIf="users$ | async as users" class="table">
     <thead>
     <tr>
-      <th>{{ 'ADMIN.USERS.USERNAME' | translate }}</th>
-      <th>{{ 'ADMIN.USERS.PERMISSIONS' | translate }}</th>
+      <th>{{ 'admin.users.username' | translate }}</th>
+      <th>{{ 'admin.users.permissions' | translate }}</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let user of users">
       <td>{{ user.username }}</td>
       <td>
-        <span *ngIf="user.role === 'ADMIN'">{{ 'ADMIN.USERS.ADMINISTRATOR' | translate }}</span>
+        <span *ngIf="user.role === 'ADMIN'">{{ 'admin.users.administrator' | translate }}</span>
         <span *ngIf="user.role === 'USER'">
         <span *ngFor="let locationId of user.locationsWithPermission">{{ locationId }}</span>
       </span>
@@ -23,4 +23,3 @@
     </tbody>
   </table>
 </div>
-

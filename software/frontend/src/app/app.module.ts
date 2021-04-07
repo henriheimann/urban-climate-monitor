@@ -3,9 +3,9 @@ import {NgModule} from '@angular/core';
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {VisualisationComponent} from './visualisation/visualisation.component';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
 import {UserModule} from './user/user.module';
-import { HeaderComponent } from './components/header/header.component';
+import {HeaderComponent} from './components/header/header.component';
 import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {DefaultDataServiceConfig, EntityDataModule} from '@ngrx/data';
@@ -14,6 +14,8 @@ import {EffectsModule} from '@ngrx/effects';
 import {AuthModule} from './auth/auth.module';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {environment} from '../environments/environment';
+import {TokenInterceptor} from './auth/interceptors/token.interceptor';
+import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 
 const customDataServiceConfig: DefaultDataServiceConfig = {
   root: environment.backendUrl + '/'
@@ -38,13 +40,24 @@ const customDataServiceConfig: DefaultDataServiceConfig = {
       defaultLanguage: 'en'
     }),
     StoreModule.forRoot({ }),
+    StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot([]),
     EntityDataModule.forRoot({ }), // Metadata will be added in each feature module by multi-provider
     UserModule,
     AuthModule,
     ModalModule.forRoot()
   ],
-  providers: [{ provide: DefaultDataServiceConfig, useValue: customDataServiceConfig }],
+  providers: [
+    {
+      provide: DefaultDataServiceConfig,
+      useValue: customDataServiceConfig
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

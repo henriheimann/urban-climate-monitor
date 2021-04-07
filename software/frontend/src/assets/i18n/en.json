@@ -1,21 +1,29 @@
 {
-  "NAVIGATION": {
-    "VISUALIZATION": "Visualization",
-    "SENSOR_LIST": "Sensor List",
-    "LOGIN": "Login"
-  },
-  "ADMIN": {
-    "USERS": {
-      "USERS": "Users",
-      "LOADING_USERS": "Loading users ...",
-      "USERNAME": "Username",
-      "PERMISSIONS": "Permissions",
-      "ADMINISTRATOR": "Administrator"
+  "navigation": {
+    "login": "Login",
+    "logout": "Logout",
+    "location": {
+      "visualization": "Visualization",
+      "sensor_list": "Sensor List"
+    },
+    "admin": {
+      "locations": "Locations",
+      "sensors": "Sensors",
+      "users": "Users"
     }
   },
-  "LOGIN": {
-    "LOGIN": "Login",
-    "USERNAME": "Username",
-    "PASSWORD": "Password"
+  "admin": {
+    "users": {
+      "users": "Users",
+      "loading_users": "Loading users ...",
+      "username": "Username",
+      "permissions": "Permissions",
+      "administrator": "Administrator"
+    }
+  },
+  "login": {
+    "login": "Login",
+    "username": "Username",
+    "password": "Password"
   }
 }

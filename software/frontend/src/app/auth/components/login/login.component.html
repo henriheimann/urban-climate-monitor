@@ -1,21 +1,22 @@
 <div class="modal-header">
-  <h1 class="pull-left">{{ 'LOGIN.LOGIN' | translate }}</h1>
+  <h1 class="pull-left">{{ 'login.login' | translate }}</h1>
   <button type="button" class="close pull-right" (click)="modalRef.hide()">
     <span>&times;</span>
   </button>
 </div>
+<ucm-alert-display destination="login"></ucm-alert-display>
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <div class="modal-body">
     <div class="form-group">
-      <label for="inputUsername">{{ 'LOGIN.USERNAME' | translate }}</label>
+      <label for="inputUsername">{{ 'login.username' | translate }}</label>
       <input type="text" class="form-control" id="inputUsername" formControlName="username">
     </div>
     <div class="form-group">
-      <label for="inputPassword">{{ 'LOGIN.PASSWORD' | translate }}</label>
+      <label for="inputPassword">{{ 'login.password' | translate }}</label>
       <input type="password" class="form-control" id="inputPassword" formControlName="password">
     </div>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">{{ 'LOGIN.LOGIN' | translate }}</button>
+    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || (loggingIn$ | async)">{{ 'login.login' | translate }}</button>
   </div>
 </form>
