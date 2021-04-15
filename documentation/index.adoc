@@ -3,6 +3,7 @@ Henri Heimann <henriheimann@gmail.com>
 :toc: left
 :icons:
 :lang: en
+:imagesdir: https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets
 
 == Hardware
 include::hardware.adoc[]

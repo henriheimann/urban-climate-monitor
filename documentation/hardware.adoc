@@ -1,29 +1,16 @@
-=== Subsection Title
+=== Schematics
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-veniam, quis nostrud ((exercitation ullamco)) laboris nisi ut aliquip ex
-ea commodo consequat. Duis aute irure dolor in reprehenderit in
-voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum.
+image::hardware/schematics/Urban Climate Monitor Sensor Node-Schematic_2.0.svg[Sensor Node Rev 2.0 Schematic,link="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/hardware/schematics/Urban Climate Monitor Sensor Node-Schematic_2.0.pdf"]
 
-[source]
---------------------------------------
-var http = require("http"); // <1>
-var server = http.createServer(); // <2>
-server.listen(8888);
---------------------------------------
+=== Plots
 
-<1> Some note here about that line.
-<2> Another note about that other line.
+[.clearfix]
+--
+[.left]
+.Top
+image::hardware/plots/sensor-node-top.svg[Top Plot, 450]
 
-=== Subsection Title
-
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-commodo consequat. Duis aute ((irure dolor)) in reprehenderit in
-voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-mollit anim id est laborum.
+[.left]
+.Bottom
+image::hardware/plots/sensor-node-bottom.svg[Bottom Plot, 450]
+--

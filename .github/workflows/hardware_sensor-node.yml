@@ -14,15 +14,17 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
+        persist-credentials: false
+        path: repo
 
     - uses: nerdyscout/kicad-exports@v2.1
       with:
         config: docs.kibot.yaml
         dir: docs
-        schema: 'hardware/sensor-node/*.sch'
-        board: 'hardware/sensor-node/*.kicad_pcb'
+        schema: 'repo/hardware/sensor-node/*.sch'
+        board: 'repo/hardware/sensor-node/*.kicad_pcb'
 
-    - name: upload schematic
+    - name: Upload schematic
       uses: actions/upload-artifact@v2
       with:
         name: hardware_sensor-node_docs
@@ -32,11 +34,41 @@ jobs:
       with:
         config: plot.kibot.yaml
         dir: docs
-        schema: 'hardware/sensor-node/*.sch'
-        board: 'hardware/sensor-node/*.kicad_pcb'
+        schema: 'repo/hardware/sensor-node/*.sch'
+        board: 'repo/hardware/sensor-node/*.kicad_pcb'
         
-    - name: upload board plots
+    - name: Upload board plots
       uses: actions/upload-artifact@v2
       with:
         name: hardware_sensor-node_docs
         path: docs/docs/img/*.svg
+
+    - name: Checkout Github Pages branch
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        persist-credentials: false
+        path: gh-pages
+
+    - name: Copy artifcats to Github Pages branch
+      run: |
+        mkdir -p gh-pages/assets/hardware/schematics/
+        mkdir -p gh-pages/assets/hardware/plots/
+        cp docs/docs/*Schematic*.pdf gh-pages/assets/hardware/schematics/
+        cp docs/docs/*Schematic*.svg gh-pages/assets/hardware/schematics/
+        cp docs/docs/img/*.svg gh-pages/assets/hardware/plots/
+
+    - name: Commit artifcats to Github Pages branch
+      working-directory: './gh-pages'
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add -A
+        git commit -m "Deploying hardware artifcats to gh-pages from ${{ github.repository }}@${{ github.sha }}" -a
+
+    - name: Push to Github Pages branch
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        directory: './gh-pages'
