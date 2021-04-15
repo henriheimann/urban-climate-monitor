@@ -1,6 +1,9 @@
 === Schematics
 
-image::hardware/schematics/Urban Climate Monitor Sensor Node-Schematic_2.0.svg[Sensor Node Rev 2.0 Schematic,link="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/hardware/schematics/Urban Climate Monitor Sensor Node-Schematic_2.0.pdf"]
+image::hardware/schematics/sensor-node-schematic.svg[Sensor Node Schematic,link="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/hardware/schematics/sensor-node-schematic.pdf"]
+
+=== Bill of Materials
+
 
 === Plots
 

@@ -3,8 +3,8 @@ name: hardware/sensor-node
 on:
   push:
     paths:
-    - 'hardware/sensor-node/**.sch'
-    - 'hardware/sensor-node/**.kicad_pcb'
+    - 'hardware/sensor-node/sensor-node.sch'
+    - 'hardware/sensor-node/sensor-node.kicad_pcb'
 
 jobs:
   generate-pdfs:
@@ -17,31 +17,19 @@ jobs:
         persist-credentials: false
         path: repo
 
-    - uses: nerdyscout/kicad-exports@v2.1
+    - uses: nerdyscout/kicad-exports@v2.2
       with:
-        config: docs.kibot.yaml
+        config: ./hardware/sensor-node/kibot-configs/docs.schema.kibot.yaml
         dir: docs
-        schema: 'repo/hardware/sensor-node/*.sch'
-        board: 'repo/hardware/sensor-node/*.kicad_pcb'
-
-    - name: Upload schematic
-      uses: actions/upload-artifact@v2
+        schema: 'hardware/sensor-node/sensor-node.sch'
+        board: 'hardware/sensor-node/sensor-node.kicad_pcb'
+    
+    - uses: nerdyscout/kicad-exports@v2.2
       with:
-        name: hardware_sensor-node_docs
-        path: docs/docs/*Schematic*.pdf
-        
-    - uses: nerdyscout/kicad-exports@v2.1
-      with:
-        config: plot.kibot.yaml
+        config: ./hardware/sensor-node/kibot-configs/plot.aisler.kibot.yaml
         dir: docs
-        schema: 'repo/hardware/sensor-node/*.sch'
-        board: 'repo/hardware/sensor-node/*.kicad_pcb'
-        
-    - name: Upload board plots
-      uses: actions/upload-artifact@v2
-      with:
-        name: hardware_sensor-node_docs
-        path: docs/docs/img/*.svg
+        schema: 'hardware/sensor-node/sensor-node.sch'
+        board: 'hardware/sensor-node/sensor-node.kicad_pcb'
 
     - name: Checkout Github Pages branch
       uses: actions/checkout@v2
@@ -54,9 +42,10 @@ jobs:
       run: |
         mkdir -p gh-pages/assets/hardware/schematics/
         mkdir -p gh-pages/assets/hardware/plots/
-        cp docs/docs/*Schematic*.pdf gh-pages/assets/hardware/schematics/
-        cp docs/docs/*Schematic*.svg gh-pages/assets/hardware/schematics/
-        cp docs/docs/img/*.svg gh-pages/assets/hardware/plots/
+        cp docs/docs/sensor-node-schematic.pdf gh-pages/assets/hardware/schematics/
+        cp docs/docs/img/sensor-node-schematic.svg gh-pages/assets/hardware/schematics/
+        cp docs/docs/img/sensor-node-top.svg gh-pages/assets/hardware/plots/
+        cp docs/docs/img/sensor-node-bottom.svg gh-pages/assets/hardware/plots/
 
     - name: Commit artifcats to Github Pages branch
       working-directory: './gh-pages'
