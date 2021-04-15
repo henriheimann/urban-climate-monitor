@@ -35,7 +35,18 @@ outputs:
       # The default is none
       show_components: none
       # [string|dict] PCB style (colors). An internal name, the name of a JSON file or the style options
-      style: '/usr/share/pcbdraw/styles/jlcpcb-green-enig.json'
+      style:
+        copper: '#4f7b27'
+        board: '#3b6529'
+        silk: '#eaebe5'
+        pads: '#9e9e9e'
+        clad: '#9c6b28'
+        outline: '#000000'
+        vcut: '#bf2600'
+        highlight-on-top: false
+        highlight-style: 'stroke:none;fill:#ff0000;opacity:0.5;'
+        highlight-padding: 1.5
+        highlight-offset: 0
       # [string=''] Board variant to apply
       variant: ''
       # [boolean=false] render V-CUTS on the Cmts.User layer
@@ -75,7 +86,18 @@ outputs:
       # The default is none
       show_components: none
       # [string|dict] PCB style (colors). An internal name, the name of a JSON file or the style options
-      style: '/usr/share/pcbdraw/styles/jlcpcb-green-enig.json'
+      style:
+        copper: '#4f7b27'
+        board: '#3b6529'
+        silk: '#eaebe5'
+        pads: '#9e9e9e'
+        clad: '#9c6b28'
+        outline: '#000000'
+        vcut: '#bf2600'
+        highlight-on-top: false
+        highlight-style: 'stroke:none;fill:#ff0000;opacity:0.5;'
+        highlight-padding: 1.5
+        highlight-offset: 0
       # [string=''] Board variant to apply
       variant: ''
       # [boolean=false] render V-CUTS on the Cmts.User layer
