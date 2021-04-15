@@ -19,14 +19,14 @@ jobs:
 
     - uses: nerdyscout/kicad-exports@v2.2
       with:
-        config: ./repo/hardware/sensor-node/kibot-configs/docs.schema.kibot.yaml
+        config: ./repo/hardware/kibot-configs/docs.schema.kibot.yaml
         dir: docs
         schema: 'repo/hardware/sensor-node/sensor-node.sch'
         board: 'repo/hardware/sensor-node/sensor-node.kicad_pcb'
     
     - uses: nerdyscout/kicad-exports@v2.2
       with:
-        config: ./repo/hardware/sensor-node/kibot-configs/plot.aisler.kibot.yaml
+        config: ./repo/hardware/kibot-configs/plot.aisler.kibot.yaml
         dir: docs
         schema: 'repo/hardware/sensor-node/sensor-node.sch'
         board: 'repo/hardware/sensor-node/sensor-node.kicad_pcb'
