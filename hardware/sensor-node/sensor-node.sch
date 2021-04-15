@@ -1586,23 +1586,23 @@ RFM95_NSS
 $Comp
 L Mechanical:MountingHole H1
 U 1 1 5FA37933
-P 14400 8200
-F 0 "H1" H 14500 8246 50  0000 L CNN
-F 1 "MountingHole" H 14500 8155 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 14400 8200 50  0001 C CNN
-F 3 "~" H 14400 8200 50  0001 C CNN
-	1    14400 8200
+P 14450 8250
+F 0 "H1" H 14550 8296 50  0000 L CNN
+F 1 "MountingHole" H 14550 8205 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 14450 8250 50  0001 C CNN
+F 3 "~" H 14450 8250 50  0001 C CNN
+	1    14450 8250
 	1    0    0    -1  
 $EndComp
 $Comp
 L Mechanical:MountingHole H2
 U 1 1 5FA3863F
-P 14400 8450
-F 0 "H2" H 14500 8496 50  0000 L CNN
-F 1 "MountingHole" H 14500 8405 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.2mm_M2" H 14400 8450 50  0001 C CNN
-F 3 "~" H 14400 8450 50  0001 C CNN
-	1    14400 8450
+P 14450 8500
+F 0 "H2" H 14550 8546 50  0000 L CNN
+F 1 "MountingHole" H 14550 8455 50  0000 L CNN
+F 2 "MountingHole:MountingHole_2.2mm_M2" H 14450 8500 50  0001 C CNN
+F 3 "~" H 14450 8500 50  0001 C CNN
+	1    14450 8500
 	1    0    0    -1  
 $EndComp
 Text Label 9650 4200 0    50   ~ 0
