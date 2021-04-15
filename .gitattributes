@@ -1,3 +1,3 @@
-software/embedded/sensor-node/Drivers/STM32L4xx_HAL_Driver/* linguist-vendored=true
-software/embedded/sensor-node/Drivers/CMSIS/* linguist-vendored=true
-software/embedded/sensor-node/Core/Startup/* linguist-vendored=true
+software/embedded/sensor-node/Drivers/STM32L4xx_HAL_Driver/**/* linguist-generated=true
+software/embedded/sensor-node/Drivers/CMSIS/**/* linguist-generated=true
+software/embedded/sensor-node/Core/Startup/*.s linguist-generated=true
