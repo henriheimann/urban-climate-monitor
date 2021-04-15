@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.core.dto.shared.UploadDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateLocationDTO;
-import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensor;
+import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensorDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationDataDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorDTO;
@@ -134,7 +134,7 @@ public class LocationService
 	}
 
 	@Transactional
-	public LocationSensorDTO updateLocationSensor(long id, long sensorId, UpdateLocationSensor updateSensorDTO)
+	public LocationSensorDTO updateLocationSensor(long id, long sensorId, UpdateLocationSensorDTO updateSensorDTO)
 	{
 		Sensor sensor = sensorRepository.findById(sensorId)
 				.filter(potentialSensor -> Optional.ofNullable(potentialSensor.getLocation())

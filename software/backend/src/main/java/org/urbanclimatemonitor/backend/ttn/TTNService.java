@@ -2,7 +2,10 @@ package org.urbanclimatemonitor.backend.ttn;
 
 import feign.FeignException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
@@ -39,11 +42,20 @@ public class TTNService
 		return stringBuilder.toString();
 	}
 
-	public List<TTNDeviceDTO> getAllDevices()
-	{
-		return ttnClient.getDevicesForApplication(properties.getAppId()).getDevices();
+	@CacheEvict(value="ttnDevices", allEntries=true)
+	@Scheduled(fixedDelay = 60 * 1000)
+	public void ttnDevicesCacheEvict() {
+
 	}
 
+	@Cacheable("ttnDevices")
+	public List<TTNDeviceDTO> getAllDevices()
+	{
+		return Optional.ofNullable(ttnClient.getDevicesForApplication(properties.getAppId()).getDevices())
+				.orElse(List.of());
+	}
+
+	@Cacheable("ttnDevices")
 	public Optional<TTNDeviceDTO> getDevice(String deviceId)
 	{
 		try {
@@ -57,15 +69,18 @@ public class TTNService
 		}
 	}
 
+	@CacheEvict(value="ttnDevices", allEntries=true)
 	public void deleteDevice(String deviceId)
 	{
 		ttnClient.deleteDevice(properties.getAppId(), deviceId);
 	}
 
+	@CacheEvict(value="ttnDevices", allEntries=true)
 	public void createDevice(String deviceId)
 	{
 		TTNLorawanDeviceDTO lorawanDevice = new TTNLorawanDeviceDTO();
 		lorawanDevice.setApplicationEui(properties.getAppEui());
+		lorawanDevice.setApplicationId(properties.getAppId());
 		lorawanDevice.setDeviceEui(generateRandomHexString(16));
 		lorawanDevice.setDeviceId(deviceId);
 		lorawanDevice.setDeviceAddress("2601" + generateRandomHexString(4));

@@ -81,7 +81,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/locations/%d".formatted(id))
+		this.mockMvc.perform(get("/location/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -100,12 +100,12 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 
 		int id = JsonPath.read(content, "$.id");
 
-		this.mockMvc.perform(delete("/locations/%d".formatted(id))
+		this.mockMvc.perform(delete("/location/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/locations/%d".formatted(id))
+		this.mockMvc.perform(get("/location/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isNotFound());
@@ -123,7 +123,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 
 		int id = JsonPath.read(content, "$.id");
 
-		this.mockMvc.perform(put("/locations/%d".formatted(id))
+		this.mockMvc.perform(put("/location/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -222,25 +222,25 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 
 		int locationId = JsonPath.read(locationContent, "$.id");
 
-		this.mockMvc.perform(put("/sensors/%d".formatted(sensorId1))
+		this.mockMvc.perform(put("/sensor/%d".formatted(sensorId1))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
 				{
 					"name": "Sensor Name 1",
-					"location": %d
+					"locationId": %d
 				}
 				""".formatted(locationId)))
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(put("/sensors/%d".formatted(sensorId2))
+		this.mockMvc.perform(put("/sensor/%d".formatted(sensorId2))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
 				{
 					"name": "Sensor Name 2",
-					"location": %d
+					"locationId": %d
 				}
 				""".formatted(locationId)))
 				.andDo(log(log))
@@ -258,7 +258,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/locations/%d/sensors".formatted(setup.getLocationId()))
+		this.mockMvc.perform(get("/location/%d/sensors".formatted(setup.getLocationId()))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -274,7 +274,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/locations/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
+		this.mockMvc.perform(get("/location/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -301,7 +301,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/locations/%d/sensors/%d".formatted(setup.getLocationId(), otherSensorId))
+		this.mockMvc.perform(get("/location/%d/sensors/%d".formatted(setup.getLocationId(), otherSensorId))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#")))
 				.andDo(log(log))
 				.andExpect(status().isNotFound());
@@ -316,7 +316,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(put("/locations/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
+		this.mockMvc.perform(put("/location/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -349,7 +349,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(put("/locations/%d/sensors/%d".formatted(setup.getLocationId(), otherSensorId))
+		this.mockMvc.perform(put("/location/%d/sensors/%d".formatted(setup.getLocationId(), otherSensorId))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -370,7 +370,7 @@ public class LocationControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(put("/locations/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
+		this.mockMvc.perform(put("/location/%d/sensors/%d".formatted(setup.getLocationId(), setup.getSensorId1()))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""

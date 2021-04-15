@@ -1,5 +1,11 @@
-<ucm-header></ucm-header>
-
-<main class="container-fluid py-3">
+<ng-container *ngIf="isIndex()">
   <router-outlet></router-outlet>
-</main>
+</ng-container>
+
+<ng-container *ngIf="!isIndex()">
+  <ucm-header></ucm-header>
+  <main class="container-fluid py-3">
+    <ucm-alert-display destination="main"></ucm-alert-display>
+    <router-outlet></router-outlet>
+  </main>
+</ng-container>

@@ -16,5 +16,5 @@ public class CreateOrUpdateSensorDTO
 	@NotBlank
 	private String name;
 
-	private Long location;
+	private Long locationId;
 }

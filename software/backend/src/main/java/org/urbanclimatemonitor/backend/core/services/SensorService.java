@@ -79,8 +79,8 @@ public class SensorService
 	{
 		Sensor sensor = new Sensor(
 				createSensorDTO.getName(),
-				createSensorDTO.getLocation() == null ? null :
-						locationRepository.findById(createSensorDTO.getLocation()).orElseThrow()
+				createSensorDTO.getLocationId() == null ? null :
+						locationRepository.findById(createSensorDTO.getLocationId()).orElseThrow()
 		);
 
 		sensorRepository.save(sensor);
@@ -134,8 +134,8 @@ public class SensorService
 		makeSureMatchingTTNDeviceExists(sensor);
 
 		sensor.setName(updateSensorDTO.getName());
-		sensor.setLocation(updateSensorDTO.getLocation() == null ? null :
-				locationRepository.findById(updateSensorDTO.getLocation()).orElseThrow());
+		sensor.setLocation(updateSensorDTO.getLocationId() == null ? null :
+				locationRepository.findById(updateSensorDTO.getLocationId()).orElseThrow());
 
 		return entityToSensorDTO(sensor);
 	}

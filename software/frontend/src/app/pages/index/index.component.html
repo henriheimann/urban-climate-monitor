@@ -1,0 +1,10 @@
+<div class="background"></div>
+<main class="container">
+  <div *ngFor="let location of (locations$ | async)" class="card mt-5">
+    <a [routerLink]="['/location/' + location.id]">
+      <div class="card-body">
+        <img height="50" [src]="getLocationIcon(location)" />
+      </div>
+    </a>
+  </div>
+</main>

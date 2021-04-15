@@ -1,0 +1,27 @@
+name: documentation
+
+on:
+  push:
+    paths:
+    - 'documentation/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install asciidoctor
+      run: sudo apt-get install -y asciidoctor
+
+    - name: Run asciidoctor
+      working-directory: ./documentation
+      run: asciidoctor -R . -D build -b html5 index.adoc
+        
+    - uses: JamesIves/github-pages-deploy-action@4.1.1
+      with:
+        branch: gh-pages
+        folder: documentation/build

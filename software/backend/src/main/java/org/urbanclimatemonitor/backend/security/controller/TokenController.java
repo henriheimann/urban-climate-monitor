@@ -1,14 +1,16 @@
 package org.urbanclimatemonitor.backend.security.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.urbanclimatemonitor.backend.security.ManageableJwtTokenStore;
 
-@Controller
+@Tag(name = "oauth", description = "Additional OAuth2 API")
+@RestController
 public class TokenController
 {
 	private final ManageableJwtTokenStore tokenStore;

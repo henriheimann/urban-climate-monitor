@@ -3,7 +3,7 @@
     "login": "Login",
     "logout": "Logout",
     "location": {
-      "visualization": "Visualization",
+      "visualisation": "Visualisation",
       "sensor_list": "Sensor List"
     },
     "admin": {
@@ -15,15 +15,52 @@
   "admin": {
     "users": {
       "users": "Users",
-      "loading_users": "Loading users ...",
+      "loading_users": "Loading users...",
       "username": "Username",
       "permissions": "Permissions",
-      "administrator": "Administrator"
+      "administrator": "Administrator",
+      "add_user": "Add User",
+      "edit_user": "Edit User",
+      "edit": "Edit",
+      "delete": "Delete",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "is_admin": "Administrator",
+      "locations_with_permission": "Locations with Permissions",
+      "roles_rights": "Roles and Rights"
+    },
+    "locations": {
+      "locations": "Locations",
+      "loading_locations": "Loading locations...",
+      "name": "Name",
+      "icon": "Icon",
+      "model3d": "3D-Model",
+      "add_location": "Add Location",
+      "edit_location": "Edit Location",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "sensors": {
+      "name": "Name",
+      "ttnId": "TTN ID",
+      "ttnKeys": "TTN Keys",
+      "location": "Location",
+      "keys": "Show",
+      "add_sensor": "Add Sensor",
+      "edit_sensor": "Edit Sensor",
+      "edit": "Edit",
+      "delete": "Delete",
+      "no_location": "Not assigned"
     }
   },
   "login": {
     "login": "Login",
     "username": "Username",
     "password": "Password"
+  },
+  "alert": {
+    "not_logged_in": "Please log in before proceeding.",
+    "login_success": "You successfully logged in.",
+    "invalid_credentials": "Invalid username or password."
   }
 }

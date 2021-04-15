@@ -5,13 +5,14 @@ $enable-print-styles: false;
 $enable-transitions: true;
 
 // Fonts
-$font-size-base: 14;
+$font-size-base: 16;
 $font-family-base: 'Jost', Helvetica, sans-serif;
 $font-weight-bold: 500;
 
 // Colors
 $light: #F6F6F6;
 $body-color: #111111;
+$body-bg: $light;
 
 // Navbar
 $navbar-light-color: #7f7f7f;
@@ -20,3 +21,5 @@ $navbar-padding-y: 0;
 $nav-link-padding-x: 25px !important;
 $nav-link-padding-y: 20px;
 $navbar-brand-padding-y: 0;
+
+

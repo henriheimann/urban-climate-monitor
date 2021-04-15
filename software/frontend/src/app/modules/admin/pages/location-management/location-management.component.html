@@ -1,0 +1,34 @@
+<div *ngIf="loading$ | async">{{ 'admin.locations.loading_locations' | translate }}</div>
+
+<div *ngIf="!(loading$ | async)" class="container-xxxl">
+  <table *ngIf="locations$ | async as locations" class="table bg-white rounded shadow-sm border-0">
+    <thead>
+    <tr>
+      <th class="border-top-0">{{ 'admin.locations.name' | translate }}</th>
+      <th class="border-top-0">{{ 'admin.locations.icon' | translate }}</th>
+      <th class="border-top-0">{{ 'admin.locations.model3d' | translate }}</th>
+      <th class="border-top-0 text-right">
+        <button class="btn p-0" (click)="onAddLocationButtonClicked()">
+          {{ 'admin.locations.add_location' | translate }}
+          <i class="bi bi-plus-circle-fill"></i>
+        </button>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let locationEntry of locations">
+      <td>{{ locationEntry.name }}</td>
+      <td>{{ locationEntry.icon.filename }}</td>
+      <td>{{ locationEntry.model3d.filename }}</td>
+      <td class="text-right">
+        <button class="btn p-0 mr-4" (click)="onEditLocationButtonClicked(locationEntry)">
+          {{ 'admin.locations.edit' | translate }}
+        </button>
+        <button class="btn p-0" (click)="onDeleteLocationButtonClicked(locationEntry)">
+          {{ 'admin.locations.delete' | translate }}
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

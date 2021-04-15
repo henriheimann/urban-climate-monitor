@@ -2,6 +2,7 @@ package org.urbanclimatemonitor.backend.exception;
 
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class CustomLocalizedExceptionWithoutRollback extends CustomLocalizedException
@@ -16,9 +17,9 @@ public class CustomLocalizedExceptionWithoutRollback extends CustomLocalizedExce
 		super(id, httpStatus);
 	}
 
-	public CustomLocalizedExceptionWithoutRollback(String id, Objects... arguments)
+	public CustomLocalizedExceptionWithoutRollback(String id, Map<String, String> params)
 	{
-		super(id, arguments);
+		super(id, params);
 	}
 
 	public CustomLocalizedExceptionWithoutRollback(Throwable cause, String id)
@@ -26,8 +27,8 @@ public class CustomLocalizedExceptionWithoutRollback extends CustomLocalizedExce
 		super(cause, id);
 	}
 
-	public CustomLocalizedExceptionWithoutRollback(Throwable cause, String id, Object... arguments)
+	public CustomLocalizedExceptionWithoutRollback(Throwable cause, String id, Map<String, String> params)
 	{
-		super(cause, id, arguments);
+		super(cause, id, params);
 	}
 }

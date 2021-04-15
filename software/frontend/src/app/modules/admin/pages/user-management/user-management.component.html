@@ -1,0 +1,37 @@
+<div *ngIf="loading$ | async">{{ 'admin.users.loading_users' | translate }}</div>
+
+<div *ngIf="!(loading$ | async)" class="container-xxxl">
+  <table *ngIf="users$ | async as users" class="table bg-white rounded shadow-sm border-0">
+    <thead>
+    <tr>
+      <th class="border-top-0">{{ 'admin.users.username' | translate }}</th>
+      <th class="border-top-0">{{ 'admin.users.permissions' | translate }}</th>
+      <th class="border-top-0 text-right">
+        <button class="btn p-0" (click)="onAddUserButtonClicked()">
+          {{ 'admin.users.add_user' | translate }}
+          <i class="bi bi-plus-circle-fill"></i>
+        </button>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{ user.username }}</td>
+      <td>
+        <span *ngIf="user.role === 'ADMIN'">{{ 'admin.users.administrator' | translate }}</span>
+        <span *ngIf="user.role === 'USER'">
+          <span *ngFor="let locationId of user.locationsWithPermission">{{ locationId }}</span>
+       </span>
+      </td>
+      <td class="text-right">
+        <button class="btn p-0 mr-4" (click)="onEditUserButtonClicked(user)">
+          {{ 'admin.users.edit' | translate }}
+        </button>
+        <button class="btn p-0" (click)="onDeleteUserButtonClicked(user)">
+          {{ 'admin.users.delete' | translate }}
+        </button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

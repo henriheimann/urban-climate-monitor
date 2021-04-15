@@ -92,6 +92,10 @@ public class UserService
 	@Transactional
 	public UserDTO createUser(CreateUserDTO createUserDTO)
 	{
+		if (userRepository.findById(createUserDTO.getUsername()).isPresent()) {
+			throw new CustomLocalizedException("user-already-exists", HttpStatus.CONFLICT);
+		}
+
 		User user = createUserDtoToEntity(createUserDTO);
 		userRepository.save(user);
 		return entityToUserDto(user);

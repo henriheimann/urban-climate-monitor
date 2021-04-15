@@ -1,6 +1,7 @@
 package org.urbanclimatemonitor.backend.security;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -32,10 +33,10 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.authorizeRequests()
-				.antMatchers("/oauth/revoke").permitAll().and()
-				.authorizeRequests()
-				.antMatchers("/**").authenticated().and()
+				.authorizeRequests().antMatchers("/oauth/revoke").permitAll().and()
+				.authorizeRequests().antMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll().and()
+				.authorizeRequests().antMatchers(HttpMethod.GET, "/locations/**", "/location/**").permitAll().and()
+				.authorizeRequests().antMatchers("/**").authenticated().and()
 				.exceptionHandling()
 				.authenticationEntryPoint(securityExceptionHandler);
 	}

@@ -35,7 +35,7 @@ jobs:
         java-version: 15
 
     - name: Write .env File
-      working-directory: ./software/deployment-local-devenv
+      working-directory: ./deployment/local-devenv
       run: |
           echo "INFLUXDB_HOST=${INFLUXDB_HOST}" >> .env
           echo "INFLUXDB_PORT=${INFLUXDB_PORT}" >> .env
@@ -52,7 +52,7 @@ jobs:
           echo "POSTGRES_TEST_DB=${POSTGRES_TEST_DB}" >> .env
 
     - name: Start Development Environment
-      working-directory: ./software/deployment-local-devenv
+      working-directory: ./deployment/local-devenv
       run: |
           chmod +x deploy-local-devenv.sh
           ./deploy-local-devenv.sh
@@ -60,5 +60,3 @@ jobs:
     - name: Execute Maven Tests
       working-directory: ./software/backend
       run: mvn test --no-transfer-progress
-      
-

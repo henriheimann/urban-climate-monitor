@@ -1,0 +1,7 @@
+<ng-container *ngIf="alerts$ | async as alerts">
+  <div *ngIf="(alerts?.length || 0) > 0" class="modal-body">
+    <alert *ngFor="let alert of alerts" [type]="alert.type">
+      {{ alert.messageKey | translate:alert.messageParams }}
+    </alert>
+  </div>
+</ng-container>

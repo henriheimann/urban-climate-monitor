@@ -114,7 +114,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(delete("/users/user1")
+		this.mockMvc.perform(delete("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk());
@@ -132,7 +132,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(put("/users/user1")
+		this.mockMvc.perform(put("/user/user1")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -154,7 +154,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(post("/users/user1/password")
+		this.mockMvc.perform(post("/user/user1/password")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -181,7 +181,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(post("/users/user1/password")
+		this.mockMvc.perform(post("/user/user1/password")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user1", "testPassword1234#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -205,7 +205,7 @@ public class UserControllerIntegrationTest extends BaseIntegrationTest
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(post("/users/user1/password")
+		this.mockMvc.perform(post("/user/user1/password")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken("user2", "testPassword5678#"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""

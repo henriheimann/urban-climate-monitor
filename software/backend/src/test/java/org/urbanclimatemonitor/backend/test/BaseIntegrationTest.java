@@ -73,6 +73,9 @@ public class BaseIntegrationTest
 	@BeforeEach
 	public void setupDatabase()
 	{
+		userRepository.deleteAll();
+		sensorRepository.deleteAll();
+		locationRepository.deleteAll();
 		userService.createUser(new CreateUserDTO(initialisationProperties.getAdmin().getUsername(),
 				initialisationProperties.getAdmin().getPassword(), Role.ADMIN));
 	}
@@ -118,7 +121,7 @@ public class BaseIntegrationTest
 	protected ResultActions createUser(String username, String password, String role, Long... locationsWithPermission)
 			throws Exception
 	{
-		return this.mockMvc.perform(post("/users")
+		return this.mockMvc.perform(post("/user")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -137,7 +140,7 @@ public class BaseIntegrationTest
 
 	protected ResultActions createSensor(String name) throws Exception
 	{
-		return this.mockMvc.perform(post("/sensors")
+		return this.mockMvc.perform(post("/sensor")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -156,7 +159,7 @@ public class BaseIntegrationTest
 
 	protected ResultActions createLocation(String name, String iconFilename, String model3dFilename) throws Exception
 	{
-		return this.mockMvc.perform(post("/locations")
+		return this.mockMvc.perform(post("/location")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""

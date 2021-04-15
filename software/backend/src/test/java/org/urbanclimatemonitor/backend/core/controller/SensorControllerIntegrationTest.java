@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
 import org.urbanclimatemonitor.backend.test.BaseIntegrationTest;
 import org.urbanclimatemonitor.backend.test.mocks.TTNWireMockConfig;
+import org.urbanclimatemonitor.backend.ttn.TTNService;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,6 +32,9 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 
 	@Autowired
 	SensorRepository sensorRepository;
+
+	@Autowired
+	TTNService ttnService;
 
 	@Test
 	public void getAllSensors_succeeds() throws Exception
@@ -56,6 +60,8 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk());
+
+		ttnService.ttnDevicesCacheEvict();
 
 		ttnWireMockConfig.setupApplicationsDevicesGet(
 				ttnWireMockConfig.loadMockJson("applications-devices-get_removed-device.json"));
@@ -131,7 +137,7 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				    }
 				""".formatted(ttnDeviceId));
 
-		this.mockMvc.perform(get("/sensors/%d".formatted(id))
+		this.mockMvc.perform(get("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk())
@@ -157,7 +163,7 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 
 		ttnWireMockConfig.setupApplicationsDevicesIdGet_notFound(ttnDeviceId);
 
-		this.mockMvc.perform(get("/sensors/%d".formatted(id))
+		this.mockMvc.perform(get("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isNotFound());
@@ -198,12 +204,12 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				""".formatted(ttnDeviceId));
 		ttnWireMockConfig.setupApplicationsDevicesIdDelete(ttnDeviceId);
 
-		this.mockMvc.perform(delete("/sensors/%d".formatted(id))
+		this.mockMvc.perform(delete("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk());
 
-		this.mockMvc.perform(get("/sensors/%d".formatted(id))
+		this.mockMvc.perform(get("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isNotFound());
@@ -243,7 +249,7 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				    }
 				""".formatted(ttnDeviceId));
 
-		this.mockMvc.perform(put("/sensors/%d".formatted(id))
+		this.mockMvc.perform(put("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
@@ -257,7 +263,7 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				.andExpect(jsonPath("$.ttnId", is(ttnDeviceId)))
 				.andExpect(jsonPath("$.name", is("New Testsensor")));
 
-		this.mockMvc.perform(get("/sensors/%d".formatted(id))
+		this.mockMvc.perform(get("/sensor/%d".formatted(id))
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
 				.andDo(log(log))
 				.andExpect(status().isOk())

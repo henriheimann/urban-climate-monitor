@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h1 class="pull-left">{{ 'admin.users.add_user' | translate }}</h1>
+  <button type="button" class="close pull-right" (click)="modalRef.hide()">
+    <span>&times;</span>
+  </button>
+</div>
+<form [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="inputUsername">{{ 'admin.users.username' | translate }}</label>
+      <input type="text" class="form-control" id="inputUsername" formControlName="username">
+    </div>
+
+    <hr/>
+
+    <div class="form-group">
+      <label for="inputPassword">{{ 'admin.users.password' | translate }}</label>
+      <input type="password" class="form-control" id="inputPassword" formControlName="password">
+    </div>
+    <div class="form-group">
+      <label for="inputConfirmPassword">{{ 'admin.users.confirm_password' | translate }}</label>
+      <input type="password" class="form-control" id="inputConfirmPassword" formControlName="confirmPassword">
+    </div>
+
+    <hr/>
+
+    <h5>{{ 'admin.users.roles_rights' | translate }}</h5>
+    <div class="form-check mb-2">
+      <input type="checkbox" class="form-check-input" id="inputIsAdmin" formControlName="isAdmin">
+      <label class="form-check-label" for="inputIsAdmin">{{ 'admin.users.is_admin' | translate }}</label>
+    </div>
+    <div *ngIf="addUserForm.get('isAdmin')?.value === false" class="form-group">
+      <label for="inputLocationsWithPermission">{{ 'admin.users.locations_with_permission' | translate }}</label>
+      <ng-select id="inputLocationsWithPermission" formControlName="locationsWithPermission">
+        <ng-option *ngFor="let location of (locations$ | async)" [value]="location.id">{{location.name}}</ng-option>
+      </ng-select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" [disabled]="addUserForm.invalid">{{ 'admin.users.add_user' | translate }}</button>
+  </div>
+</form>

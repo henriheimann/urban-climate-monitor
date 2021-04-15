@@ -1,4 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+$grid-breakpoints: (
+  xxxs: 0,
+  xxs: 320px,
+  xs: 568px,
+  sm: 667px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1440px,
+  xxxl: 1600px
+);
+
+$container-max-widths: (
+  xxxs: 0,
+  xxs: 320px,
+  xs: 568px,
+  sm: 667px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1440px,
+  xxxl: 1600px
+);
+
 @import "variables";
-@import "../../../node_modules/bootstrap/scss/bootstrap";
+
+@import "~bootstrap/scss/bootstrap";
+@import "~bootstrap-icons/font/bootstrap-icons.css";
+
+@import "~@ng-select/ng-select/themes/default.theme.css";
