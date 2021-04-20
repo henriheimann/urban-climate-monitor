@@ -11,11 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
       with:
         submodules: recursive
         persist-credentials: false
         path: repo
+        
+    - name: Checkout Github Pages branch
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        persist-credentials: false
+        path: gh-pages
 
     - uses: nerdyscout/kicad-exports@v2.2
       with:
@@ -31,14 +39,7 @@ jobs:
         schema: 'repo/hardware/sensor-node/sensor-node.sch'
         board: 'repo/hardware/sensor-node/sensor-node.kicad_pcb'
 
-    - name: Checkout Github Pages branch
-      uses: actions/checkout@v2
-      with:
-        ref: gh-pages
-        persist-credentials: false
-        path: gh-pages
-
-    - name: Copy artifcats to Github Pages branch
+    - name: Copy Artifacts to Github Pages Branch
       run: |
         mkdir -p gh-pages/assets/hardware/schematics/
         mkdir -p gh-pages/assets/hardware/plots/
@@ -47,7 +48,7 @@ jobs:
         cp docs/docs/img/sensor-node-top.svg gh-pages/assets/hardware/plots/
         cp docs/docs/img/sensor-node-bottom.svg gh-pages/assets/hardware/plots/
 
-    - name: Commit artifcats to Github Pages branch
+    - name: Commit Artifacts to Github Pages Branch
       working-directory: './gh-pages'
       run: |
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -55,7 +56,7 @@ jobs:
         git add -A
         git commit -m "Deploying hardware artifcats to gh-pages from ${{ github.repository }}@${{ github.sha }}" -a
 
-    - name: Push to Github Pages branch
+    - name: Push to Github Pages Branch
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}

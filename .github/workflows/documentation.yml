@@ -10,21 +10,46 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
     - name: Install asciidoctor
       run: sudo apt-get install -y asciidoctor
 
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        path: repo
+
+    - name: Checkout Github Pages Branch
+      uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+        persist-credentials: false
+        path: gh-pages
+
     - name: Run asciidoctor
-      working-directory: ./documentation
+      working-directory: ./repo/documentation
       run: asciidoctor -R . -D build -b html5 index.adoc
         
-    - uses: JamesIves/github-pages-deploy-action@4.1.1
+    - name: Copy Assets to Github Pages Branch
+      run: |
+        mkdir -p gh-pages/assets
+        cp -R -u repo/documentation/assets gh-pages/assets
+
+    - name: Copy Build to Github Pages Branch
+      run: |
+        cp -R -u repo/documentation/build gh-pages
+
+    - name: Commit Artifacts to Github Pages Branch
+      working-directory: './gh-pages'
+      run: |
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add -A
+        git commit -m "Deploying documentation to gh-pages from ${{ github.repository }}@${{ github.sha }}" -a
+
+    - name: Push to Github Pages Branch
+      uses: ad-m/github-push-action@master
       with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: gh-pages
-        folder: documentation/build
-        commit-message: Deploying to gh-pages from ${{ github.repository }}@${{ github.sha }}
-        git-config-name: github-actions[bot]
-        git-config-email: 41898282+github-actions[bot]@users.noreply.github.com
+        directory: './gh-pages'
