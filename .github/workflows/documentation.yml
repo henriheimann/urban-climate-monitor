@@ -28,7 +28,7 @@ jobs:
 
     - name: Run asciidoctor
       working-directory: ./repo/documentation
-      run: asciidoctor -R . -D build -b html5 index.adoc
+      run: asciidoctor -a env-github -R . -D build -b html5 index.adoc
         
     - name: Copy Assets to Github Pages Branch
       run: |
