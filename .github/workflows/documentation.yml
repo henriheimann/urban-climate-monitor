@@ -33,11 +33,11 @@ jobs:
     - name: Copy Assets to Github Pages Branch
       run: |
         mkdir -p gh-pages/assets
-        cp -R -u repo/documentation/assets gh-pages/assets
+        cp -R -u repo/documentation/assets/ gh-pages/assets/
 
     - name: Copy Build to Github Pages Branch
       run: |
-        cp -R -u repo/documentation/build gh-pages
+        cp -R -u repo/documentation/build/ gh-pages/
 
     - name: Commit Artifacts to Github Pages Branch
       working-directory: './gh-pages'
