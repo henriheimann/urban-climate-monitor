@@ -8,7 +8,7 @@
       <th class="border-top-0">{{ 'admin.locations.icon' | translate }}</th>
       <th class="border-top-0">{{ 'admin.locations.model3d' | translate }}</th>
       <th class="border-top-0 text-right">
-        <button class="btn p-0" (click)="onAddLocationButtonClicked()">
+        <button class="btn btn-link text-dark p-0" (click)="onAddLocationButtonClicked()">
           {{ 'admin.locations.add_location' | translate }}
           <i class="bi bi-plus-circle-fill"></i>
         </button>
@@ -21,10 +21,10 @@
       <td>{{ locationEntry.icon.filename }}</td>
       <td>{{ locationEntry.model3d.filename }}</td>
       <td class="text-right">
-        <button class="btn p-0 mr-4" (click)="onEditLocationButtonClicked(locationEntry)">
+        <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditLocationButtonClicked(locationEntry)">
           {{ 'admin.locations.edit' | translate }}
         </button>
-        <button class="btn p-0" (click)="onDeleteLocationButtonClicked(locationEntry)">
+        <button class="btn btn-link text-dark p-0" (click)="onDeleteLocationButtonClicked(locationEntry)">
           {{ 'admin.locations.delete' | translate }}
         </button>
       </td>

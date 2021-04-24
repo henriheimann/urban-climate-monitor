@@ -7,7 +7,7 @@
       <th class="border-top-0">{{ 'admin.users.username' | translate }}</th>
       <th class="border-top-0">{{ 'admin.users.permissions' | translate }}</th>
       <th class="border-top-0 text-right">
-        <button class="btn p-0" (click)="onAddUserButtonClicked()">
+        <button class="btn btn-link text-dark p-0" (click)="onAddUserButtonClicked()">
           {{ 'admin.users.add_user' | translate }}
           <i class="bi bi-plus-circle-fill"></i>
         </button>
@@ -24,10 +24,10 @@
        </span>
       </td>
       <td class="text-right">
-        <button class="btn p-0 mr-4" (click)="onEditUserButtonClicked(user)">
+        <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditUserButtonClicked(user)">
           {{ 'admin.users.edit' | translate }}
         </button>
-        <button class="btn p-0" (click)="onDeleteUserButtonClicked(user)">
+        <button class="btn btn-link text-dark p-0" (click)="onDeleteUserButtonClicked(user)">
           {{ 'admin.users.delete' | translate }}
         </button>
       </td>

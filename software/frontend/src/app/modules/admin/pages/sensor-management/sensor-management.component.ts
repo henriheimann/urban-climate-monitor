@@ -7,7 +7,6 @@ import {BsModalService} from 'ngx-bootstrap/modal';
 import {Sensor} from '../../../shared/models/sensor.model';
 import {SensorModalComponent} from '../../modals/sensor-modal/sensor-modal.component';
 import {Dictionary} from '@ngrx/entity';
-import {LocationModalComponent} from '../../modals/location-modal/location-modal.component';
 
 @Component({
   selector: 'ucm-sensor-management',

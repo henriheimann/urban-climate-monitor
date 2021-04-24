@@ -4,9 +4,18 @@
   font-size: 1.15rem;
   font-weight: 500;
   justify-content: space-between;
-  height: 70px;
+  height: $navbar-height;
 }
 
-.nav-item.active {
-  border-bottom: 4px solid $body-color;
+.nav-item {
+  .btn {
+    font-size: 1.15rem;
+    font-weight: 500;
+    display: block;
+    padding: 20px 25px !important;
+  }
+
+  &.active {
+    border-bottom: 4px solid $body-color;
+  }
 }

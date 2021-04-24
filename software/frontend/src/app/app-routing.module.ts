@@ -1,11 +1,16 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {IndexComponent} from './pages/index/index.component';
+import {FrontPageComponent} from './pages/front-page/front-page.component';
+import {ImprintDataProtectionComponent} from './pages/imprint-data-protection/imprint-data-protection.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: IndexComponent
+    component: FrontPageComponent
+  },
+  {
+    path: 'imprint-data-protection',
+    component: ImprintDataProtectionComponent
   }
 ];
 

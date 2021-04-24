@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {BsModalService} from 'ngx-bootstrap/modal';
-import {LoginComponent} from '../../modules/auth/components/login/login.component';
 import {Store} from '@ngrx/store';
 import {selectLoggedInUser} from '../../modules/auth/store/auth.selectors';
 import {logoutUser} from '../../modules/auth/store/auth.actions';
@@ -11,6 +10,7 @@ import {Observable} from 'rxjs';
 import {Dictionary} from '@ngrx/entity';
 import {map} from 'rxjs/operators';
 import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import {LoginModalComponent} from '../../modules/auth/modals/login-modal/login-modal.component';
 
 @Component({
   selector: 'ucm-header',
@@ -33,7 +33,7 @@ export class HeaderComponent implements OnInit {
   }
 
   onLoginButtonClicked(): void {
-    this.modalService.show(LoginComponent, {class: 'modal-dialog-centered'});
+    this.modalService.show(LoginModalComponent, {class: 'modal-dialog-centered'});
   }
 
   onLogout(): void {

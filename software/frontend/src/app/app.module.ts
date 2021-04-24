@@ -16,9 +16,11 @@ import {environment} from '../environments/environment';
 import {TokenInterceptor} from './modules/auth/interceptors/token.interceptor';
 import {StoreDevtoolsModule} from '@ngrx/store-devtools';
 import {AlertModule} from './modules/alert/alert.module';
-import { AlertModule as NgxBootstrapAlertModule } from 'ngx-bootstrap/alert';
+import {AlertModule as NgxBootstrapAlertModule} from 'ngx-bootstrap/alert';
 import {LocationModule} from './modules/location/location.module';
-import { IndexComponent } from './pages/index/index.component';
+import {ImprintDataProtectionComponent} from './pages/imprint-data-protection/imprint-data-protection.component';
+import {FrontPageComponent} from './pages/front-page/front-page.component';
+import {LoginPageComponent} from './modules/admin/pages/login-page/login-page.component';
 
 const customDataServiceConfig: DefaultDataServiceConfig = {
   root: environment.backendUrl + '/'
@@ -28,7 +30,8 @@ const customDataServiceConfig: DefaultDataServiceConfig = {
   declarations: [
     AppComponent,
     HeaderComponent,
-    IndexComponent
+    FrontPageComponent,
+    ImprintDataProtectionComponent
   ],
   imports: [
     BrowserModule,

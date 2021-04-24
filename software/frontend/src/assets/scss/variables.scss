@@ -10,6 +10,10 @@ $font-family-base: 'Jost', Helvetica, sans-serif;
 $font-weight-bold: 500;
 
 // Colors
+$theme-colors: (
+  "primary": #008198
+);
+
 $light: #F6F6F6;
 $body-color: #111111;
 $body-bg: $light;
@@ -21,5 +25,14 @@ $navbar-padding-y: 0;
 $nav-link-padding-x: 25px !important;
 $nav-link-padding-y: 20px;
 $navbar-brand-padding-y: 0;
+$navbar-height: 70px;
 
+$modal-content-border-width: 0;
+$modal-content-box-shadow-xs: 0;
+$modal-content-box-shadow-sm-up: 0;
 
+// Links
+$emphasized-link-hover-darken-percentage: 0;
+
+// Footer
+$footer-height: 30px;

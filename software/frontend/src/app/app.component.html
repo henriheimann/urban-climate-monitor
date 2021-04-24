@@ -1,5 +1,8 @@
 <ng-container *ngIf="isIndex()">
-  <router-outlet></router-outlet>
+  <div class="background"></div>
+  <main class="d-flex flex-wrap justify-content-center align-content-center without-navbar">
+    <router-outlet></router-outlet>
+  </main>
 </ng-container>
 
 <ng-container *ngIf="!isIndex()">
@@ -9,3 +12,7 @@
     <router-outlet></router-outlet>
   </main>
 </ng-container>
+
+<div class="d-flex flex-row-reverse">
+  <a class="mr-2" [class.text-light] = "isIndex()" [class.text-dark] = "!isIndex()" [routerLink]="['/imprint-data-protection']">Imprint & Data Protection</a>
+</div>

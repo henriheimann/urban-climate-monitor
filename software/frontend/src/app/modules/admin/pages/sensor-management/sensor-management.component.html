@@ -1,10 +1,9 @@
 <div *ngIf="loading$ | async">
-  <div class="d-flex justify-content-center">
-    <div class="spinner-grow" role="status">
-    </div>
-    <h3>
-      {{ 'admin.sensors.loading_sensors' | translate }}
-    </h3>
+  <div class="d-flex flex-column align-items-center mt-5">
+      <div class="spinner-grow" role="status"></div>
+      <h3 class="mt-3">
+        {{ 'admin.sensors.loading_sensors' | translate }}
+      </h3>
   </div>
 </div>
 
@@ -17,7 +16,7 @@
       <th class="border-top-0">{{ 'admin.sensors.ttnId' | translate }}</th>
       <th class="border-top-0">{{ 'admin.sensors.ttnKeys' | translate }}</th>
       <th class="border-top-0 text-right">
-        <button class="btn p-0" (click)="onAddSensorButtonClicked()">
+        <button class="btn btn-link text-dark p-0" (click)="onAddSensorButtonClicked()">
           {{ 'admin.sensors.add_sensor' | translate }}
           <i class="bi bi-plus-circle-fill"></i>
         </button>
@@ -35,15 +34,15 @@
       </td>
       <td>{{ sensor.ttnId }}</td>
       <td>
-        <button class="btn p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
+        <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
           {{ 'admin.sensors.keys' | translate }}
         </button>
       </td>
       <td class="text-right">
-        <button class="btn p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
+        <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
           {{ 'admin.sensors.edit' | translate }}
         </button>
-        <button class="btn p-0" (click)="onDeleteSensorButtonClicked(sensor)">
+        <button class="btn btn-link text-dark p-0" (click)="onDeleteSensorButtonClicked(sensor)">
           {{ 'admin.sensors.delete' | translate }}
         </button>
       </td>

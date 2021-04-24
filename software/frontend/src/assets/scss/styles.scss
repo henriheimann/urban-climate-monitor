@@ -33,3 +33,7 @@ $container-max-widths: (
 @import "~bootstrap-icons/font/bootstrap-icons.css";
 
 @import "~@ng-select/ng-select/themes/default.theme.css";
+
+.btn-link:focus {
+  box-shadow: none !important;
+}

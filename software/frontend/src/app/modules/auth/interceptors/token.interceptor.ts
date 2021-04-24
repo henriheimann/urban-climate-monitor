@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
-import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
 import {Store} from '@ngrx/store';
 import {selectAuthState, selectToken} from '../store/auth.selectors';
-import {catchError, filter, mergeMap, switchMap, take} from 'rxjs/operators';
+import {catchError, filter, switchMap, take} from 'rxjs/operators';
 import {refreshUserToken} from '../store/auth.actions';
-import {AuthEffects} from '../store/auth.effects';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {

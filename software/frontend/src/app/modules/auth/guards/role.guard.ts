@@ -24,7 +24,7 @@ export class RoleGuard implements CanActivate {
         this.store.dispatch(dispatchAlert({
           alert: new Alert('alert.wrong_role')
         }));
-        this.router.navigate(['/']).then();
+        this.router.navigate(['']).then();
       }
       return loggedInUser?.role === role;
     }));

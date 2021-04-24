@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
         this.store.dispatch(dispatchAlert({
           alert: new Alert('alert.not_logged_in')
         }));
-        this.router.navigate(['/']).then();
+        this.router.navigate(['']).then();
       }
     }));
   }

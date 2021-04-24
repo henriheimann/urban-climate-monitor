@@ -1,0 +1,11 @@
+<div *ngIf="(locations$ | async)?.length == 0">
+  <h5 class="text-light">No Locations have been added yet...</h5>
+  <a [routerLink]="['admin', 'login']" class="text-light">Go to Administration</a>
+</div>
+<div *ngFor="let location of (locations$ | async)" class="card m-5" style="width: 24rem; height: 24rem">
+  <a [routerLink]="['location', location.id]">
+    <div class="card-body">
+      <img height="50" [src]="getLocationIcon(location)" />
+    </div>
+  </a>
+</div>

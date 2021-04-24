@@ -5,8 +5,13 @@ import {LocationManagementComponent} from './pages/location-management/location-
 import {SensorManagementComponent} from './pages/sensor-management/sensor-management.component';
 import {AuthGuard} from '../auth/guards/auth.guard';
 import {RoleGuard} from '../auth/guards/role.guard';
+import {LoginPageComponent} from './pages/login-page/login-page.component';
 
 const routes: Routes = [
+  {
+    path: 'admin/login',
+    component: LoginPageComponent
+  },
   {
     path: 'admin',
     redirectTo: 'admin/locations'

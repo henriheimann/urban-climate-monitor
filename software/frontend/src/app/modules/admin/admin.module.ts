@@ -2,8 +2,6 @@ import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ENTITY_METADATA_TOKEN} from '@ngrx/data';
 import {User} from '../shared/models/user.model';
-import {Location} from '../shared/models/location.model';
-import {Sensor} from '../shared/models/sensor.model';
 import {UserManagementComponent} from './pages/user-management/user-management.component';
 import {AdminRoutingModule} from './admin-routing.module';
 import {SharedModule} from '../shared/shared.module';
@@ -14,6 +12,7 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {EditUserModalComponent} from './modals/edit-user-modal/edit-user-modal.component';
 import {LocationModalComponent} from './modals/location-modal/location-modal.component';
 import {SensorModalComponent} from './modals/sensor-modal/sensor-modal.component';
+import {LoginPageComponent} from './pages/login-page/login-page.component';
 
 @NgModule({
   imports: [
@@ -29,7 +28,8 @@ import {SensorModalComponent} from './modals/sensor-modal/sensor-modal.component
     AddUserModalComponent,
     EditUserModalComponent,
     LocationModalComponent,
-    SensorModalComponent
+    SensorModalComponent,
+    LoginPageComponent
   ],
   providers: [
     {
