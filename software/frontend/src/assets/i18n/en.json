@@ -12,6 +12,10 @@
       "users": "Users"
     }
   },
+  "front_page": {
+    "no_locations": "No Locations have been added yet...",
+    "go_to_administration": "Go to Administration"
+  },
   "admin": {
     "users": {
       "users": "Users",
@@ -46,12 +50,16 @@
       "ttnId": "TTN ID",
       "ttnKeys": "TTN Keys",
       "location": "Location",
-      "keys": "Show",
+      "show_keys": "Show",
       "add_sensor": "Add Sensor",
       "edit_sensor": "Edit Sensor",
       "edit": "Edit",
       "delete": "Delete",
-      "no_location": "Not assigned"
+      "no_location": "Not assigned",
+      "keys": "Keys of",
+      "device_address": "Device Address",
+      "application_session_key": "Application Session Key",
+      "network_session_key": "Network Session Key"
     }
   },
   "login": {

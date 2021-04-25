@@ -10,13 +10,14 @@ $font-family-base: 'Jost', Helvetica, sans-serif;
 $font-weight-bold: 500;
 
 // Colors
-$theme-colors: (
-  "primary": #008198
-);
-
 $light: #F6F6F6;
 $body-color: #111111;
 $body-bg: $light;
+
+// Tables
+$table-border-width: 1px;
+$table-border-color: #E8E8E8;
+$table-header-border-color: $body-color;
 
 // Navbar
 $navbar-light-color: #7f7f7f;

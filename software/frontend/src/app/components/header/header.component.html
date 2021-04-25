@@ -1,6 +1,9 @@
 <nav class="navbar navbar-expand navbar-light bg-white shadow-sm">
   <div class="dropdown">
     <button class="btn bg-white dropdown-toggle p-0 pr-2" type="button" data-toggle="dropdown">
+      <span *ngIf="routeStartsWith('/imprint-data-protection')" >
+        Imprint & Data Protection
+      </span>
       <span *ngIf="routeStartsWith('/admin')" >
         <img src="assets/images/administration-icon.png" height="39" alt="Administration">
       </span>

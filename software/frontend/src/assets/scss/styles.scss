@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;1,400;1,500&display=swap');
 
+$theme-colors: (
+  "primary": #008198
+);
+
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 
@@ -36,4 +40,10 @@ $container-max-widths: (
 
 .btn-link:focus {
   box-shadow: none !important;
+}
+
+.table {
+  thead th {
+    border-bottom: $table-border-width solid $table-header-border-color;
+  }
 }

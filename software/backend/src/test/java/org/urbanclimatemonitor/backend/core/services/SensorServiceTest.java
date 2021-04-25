@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateSensorDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.SensorDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.SensorKeysDTO;
 import org.urbanclimatemonitor.backend.core.entities.Location;
 import org.urbanclimatemonitor.backend.core.entities.Sensor;
 import org.urbanclimatemonitor.backend.core.repositories.LocationRepository;
@@ -18,6 +19,7 @@ import org.urbanclimatemonitor.backend.test.TestEntities;
 import org.urbanclimatemonitor.backend.test.mockito.SaveSensorAnswer;
 import org.urbanclimatemonitor.backend.ttn.TTNService;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
+import org.urbanclimatemonitor.backend.ttn.dto.TTNLorawanDeviceDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -188,5 +190,28 @@ class SensorServiceTest
 		assertThat(sensorDTO.getTtnId()).isEqualTo("device-00000014");
 		assertThat(sensorDTO.getName()).isEqualTo("New Name");
 		assertThat(sensorDTO.getLocationId()).isEqualTo(98L);
+	}
+
+	@Test
+	public void getSensorKeys()
+	{
+		TTNLorawanDeviceDTO lorawanDeviceDTO = new TTNLorawanDeviceDTO();
+		lorawanDeviceDTO.setDeviceAddress("1234");
+		lorawanDeviceDTO.setApplicationSessionKey("AABB");
+		lorawanDeviceDTO.setNetworkSessionKey("1122");
+
+		TTNDeviceDTO ttnDeviceDTO = new TTNDeviceDTO();
+		ttnDeviceDTO.setDeviceId("device-00000014");
+		ttnDeviceDTO.setLorawanDevice(lorawanDeviceDTO);
+
+		when(ttnService.getDevice("device-00000014")).thenReturn(Optional.of(ttnDeviceDTO));
+
+		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
+
+		SensorKeysDTO sensorKeysDTO = sensorService.getSensorKeys(14L);
+		assertThat(sensorKeysDTO.getDeviceAddress()).isEqualTo("1234");
+		assertThat(sensorKeysDTO.getApplicationSessionKey()).isEqualTo("AABB");
+		assertThat(sensorKeysDTO.getNetworkSessionKey()).isEqualTo("1122");
 	}
 }

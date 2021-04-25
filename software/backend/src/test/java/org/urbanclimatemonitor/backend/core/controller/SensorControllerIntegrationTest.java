@@ -271,4 +271,48 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 				.andExpect(jsonPath("$.ttnId", is(ttnDeviceId)))
 				.andExpect(jsonPath("$.name", is("New Testsensor")));
 	}
+
+	@Test
+	public void getSensorKeys_succeeds() throws Exception
+	{
+		ttnWireMockConfig.setupApplicationsDevicesPost();
+
+		String content = createSensor("Testsensor")
+				.andDo(log(log))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.name", is("Testsensor")))
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		int id = JsonPath.read(content, "$.id");
+		String ttnDeviceId = JsonPath.read(content, "$.ttnId");
+
+		ttnWireMockConfig.setupApplicationsDevicesIdGet(ttnDeviceId, """
+				{
+				      "app_id": "ucm-ttn-app-id",
+				      "dev_id": "%1$s",
+				      "lorawan_device": {
+				        "app_eui": "2D42890323AC1323",
+				        "dev_eui": "D9A5D8C71C10D21A",
+				        "app_id": "ucm-ttn-app-id",
+				        "dev_id": "%1$s",
+				        "dev_addr": "260157EE",
+				        "nwk_s_key": "570B4D15DDCFD28D2FFC4B90DEA48d2D",
+				        "app_s_key": "5E84BB636C7082BFC37EFFF250A0F620",
+				        "app_key": "",
+				        "disable_f_cnt_check": true,
+				        "activation_constraints": "local"
+				      }
+				    }
+				""".formatted(ttnDeviceId));
+
+		this.mockMvc.perform(get("/sensor/%d/keys".formatted(id))
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
+				.andDo(log(log))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.deviceAddress", is("260157EE")))
+				.andExpect(jsonPath("$.applicationSessionKey", is("5E84BB636C7082BFC37EFFF250A0F620")))
+				.andExpect(jsonPath("$.networkSessionKey", is("570B4D15DDCFD28D2FFC4B90DEA48d2D")));
+	}
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateSensorDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.SensorDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.SensorKeysDTO;
 import org.urbanclimatemonitor.backend.core.entities.Sensor;
 import org.urbanclimatemonitor.backend.core.repositories.LocationRepository;
 import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
@@ -16,6 +17,7 @@ import org.urbanclimatemonitor.backend.util.Streams;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -94,11 +96,15 @@ public class SensorService
 		return entityToSensorDTO(sensor);
 	}
 
-	private void makeSureMatchingTTNDeviceExists(Sensor sensor)
+	private TTNDeviceDTO makeSureMatchingTTNDeviceExists(Sensor sensor)
 	{
-		if (ttnService.getDevice(sensor.getTtnId()).isEmpty()) {
+		Optional<TTNDeviceDTO> ttnDeviceOptional = ttnService.getDevice(sensor.getTtnId());
+
+		if (ttnDeviceOptional.isEmpty()) {
 			sensorRepository.delete(sensor);
 			throw new CustomLocalizedExceptionWithoutRollback("ttn-device-does-not-exist", HttpStatus.NOT_FOUND);
+		} else {
+			return ttnDeviceOptional.get();
 		}
 	}
 
@@ -138,5 +144,20 @@ public class SensorService
 				locationRepository.findById(updateSensorDTO.getLocationId()).orElseThrow());
 
 		return entityToSensorDTO(sensor);
+	}
+
+	@Transactional(noRollbackFor = {CustomLocalizedExceptionWithoutRollback.class})
+	public SensorKeysDTO getSensorKeys(long id)
+	{
+		Sensor sensor = sensorRepository.findById(id).orElseThrow(() ->
+				new CustomLocalizedException("sensor-not-found", HttpStatus.NOT_FOUND));
+
+		TTNDeviceDTO ttnDeviceDTO = makeSureMatchingTTNDeviceExists(sensor);
+
+		return new SensorKeysDTO(
+				ttnDeviceDTO.getLorawanDevice().getDeviceAddress(),
+				ttnDeviceDTO.getLorawanDevice().getApplicationSessionKey(),
+				ttnDeviceDTO.getLorawanDevice().getNetworkSessionKey()
+		);
 	}
 }

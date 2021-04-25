@@ -7,6 +7,7 @@ import {BsModalService} from 'ngx-bootstrap/modal';
 import {Sensor} from '../../../shared/models/sensor.model';
 import {SensorModalComponent} from '../../modals/sensor-modal/sensor-modal.component';
 import {Dictionary} from '@ngrx/entity';
+import {SensorKeysModalComponent} from '../../modals/sensor-keys-modal/sensor-keys-modal.component';
 
 @Component({
   selector: 'ucm-sensor-management',
@@ -50,5 +51,12 @@ export class SensorManagementComponent implements OnInit {
 
   onDeleteSensorButtonClicked(sensor: Sensor): void {
     this.sensorService.delete(sensor);
+  }
+
+  onShowSensorKeysButtonClicked(sensor: Sensor): void {
+    this.modalService.show(SensorKeysModalComponent, {
+      class: 'modal-dialog-centered modal-lg',
+      initialState: { sensor }
+    });
   }
 }

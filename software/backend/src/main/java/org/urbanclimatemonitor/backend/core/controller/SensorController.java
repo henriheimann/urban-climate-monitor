@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateSensorDTO;
 import org.urbanclimatemonitor.backend.core.dto.result.SensorDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.SensorKeysDTO;
 import org.urbanclimatemonitor.backend.core.services.SensorService;
 
 import javax.validation.Valid;
@@ -63,5 +64,13 @@ public class SensorController
 	public SensorDTO updateSensor(@PathVariable long id, @Valid @RequestBody CreateOrUpdateSensorDTO updateSensorDTO)
 	{
 		return sensorService.updateSensor(id, updateSensorDTO);
+	}
+
+	@Operation(summary = "Get the TTN keys for a single sensor")
+	@GetMapping("/sensor/{id}/keys")
+	@PreAuthorize("hasRole('ADMIN')")
+	public SensorKeysDTO getSensorKeys(@PathVariable long id)
+	{
+		return sensorService.getSensorKeys(id);
 	}
 }

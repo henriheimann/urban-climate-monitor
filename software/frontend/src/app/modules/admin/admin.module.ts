@@ -13,6 +13,8 @@ import {EditUserModalComponent} from './modals/edit-user-modal/edit-user-modal.c
 import {LocationModalComponent} from './modals/location-modal/location-modal.component';
 import {SensorModalComponent} from './modals/sensor-modal/sensor-modal.component';
 import {LoginPageComponent} from './pages/login-page/login-page.component';
+import { SensorKeysModalComponent } from './modals/sensor-keys-modal/sensor-keys-modal.component';
+import { HexOutputComponent } from './components/hex-output/hex-output.component';
 
 @NgModule({
   imports: [
@@ -29,7 +31,9 @@ import {LoginPageComponent} from './pages/login-page/login-page.component';
     EditUserModalComponent,
     LocationModalComponent,
     SensorModalComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    SensorKeysModalComponent,
+    HexOutputComponent
   ],
   providers: [
     {
