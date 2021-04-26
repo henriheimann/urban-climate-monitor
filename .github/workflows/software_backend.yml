@@ -8,7 +8,7 @@ on:
 env:
   INFLUXDB_HOST: localhost
   INFLUXDB_PORT: 8086
-  INFLUXDB_DB: metrics
+  INFLUXDB_TEST_DB: metricstest
   INFLUXDB_ADMIN_USER: admin
   INFLUXDB_ADMIN_PASSWORD: inlufxdb-admin-test-pass
   INFLUXDB_USER: user
@@ -17,7 +17,6 @@ env:
   POSTGRES_PORT: 5432
   POSTGRES_USER: user
   POSTGRES_PASSWORD: postgres-user-test-pass
-  POSTGRES_DB: ucm
   POSTGRES_TEST_DB: ucmtest
 
 jobs:
