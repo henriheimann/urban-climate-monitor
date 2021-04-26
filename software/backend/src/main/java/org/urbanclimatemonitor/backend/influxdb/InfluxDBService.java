@@ -108,6 +108,8 @@ public class InfluxDBService
 				.fill("linear");
 	}
 
+
+
 	public void selectSensorValues(String ttnDeviceId)
 	{
 		Query query = buildSensorValuesQuery(List.of(ttnDeviceId), SensorDataType.HUMIDITY, SensorDataResolution.WEEKS,
@@ -117,5 +119,10 @@ public class InfluxDBService
 		QueryResult queryResult = influxDB.query(query);
 		queryResult.getResults().forEach(result ->
 				result.getSeries().forEach(series -> System.out.println(series)));
+	}
+
+	public void getMostRecentSensorValues(String ttnDeviceId)
+	{
+
 	}
 }

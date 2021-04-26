@@ -8,12 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
+import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNLorawanDeviceDTO;
 
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -40,6 +43,20 @@ public class TTNService
 				.forEach(stringBuilder::append);
 
 		return stringBuilder.toString();
+	}
+
+	private static String generateRandomHexString(int length, Set<String> possibleCollisions)
+	{
+		String randomHexString;
+		int numberOfRoll = 0;
+		do {
+			if (numberOfRoll++ >= 10) {
+				throw new CustomLocalizedException("no-more-random-device-addresses");
+			}
+			randomHexString = generateRandomHexString(length);
+		} while (possibleCollisions.contains(randomHexString));
+
+		return randomHexString;
 	}
 
 	@CacheEvict(value="ttnDevices", allEntries=true)
@@ -78,12 +95,17 @@ public class TTNService
 	@CacheEvict(value="ttnDevices", allEntries=true)
 	public void createDevice(String deviceId)
 	{
+		Set<String> existingRandomDeviceStrings = getAllDevices().stream()
+				.map(device -> device.getLorawanDevice().getDeviceAddress().substring(5))
+				.collect(Collectors.toSet());
+
 		TTNLorawanDeviceDTO lorawanDevice = new TTNLorawanDeviceDTO();
 		lorawanDevice.setApplicationEui(properties.getAppEui());
 		lorawanDevice.setApplicationId(properties.getAppId());
 		lorawanDevice.setDeviceEui(generateRandomHexString(16));
 		lorawanDevice.setDeviceId(deviceId);
-		lorawanDevice.setDeviceAddress("2601" + generateRandomHexString(4));
+		lorawanDevice.setDeviceAddress(properties.getDeviceIdPrefix() +
+				generateRandomHexString(3, existingRandomDeviceStrings));
 		lorawanDevice.setNetworkSessionKey(generateRandomHexString(32));
 		lorawanDevice.setApplicationSessionKey(generateRandomHexString(32));
 		lorawanDevice.setDisableFrameCounterChecks(true);

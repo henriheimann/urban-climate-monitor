@@ -218,6 +218,11 @@ public class SensorControllerIntegrationTest extends BaseIntegrationTest
 	@Test
 	public void updateSensor_succeeds() throws Exception
 	{
+		ttnWireMockConfig.setupApplicationsDevicesGet("""
+				{
+				  "devices": []
+				}
+				""");
 		ttnWireMockConfig.setupApplicationsDevicesPost();
 
 		String content = createSensor("Testsensor")

@@ -52,24 +52,24 @@ class SensorServiceTest
 	@Test
 	public void loadAllSensors_addsSensor_ifDeviceExistsOnlyInTTN()
 	{
-		TTNDeviceDTO ttnDevice1 = TestEntities.ttnDeviceDTO("device-00000014");
-		TTNDeviceDTO ttnDevice2 = TestEntities.ttnDeviceDTO("device-00000029");
+		TTNDeviceDTO ttnDevice1 = TestEntities.ttnDeviceDTO("5ee00e6d-bd66-463f-a472-005534fe46d6");
+		TTNDeviceDTO ttnDevice2 = TestEntities.ttnDeviceDTO("38d5f56e-42d6-413e-b1c4-607bdc05ed20");
 		List<TTNDeviceDTO> ttnDeviceDTOList = List.of(ttnDevice1, ttnDevice2);
 		when(ttnService.getAllDevices()).thenReturn(ttnDeviceDTOList);
 
-		Sensor sensor1 = TestEntities.sensor(14L, "device-00000014");
-		Sensor sensor2 = TestEntities.sensor(29L, "device-00000029");
+		Sensor sensor1 = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6");
+		Sensor sensor2 = TestEntities.sensor(29L, "38d5f56e-42d6-413e-b1c4-607bdc05ed20");
 		List<Sensor> sensorList = List.of(sensor1, sensor2);
-		when(sensorRepository.findByTtnId("device-00000014")).thenReturn(Optional.of(sensor1));
-		when(sensorRepository.findByTtnId("device-00000029")).thenReturn(Optional.empty());
+		when(sensorRepository.findByTtnId("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(sensor1));
+		when(sensorRepository.findByTtnId("38d5f56e-42d6-413e-b1c4-607bdc05ed20")).thenReturn(Optional.empty());
 		when(sensorRepository.findAll()).thenReturn(sensorList);
 
-		when(sensorRepository.save(argThat(sensor -> sensor.getTtnId().equals("device-00000029"))))
+		when(sensorRepository.save(argThat(sensor -> sensor.getTtnId().equals("38d5f56e-42d6-413e-b1c4-607bdc05ed20"))))
 				.thenAnswer(new SaveSensorAnswer(29L));
 
 		List<SensorDTO> sensorDTOList = sensorService.getAllSensors();
 
-		verify(sensorRepository).save(argThat(sensor -> sensor.getTtnId().equals("device-00000029")));
+		verify(sensorRepository).save(argThat(sensor -> sensor.getTtnId().equals("38d5f56e-42d6-413e-b1c4-607bdc05ed20")));
 		assertThat(sensorDTOList).hasSize(2);
 		assertThat(sensorDTOList).anyMatch((sensorDTO -> sensorDTO.getId() == 14L));
 		assertThat(sensorDTOList).anyMatch((sensorDTO -> sensorDTO.getId() == 29L));
@@ -78,17 +78,17 @@ class SensorServiceTest
 	@Test
 	public void loadAllSensors_deletesSensor_ifDeviceIsNotReturnedByTTN()
 	{
-		TTNDeviceDTO ttnDevice1 = TestEntities.ttnDeviceDTO("device-00000014");
-		TTNDeviceDTO ttnDevice2 = TestEntities.ttnDeviceDTO("device-00000029");
+		TTNDeviceDTO ttnDevice1 = TestEntities.ttnDeviceDTO("5ee00e6d-bd66-463f-a472-005534fe46d6");
+		TTNDeviceDTO ttnDevice2 = TestEntities.ttnDeviceDTO("38d5f56e-42d6-413e-b1c4-607bdc05ed20");
 		List<TTNDeviceDTO> ttnDeviceDTOList = List.of(ttnDevice1, ttnDevice2);
 		when(ttnService.getAllDevices()).thenReturn(ttnDeviceDTOList);
 
-		Sensor sensor1 = TestEntities.sensor(14L, "device-00000014");
-		Sensor sensor2 = TestEntities.sensor(29L, "device-00000029");
-		Sensor sensor3 = TestEntities.sensor(32L, "device-00000032");
+		Sensor sensor1 = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6");
+		Sensor sensor2 = TestEntities.sensor(29L, "38d5f56e-42d6-413e-b1c4-607bdc05ed20");
+		Sensor sensor3 = TestEntities.sensor(32L, "5dd5ecb4-21ae-4e52-8d67-bdaa5ef2957b");
 		List<Sensor> sensorList = List.of(sensor1, sensor2, sensor3);
-		when(sensorRepository.findByTtnId("device-00000014")).thenReturn(Optional.of(sensor1));
-		when(sensorRepository.findByTtnId("device-00000029")).thenReturn(Optional.of(sensor2));
+		when(sensorRepository.findByTtnId("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(sensor1));
+		when(sensorRepository.findByTtnId("38d5f56e-42d6-413e-b1c4-607bdc05ed20")).thenReturn(Optional.of(sensor2));
 		when(sensorRepository.findAll()).thenReturn(sensorList);
 
 		List<SensorDTO> sensorDTOList = sensorService.getAllSensors();
@@ -110,9 +110,9 @@ class SensorServiceTest
 		CreateOrUpdateSensorDTO createSensorDTO = new CreateOrUpdateSensorDTO("Name", 98L);
 		SensorDTO sensorDTO = sensorService.createSensor(createSensorDTO);
 
-		verify(ttnService).createDevice(eq("device-00004124"));
+		verify(ttnService).createDevice(any());
 		assertThat(sensorDTO.getId()).isEqualTo(4124L);
-		assertThat(sensorDTO.getTtnId()).isEqualTo("device-00004124");
+		assertThat(sensorDTO.getTtnId()).isNotNull();
 		assertThat(sensorDTO.getName()).isEqualTo("Name");
 		assertThat(sensorDTO.getLocationId()).isEqualTo(98L);
 	}
@@ -120,15 +120,15 @@ class SensorServiceTest
 	@Test
 	public void getSensor()
 	{
-		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("device-00000014");
-		when(ttnService.getDevice("device-00000014")).thenReturn(Optional.of(ttnDevice));
+		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("5ee00e6d-bd66-463f-a472-005534fe46d6");
+		when(ttnService.getDevice("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(ttnDevice));
 
-		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		Sensor sensor = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6", "Sensor Name");
 		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
 
 		SensorDTO sensorDTO = sensorService.getSensor(14L);
 		assertThat(sensorDTO.getId()).isEqualTo(14L);
-		assertThat(sensorDTO.getTtnId()).isEqualTo("device-00000014");
+		assertThat(sensorDTO.getTtnId()).isEqualTo("5ee00e6d-bd66-463f-a472-005534fe46d6");
 		assertThat(sensorDTO.getName()).isEqualTo("Sensor Name");
 		assertThat(sensorDTO.getLocationId()).isNull();
 	}
@@ -146,7 +146,7 @@ class SensorServiceTest
 	@Test
 	public void getSensor_throwsAnExceptionAndDeletesSensor_ifDeviceIsNotReturnedByTTN()
 	{
-		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		Sensor sensor = TestEntities.sensor(14L, "00000014", "Sensor Name");
 		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
 
 		assertThatThrownBy(() -> sensorService.getSensor(14L))
@@ -159,25 +159,25 @@ class SensorServiceTest
 	@Test
 	public void deleteSensor()
 	{
-		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("device-00000014");
-		when(ttnService.getDevice("device-00000014")).thenReturn(Optional.of(ttnDevice));
+		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("5ee00e6d-bd66-463f-a472-005534fe46d6");
+		when(ttnService.getDevice("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(ttnDevice));
 
-		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		Sensor sensor = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6", "Sensor Name");
 		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
 
 		sensorService.deleteSensor(14L);
 
-		verify(ttnService).deleteDevice("device-00000014");
+		verify(ttnService).deleteDevice("5ee00e6d-bd66-463f-a472-005534fe46d6");
 		verify(sensorRepository).delete(argThat(s -> s.getId() == 14L));
 	}
 
 	@Test
 	public void updateSensor()
 	{
-		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("device-00000014");
-		when(ttnService.getDevice("device-00000014")).thenReturn(Optional.of(ttnDevice));
+		TTNDeviceDTO ttnDevice = TestEntities.ttnDeviceDTO("5ee00e6d-bd66-463f-a472-005534fe46d6");
+		when(ttnService.getDevice("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(ttnDevice));
 
-		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		Sensor sensor = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6", "Sensor Name");
 		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
 
 		Location location = TestEntities.location(98L, "Location Name");
@@ -187,7 +187,7 @@ class SensorServiceTest
 		SensorDTO sensorDTO = sensorService.updateSensor(14L, updateSensorDTO);
 
 		assertThat(sensorDTO.getId()).isEqualTo(14L);
-		assertThat(sensorDTO.getTtnId()).isEqualTo("device-00000014");
+		assertThat(sensorDTO.getTtnId()).isEqualTo("5ee00e6d-bd66-463f-a472-005534fe46d6");
 		assertThat(sensorDTO.getName()).isEqualTo("New Name");
 		assertThat(sensorDTO.getLocationId()).isEqualTo(98L);
 	}
@@ -201,12 +201,12 @@ class SensorServiceTest
 		lorawanDeviceDTO.setNetworkSessionKey("1122");
 
 		TTNDeviceDTO ttnDeviceDTO = new TTNDeviceDTO();
-		ttnDeviceDTO.setDeviceId("device-00000014");
+		ttnDeviceDTO.setDeviceId("5ee00e6d-bd66-463f-a472-005534fe46d6");
 		ttnDeviceDTO.setLorawanDevice(lorawanDeviceDTO);
 
-		when(ttnService.getDevice("device-00000014")).thenReturn(Optional.of(ttnDeviceDTO));
+		when(ttnService.getDevice("5ee00e6d-bd66-463f-a472-005534fe46d6")).thenReturn(Optional.of(ttnDeviceDTO));
 
-		Sensor sensor = TestEntities.sensor(14L, "device-00000014", "Sensor Name");
+		Sensor sensor = TestEntities.sensor(14L, "5ee00e6d-bd66-463f-a472-005534fe46d6", "Sensor Name");
 		when(sensorRepository.findById(14L)).thenReturn(Optional.of(sensor));
 
 		SensorKeysDTO sensorKeysDTO = sensorService.getSensorKeys(14L);
