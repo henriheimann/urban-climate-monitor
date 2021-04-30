@@ -34,6 +34,12 @@ CREATE TABLE sensors
     name                VARCHAR(255),
     ttn_id              VARCHAR(255) UNIQUE,
     location_id         BIGINT DEFAULT NULL,
+    location_positionx  FLOAT DEFAULT NULL,
+    location_positiony  FLOAT DEFAULT NULL,
+    location_positionz  FLOAT DEFAULT NULL,
+    location_rotationx  FLOAT DEFAULT NULL,
+    location_rotationy  FLOAT DEFAULT NULL,
+    location_rotationz  FLOAT DEFAULT NULL,
 
     PRIMARY KEY (id),
     FOREIGN KEY (location_id) REFERENCES locations (id)

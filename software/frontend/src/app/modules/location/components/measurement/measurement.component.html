@@ -1,0 +1,10 @@
+<span *ngIf="value; else no_value">
+  {{ value }}
+  <span *ngIf="unit">
+    {{ ' ' + (unit | translate) }}
+  </span>
+</span>
+
+<ng-template #no_value>
+  <span>-</span>
+</ng-template>

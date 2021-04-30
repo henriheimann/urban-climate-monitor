@@ -11,4 +11,6 @@ public class InfluxDBConfigurationProperties
 	private String db;
 	private String username;
 	private String password;
+
+	private String appIdForTesting;
 }

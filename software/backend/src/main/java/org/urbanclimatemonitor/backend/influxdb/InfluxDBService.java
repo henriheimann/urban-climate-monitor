@@ -2,31 +2,26 @@ package org.urbanclimatemonitor.backend.influxdb;
 
 import lombok.extern.log4j.Log4j2;
 import org.influxdb.InfluxDB;
+import org.influxdb.InfluxDBException;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.influxdb.querybuilder.SelectQueryImpl;
-import org.influxdb.querybuilder.SelectionQueryImpl;
-import org.influxdb.querybuilder.WhereNested;
-import org.influxdb.querybuilder.WhereQueryImpl;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.InfluxDBConfigurationProperties;
+import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
 import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataResolution;
 import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
+import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
+import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.time;
 import static org.influxdb.querybuilder.time.DurationLiteral.*;
 
 @Service
@@ -36,11 +31,14 @@ public class InfluxDBService
 {
 	private final InfluxDBConfigurationProperties properties;
 
+	private final TTNConfigurationProperties ttnProperties;
+
 	private InfluxDB influxDB;
 
-	public InfluxDBService(InfluxDBConfigurationProperties properties)
+	public InfluxDBService(InfluxDBConfigurationProperties properties, TTNConfigurationProperties ttnProperties)
 	{
 		this.properties = properties;
+		this.ttnProperties = ttnProperties;
 	}
 
 	@PostConstruct
@@ -56,15 +54,6 @@ public class InfluxDBService
 		log.info("Connected to InfluxDB!");
 	}
 
-	private List<String> columnsFromDataType(SensorDataType dataType)
-	{
-		return switch (dataType) {
-			case TEMPERATURE -> List.of("payload_fields_temperature", "payload_fields_ir_temperature");
-			case HUMIDITY -> List.of("payload_fields_humidity");
-			case BRIGHTNESS -> List.of("payload_fields_brightness");
-		};
-	}
-
 	private Object groupByColumnFromDataResolution(SensorDataResolution dataResolution)
 	{
 		return switch (dataResolution) {
@@ -75,7 +64,7 @@ public class InfluxDBService
 		};
 	}
 
-	private Query buildSensorValuesQuery(List<String> ttnDeviceIds, SensorDataType dataType,
+	/*private Query buildSensorValuesQuery(List<String> ttnDeviceIds, SensorDataType dataType,
 	                                     SensorDataResolution dataResolution, ZonedDateTime from, ZonedDateTime to)
 	{
 		SelectionQueryImpl selectionQuery = select();
@@ -106,11 +95,11 @@ public class InfluxDBService
 				.close()
 				.groupBy(groupByColumnFromDataResolution(dataResolution))
 				.fill("linear");
-	}
+	}*/
 
 
 
-	public void selectSensorValues(String ttnDeviceId)
+	/*public void selectSensorValues(String ttnDeviceId)
 	{
 		Query query = buildSensorValuesQuery(List.of(ttnDeviceId), SensorDataType.HUMIDITY, SensorDataResolution.WEEKS,
 				ZonedDateTime.of(LocalDateTime.of(2021, 2, 1, 0, 0, 0), ZoneId.of("Europe/Berlin")),
@@ -119,10 +108,84 @@ public class InfluxDBService
 		QueryResult queryResult = influxDB.query(query);
 		queryResult.getResults().forEach(result ->
 				result.getSeries().forEach(series -> System.out.println(series)));
+	}*/
+
+	private String getAppId() {
+		if (properties.getAppIdForTesting() != null) {
+			return properties.getAppIdForTesting();
+		} else {
+			return ttnProperties.getAppId();
+		}
 	}
 
-	public void getMostRecentSensorValues(String ttnDeviceId)
+	public Map<SensorDataType, Object> getLatestMeasurements(String ttnDeviceId, Set<SensorDataType> dataTypes)
 	{
+		return getLatestMeasurements(Set.of(ttnDeviceId), dataTypes).get(ttnDeviceId);
+	}
 
+	public Map<String, Map<SensorDataType, Object>> getLatestMeasurements(Set<String> ttnDeviceIds, Set<SensorDataType> dataTypes)
+	{
+		StringBuilder queryBuilder = new StringBuilder();
+
+		queryBuilder.append("SELECT ");
+		Set<String> columnNames = dataTypes.stream()
+				.map(SensorDataType::getColumnName)
+				.collect(Collectors.toSet());
+		queryBuilder.append(String.join(", ", columnNames));
+
+		queryBuilder.append(" FROM mqtt_consumer");
+
+		queryBuilder.append(" WHERE ");
+		Set<String> whereClauses = ttnDeviceIds.stream()
+				.map(ttnDeviceId -> "topic = '" + getAppId() + "/devices/" + ttnDeviceId + "/up'")
+				.collect(Collectors.toSet());
+		queryBuilder.append(String.join(" OR ", whereClauses));
+
+		queryBuilder.append(" GROUP BY topic ORDER BY DESC LIMIT 1");
+
+		Query query = new Query(queryBuilder.toString(), properties.getDb());
+		QueryResult queryResult;
+
+		try {
+			queryResult = influxDB.query(query);
+		} catch (InfluxDBException exception) {
+			throw new CustomLocalizedException(exception, "influxdb-query-error");
+		}
+
+		if (queryResult.getResults().size() != 1) {
+			throw new CustomLocalizedException("influxdb-query-error");
+		}
+
+		QueryResult.Result result = queryResult.getResults().get(0);
+
+		if (result.getSeries() == null) {
+			throw new CustomLocalizedException("TODO");
+		}
+
+		Map<String, Map<SensorDataType, Object>> sensorsMap = new HashMap<>();
+
+		final int prefixLength = (getAppId() + "/devices/").length();
+		final int postfixLength = "/up".length();
+
+		for (QueryResult.Series series: result.getSeries()) {
+			String topic = series.getTags().get("topic");
+			String ttnDeviceId = series.getTags().get("topic").substring(prefixLength, topic.length() - postfixLength);
+
+			Map<SensorDataType, Object> valuesMap = new HashMap<>();
+
+			for (int columnIndex = 0; columnIndex < series.getColumns().size(); columnIndex++) {
+				String columnName = series.getColumns().get(columnIndex);
+				SensorDataType dataType = SensorDataType.forColumnName(columnName);
+
+				if (dataTypes.contains(dataType)) {
+					Object value = series.getValues().get(0).get(columnIndex);
+					valuesMap.put(dataType, value);
+				}
+			}
+
+			sensorsMap.put(ttnDeviceId, valuesMap);
+		}
+
+		return sensorsMap;
 	}
 }

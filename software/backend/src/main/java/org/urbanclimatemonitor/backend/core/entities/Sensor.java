@@ -22,6 +22,14 @@ public class Sensor
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Location location;
 
+	private Float locationPositionX;
+	private Float locationPositionY;
+	private Float locationPositionZ;
+
+	private Float locationRotationX;
+	private Float locationRotationY;
+	private Float locationRotationZ;
+
 	public Sensor(String name, Location location)
 	{
 		this.name = name;

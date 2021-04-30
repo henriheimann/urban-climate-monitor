@@ -220,7 +220,7 @@ void application_main()
 		data_packet.temperature = (int16_t)roundf(sht3x_temperature * 100);
 		data_packet.humidity = (uint16_t)roundf(sht3x_humidity * 100);
 	} else {
-		data_packet.temperature = UINT16_MAX;
+		data_packet.temperature = INT16_MAX;
 		data_packet.humidity = INT16_MAX;
 	}
 

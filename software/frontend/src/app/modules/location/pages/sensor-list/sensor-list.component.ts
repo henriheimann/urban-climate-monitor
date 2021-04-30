@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {MeasurementsService} from '../../services/measurements.service';
+import {Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {SensorLatestMeasurements} from '../../models/sensor-measurements.model';
 
 @Component({
   selector: 'ucm-sensor-list',
@@ -7,9 +11,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SensorListComponent implements OnInit {
 
-  constructor() { }
+  locationSensorsLatestMeasurements$: Observable<SensorLatestMeasurements[]> | undefined;
+
+  constructor(private measurementsService: MeasurementsService, private router: Router) { }
 
   ngOnInit(): void {
+    this.locationSensorsLatestMeasurements$ = this.measurementsService.getLocationSensorsLatestMeasurements(this.getRouteLocationId());
   }
 
+  getRouteLocationId(): number {
+    return parseInt(this.router.url.split('/')[2], 10);
+  }
 }

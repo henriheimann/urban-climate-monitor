@@ -1,0 +1,16 @@
+<span>
+  <span [ngClass]="iconColorClass">
+    <i class="bi bi-circle-fill"></i>
+  </span>
+  <span class="ml-2" *ngIf="difference === undefined; else show_difference">
+    {{ 'last_contact.never_seen' | translate }}
+  </span>
+  <ng-template #show_difference>
+    <span class="ml-2" *ngIf="difference > 0">
+      {{ this.difference + ' ' + (this.differenceUnit | translate) + ' ' + ('last_contact.ago' | translate) }}
+    </span>
+    <span class="ml-2" *ngIf="difference == 0">
+      {{ 'last_contact.just_now' | translate }}
+    </span>
+  </ng-template>
+</span>

@@ -3,11 +3,15 @@ package org.urbanclimatemonitor.backend.startup;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.urbanclimatemonitor.backend.config.properties.InitialisationConfigurationProperties;
+import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateUserDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.UpdateUserDTO;
 import org.urbanclimatemonitor.backend.core.entities.Role;
 import org.urbanclimatemonitor.backend.core.services.UserService;
+import org.urbanclimatemonitor.backend.influxdb.InfluxDBService;
 import org.urbanclimatemonitor.backend.ttn.TTNService;
+
+import java.util.Set;
 
 @Component
 public class InitialiseDatabase implements CommandLineRunner
@@ -16,14 +20,10 @@ public class InitialiseDatabase implements CommandLineRunner
 
 	private final UserService userService;
 
-	private final TTNService ttnService;
-
-	public InitialiseDatabase(InitialisationConfigurationProperties properties, UserService userService,
-	                          TTNService ttnService)
+	public InitialiseDatabase(InitialisationConfigurationProperties properties, UserService userService)
 	{
 		this.properties = properties;
 		this.userService = userService;
-		this.ttnService = ttnService;
 	}
 
 	@Override
