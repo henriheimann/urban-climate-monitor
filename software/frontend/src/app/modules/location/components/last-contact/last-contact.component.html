@@ -6,8 +6,8 @@
     {{ 'last_contact.never_seen' | translate }}
   </span>
   <ng-template #show_difference>
-    <span class="ml-2" *ngIf="difference > 0">
-      {{ this.difference + ' ' + (this.differenceUnit | translate) + ' ' + ('last_contact.ago' | translate) }}
+    <span class="ml-2" *ngIf="difference || 0 > 0">
+      {{ this.difference + ' ' + (this.differenceUnit || '' | translate) + ' ' + ('last_contact.ago' | translate) }}
     </span>
     <span class="ml-2" *ngIf="difference == 0">
       {{ 'last_contact.just_now' | translate }}
