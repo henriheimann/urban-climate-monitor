@@ -7,12 +7,13 @@
 
 <ng-container *ngIf="!isIndex()">
   <ucm-header></ucm-header>
-  <main class="container-fluid py-3">
+  <main *ngIf="!isVisualisation()" class="container-fluid py-3">
     <ucm-alert-display destination="main"></ucm-alert-display>
+    <router-outlet></router-outlet>
+  </main>
+  <main *ngIf="isVisualisation()" class="fix-height">
     <router-outlet></router-outlet>
   </main>
 </ng-container>
 
-<div class="d-flex flex-row-reverse">
-  <a class="mr-3" [class.text-light] = "isIndex()" [class.text-dark] = "!isIndex()" [routerLink]="['/imprint-data-protection']">Imprint & Data Protection</a>
-</div>
+<ucm-footer></ucm-footer>

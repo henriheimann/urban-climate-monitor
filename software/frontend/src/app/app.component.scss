@@ -17,3 +17,7 @@ main {
 main.without-navbar {
   min-height: calc(100vh - #{$footer-height});
 }
+
+main.fix-height {
+  height: calc(100vh - #{$footer-height} - #{$navbar-height});
+}

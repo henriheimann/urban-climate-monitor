@@ -1,4 +1,4 @@
-import {AbstractControl, ValidatorFn} from '@angular/forms';
+import { AbstractControl, ValidatorFn } from '@angular/forms';
 
 export function MustMatch(controlName: string, matchingControlName: string): ValidatorFn {
   return (control: AbstractControl) => {
@@ -7,8 +7,7 @@ export function MustMatch(controlName: string, matchingControlName: string): Val
 
     if (password !== confirmPassword) {
       return { MustMatch: true };
-    } else {
-      return null;
     }
+    return null;
   };
 }

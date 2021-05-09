@@ -5,11 +5,4 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './imprint-data-protection.component.html',
   styleUrls: ['./imprint-data-protection.component.css']
 })
-export class ImprintDataProtectionComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class ImprintDataProtectionComponent {}

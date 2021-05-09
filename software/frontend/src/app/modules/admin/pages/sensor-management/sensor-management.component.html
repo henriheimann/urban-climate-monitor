@@ -1,52 +1,52 @@
 <div *ngIf="loading$ | async">
   <div class="d-flex flex-column align-items-center mt-5">
-      <div class="spinner-grow" role="status"></div>
-      <h3 class="mt-3">
-        {{ 'admin.sensors.loading_sensors' | translate }}
-      </h3>
+    <div class="spinner-grow" role="status"></div>
+    <h3 class="mt-3">
+      {{ 'admin.sensors.loading_sensors' | translate }}
+    </h3>
   </div>
 </div>
 
-<div *ngIf="!(loading$ | async)" class="container-xxxl">
+<div *ngIf="(loading$ | async) === false" class="container-xxxl">
   <table *ngIf="sensors$ | async as sensors" class="table bg-white rounded shadow-sm border-0">
     <thead>
-    <tr>
-      <th class="border-top-0">{{ 'admin.sensors.name' | translate }}</th>
-      <th class="border-top-0">{{ 'admin.sensors.location' | translate }}</th>
-      <th class="border-top-0">{{ 'admin.sensors.ttnId' | translate }}</th>
-      <th class="border-top-0">{{ 'admin.sensors.ttnKeys' | translate }}</th>
-      <th class="border-top-0 text-right">
-        <button class="btn btn-link text-dark p-0" (click)="onAddSensorButtonClicked()">
-          {{ 'admin.sensors.add_sensor' | translate }}
-          <i class="bi bi-plus-circle-fill"></i>
-        </button>
-      </th>
-    </tr>
+      <tr>
+        <th class="border-top-0">{{ 'admin.sensors.name' | translate }}</th>
+        <th class="border-top-0">{{ 'admin.sensors.location' | translate }}</th>
+        <th class="border-top-0">{{ 'admin.sensors.ttnId' | translate }}</th>
+        <th class="border-top-0">{{ 'admin.sensors.ttnKeys' | translate }}</th>
+        <th class="border-top-0 text-right">
+          <button class="btn btn-link text-dark p-0" (click)="onAddSensorButtonClicked()">
+            {{ 'admin.sensors.add_sensor' | translate }}
+            <i class="bi bi-plus-circle-fill"></i>
+          </button>
+        </th>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let sensor of sensors">
-      <td>{{ sensor.name }}</td>
-      <td *ngIf="sensor.locationId === null">{{ 'admin.sensors.no_location' | translate }}</td>
-      <td *ngIf="sensor.locationId !== null">
-        <div *ngIf="locationsMap$ | async as locations">
-          {{ locations[sensor.locationId]?.name }}
-        </div>
-      </td>
-      <td>{{ sensor.ttnId }}</td>
-      <td>
-        <button class="btn btn-link text-dark p-0 mr-4" (click)="onShowSensorKeysButtonClicked(sensor)">
-          {{ 'admin.sensors.show_keys' | translate }}
-        </button>
-      </td>
-      <td class="text-right">
-        <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
-          {{ 'admin.sensors.edit' | translate }}
-        </button>
-        <button class="btn btn-link text-dark p-0" (click)="onDeleteSensorButtonClicked(sensor)">
-          {{ 'admin.sensors.delete' | translate }}
-        </button>
-      </td>
-    </tr>
+      <tr *ngFor="let sensor of sensors">
+        <td>{{ sensor.name }}</td>
+        <td *ngIf="sensor.locationId === null">{{ 'admin.sensors.no_location' | translate }}</td>
+        <td *ngIf="sensor.locationId !== null">
+          <div *ngIf="locationsMap$ | async as locations">
+            {{ locations[sensor.locationId]?.name }}
+          </div>
+        </td>
+        <td>{{ sensor.ttnId }}</td>
+        <td>
+          <button class="btn btn-link text-dark p-0 mr-4" (click)="onShowSensorKeysButtonClicked(sensor)">
+            {{ 'admin.sensors.show_keys' | translate }}
+          </button>
+        </td>
+        <td class="text-right">
+          <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditSensorButtonClicked(sensor)">
+            {{ 'admin.sensors.edit' | translate }}
+          </button>
+          <button class="btn btn-link text-dark p-0" (click)="onDeleteSensorButtonClicked(sensor)">
+            {{ 'admin.sensors.delete' | translate }}
+          </button>
+        </td>
+      </tr>
     </tbody>
   </table>
 </div>

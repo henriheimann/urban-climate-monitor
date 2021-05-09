@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {EntityCollectionService, EntityCollectionServiceFactory} from '@ngrx/data';
-import {BsModalRef} from 'ngx-bootstrap/modal';
-import {Sensor} from '../../../shared/models/sensor.model';
-import {Observable} from 'rxjs';
-import {Location} from '../../../shared/models/location.model';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { Sensor } from '../../../shared/models/sensor.model';
+import { Observable } from 'rxjs';
+import { Location } from '../../../shared/models/location.model';
 
 @Component({
   selector: 'ucm-sensor-modal',
@@ -12,14 +12,15 @@ import {Location} from '../../../shared/models/location.model';
   styleUrls: ['./sensor-modal.component.css']
 })
 export class SensorModalComponent implements OnInit {
-
   sensorForm = new FormGroup({
     name: new FormControl('', Validators.required),
     location: new FormControl(null)
   });
 
   sensorService: EntityCollectionService<Sensor>;
+
   locations$: Observable<Location[]>;
+
   locationService: EntityCollectionService<Location>;
 
   constructor(public modalRef: BsModalRef, EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory) {
@@ -33,9 +34,8 @@ export class SensorModalComponent implements OnInit {
   switchOnModelType(addKey: string, editKey: string): string {
     if (this.sensor !== undefined) {
       return editKey;
-    } else {
-      return addKey;
     }
+    return addKey;
   }
 
   ngOnInit(): void {
@@ -50,23 +50,27 @@ export class SensorModalComponent implements OnInit {
 
   onSubmit(): void {
     if (this.sensor) {
-      this.sensorService.update({
-        id: this.sensor.id,
-        name: this.sensorForm.get('name')?.value,
-        ttnId: this.sensor.ttnId,
-        locationId: this.sensorForm.get('location')?.value
-      }).subscribe(() => {
-        this.modalRef.hide();
-      });
+      this.sensorService
+        .update({
+          id: this.sensor.id,
+          name: this.sensorForm.get('name')?.value,
+          ttnId: this.sensor.ttnId,
+          locationId: this.sensorForm.get('location')?.value
+        })
+        .subscribe(() => {
+          this.modalRef.hide();
+        });
     } else {
-      this.sensorService.add({
-        id: null,
-        name: this.sensorForm.get('name')?.value,
-        ttnId: null,
-        locationId: this.sensorForm.get('location')?.value
-      }).subscribe(() => {
-        this.modalRef.hide();
-      });
+      this.sensorService
+        .add({
+          id: null,
+          name: this.sensorForm.get('name')?.value,
+          ttnId: null,
+          locationId: this.sensorForm.get('location')?.value
+        })
+        .subscribe(() => {
+          this.modalRef.hide();
+        });
     }
   }
 }

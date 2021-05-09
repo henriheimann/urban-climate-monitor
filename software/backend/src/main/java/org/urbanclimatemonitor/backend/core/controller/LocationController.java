@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateLocationDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.GetLocationMeasurementsDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensorDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationMeasurementsDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorLatestMeasurementsDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.*;
 import org.urbanclimatemonitor.backend.core.services.LocationService;
 import org.urbanclimatemonitor.backend.core.services.UserService;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
@@ -45,14 +44,14 @@ public class LocationController
 	@Operation(summary = "Create a new location", security = @SecurityRequirement(name = "auth"))
 	@PostMapping("/location")
 	@PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-	public LocationDTO createLocation(@Valid @RequestBody CreateOrUpdateLocationDTO createLocationDTO)
+	public LocationWithUploadsDTO createLocation(@Valid @RequestBody CreateOrUpdateLocationDTO createLocationDTO)
 	{
 		return locationService.createLocation(createLocationDTO);
 	}
 
 	@Operation(summary = "Get a single location")
 	@GetMapping("/location/{id}")
-	public LocationDTO getLocation(@PathVariable long id)
+	public LocationWithUploadsDTO getLocation(@PathVariable long id)
 	{
 		return locationService.getLocation(id);
 	}
@@ -68,7 +67,7 @@ public class LocationController
 	@Operation(summary = "Update a single location", security = @SecurityRequirement(name = "auth"))
 	@PutMapping("/location/{id}")
 	@PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-	public LocationDTO updateLocation(@PathVariable long id, @Valid @RequestBody CreateOrUpdateLocationDTO updateLocationDTO)
+	public LocationWithUploadsDTO updateLocation(@PathVariable long id, @Valid @RequestBody CreateOrUpdateLocationDTO updateLocationDTO)
 	{
 		return locationService.updateLocation(id, updateLocationDTO);
 	}
@@ -81,19 +80,21 @@ public class LocationController
 	}
 
 	@Operation(summary = "Get a single sensor of a location")
-	@GetMapping("/location/{id}/sensors/{sensorId}")
+	@GetMapping("/location/{id}/sensor/{sensorId}")
 	public LocationSensorDTO getLocationSensor(@PathVariable long id, @PathVariable long sensorId)
 	{
 		return locationService.getLocationSensor(id, sensorId);
 	}
 
 	@Operation(summary = "Update a single sensor of a location", security = @SecurityRequirement(name = "auth"))
-	@PutMapping("/location/{id}/sensors/{sensorId}")
+	@PutMapping("/location/{id}/sensor/{sensorId}")
 	@PreAuthorize("isAuthenticated()")
-	public LocationSensorDTO updateLocationSensor(@PathVariable long id, @PathVariable long sensorId, @Valid @RequestBody UpdateLocationSensorDTO updateSensorDTO, Principal principal)
+	public LocationSensorDTO updateLocationSensor(@PathVariable long id, @PathVariable long sensorId, @Valid @RequestBody UpdateLocationSensorDTO updateSensorDTO, Principal principal, Authentication auth)
 	{
-		if (!userService.checkUserLocationPermission(principal.getName(), id)) {
-			throw new CustomLocalizedException("user-has-no-location-permission", HttpStatus.UNAUTHORIZED);
+		if (auth == null || auth.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+			if (!userService.checkUserLocationPermission(principal.getName(), id)) {
+				throw new CustomLocalizedException("user-has-no-location-permission", HttpStatus.UNAUTHORIZED);
+			}
 		}
 
 		return locationService.updateLocationSensor(id, sensorId, updateSensorDTO);
@@ -104,6 +105,13 @@ public class LocationController
 	public List<LocationSensorLatestMeasurementsDTO> getAllLocationSensorsLatestMeasurements(@PathVariable long id)
 	{
 		return locationService.getAllLocationSensorsLatestMeasurements(id);
+	}
+
+	@Operation(summary = "Get the latest measurements of a single sensor of a location")
+	@GetMapping("/location/{id}/sensor/{sensorId}/latest-measurements")
+	public LocationSensorLatestMeasurementsDTO getLocationSensorLatestMeasurements(@PathVariable long id, @PathVariable long sensorId)
+	{
+		return locationService.getLocationSensorLatestMeasurements(id, sensorId);
 	}
 
 	@Operation(summary = "Get measurements of all sensors of a location")

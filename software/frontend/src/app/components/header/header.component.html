@@ -1,20 +1,18 @@
 <nav class="navbar navbar-expand navbar-light bg-white shadow-sm">
   <div class="dropdown">
     <button class="btn bg-white dropdown-toggle p-0 pr-2" type="button" data-toggle="dropdown">
-      <span *ngIf="routeStartsWith('/imprint-data-protection')" >
-        Imprint & Data Protection
-      </span>
-      <span *ngIf="routeStartsWith('/admin')" >
-        <img src="assets/images/administration-icon.png" height="39" alt="Administration">
+      <span *ngIf="routeStartsWith('/imprint-data-protection')"> Imprint & Data Protection </span>
+      <span *ngIf="routeStartsWith('/admin')">
+        <img src="assets/images/administration-icon.png" height="39" alt="Administration" />
       </span>
       <span *ngIf="routeStartsWith('/location')" class="pr-2">
         <span *ngIf="getRouteLocationIcon() | async as icon">
-         <img height="50" [src]="icon" />
+          <img height="50" [src]="icon" />
         </span>
       </span>
     </button>
     <div class="dropdown-menu">
-      <a *ngFor="let location of (locations$ | async)" class="dropdown-item" [routerLink]="['/location/' + location.id]">
+      <a *ngFor="let location of locations$ | async" class="dropdown-item" [routerLink]="['/location/' + location.id]">
         <span *ngIf="getLocationIcon(location); let icon">
           <img height="50" [src]="icon" />
         </span>
@@ -22,7 +20,7 @@
       <ng-container *ngIf="(user$ | async)?.role == 'ADMIN'">
         <div class="dropdown-divider"></div>
         <a class="dropdown-item" [routerLink]="['/admin']">
-          <img src="assets/images/administration-icon.png" height="39" alt="Administration">
+          <img src="assets/images/administration-icon.png" height="39" alt="Administration" />
         </a>
       </ng-container>
     </div>
@@ -42,17 +40,23 @@
     </ng-container>
     <ng-container *ngIf="routeStartsWith('/location')">
       <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/location/' + getRouteLocationId() + '/visualisation']">{{ 'navigation.location.visualisation' | translate }}</a>
+        <a class="nav-link" [routerLink]="['/location/' + getRouteLocationId() + '/visualisation']">{{
+          'navigation.location.visualisation' | translate
+        }}</a>
       </li>
       <li class="nav-item" [routerLinkActive]="['active']">
-        <a class="nav-link" [routerLink]="['/location/' + getRouteLocationId() + '/sensors']">{{ 'navigation.location.sensor_list' | translate }}</a>
+        <a class="nav-link" [routerLink]="['/location/' + getRouteLocationId() + '/sensors']">{{
+          'navigation.location.sensor_list' | translate
+        }}</a>
       </li>
     </ng-container>
   </ul>
 
   <ul class="navbar-nav">
-    <li *ngIf="(user$ | async) == null" class="nav-item">
-      <button type="button" class="btn btn-link text-dark" (click)="onLoginButtonClicked()">{{ 'navigation.login' | translate }}</button>
+    <li *ngIf="(user$ | async) === null" class="nav-item">
+      <button type="button" class="btn btn-link text-dark" (click)="onLoginButtonClicked()">
+        {{ 'navigation.login' | translate }}
+      </button>
     </li>
     <ng-container *ngIf="(user$ | async) != null" class="nav-item">
       <li class="nav-item">
@@ -61,12 +65,12 @@
         </span>
       </li>
       <li class="nav-item">
-        <span class="nav-link pl-0 pr-0 text-dark">
-          |
-        </span>
+        <span class="nav-link pl-0 pr-0 text-dark"> | </span>
       </li>
       <li class="nav-item">
-        <button type="button" class="btn btn-link text-dark" (click)="onLogout()">{{ 'navigation.logout' | translate }}</button>
+        <button type="button" class="btn btn-link text-dark" (click)="onLogout()">
+          {{ 'navigation.logout' | translate }}
+        </button>
       </li>
     </ng-container>
   </ul>

@@ -36,6 +36,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 				.authorizeRequests().antMatchers("/oauth/revoke").permitAll().and()
 				.authorizeRequests().antMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll().and()
 				.authorizeRequests().antMatchers(HttpMethod.GET, "/locations/**", "/location/**").permitAll().and()
+				.authorizeRequests().antMatchers(HttpMethod.GET, "/upload/**").permitAll().and()
 				.authorizeRequests().antMatchers("/**").authenticated().and()
 				.exceptionHandling()
 				.authenticationEntryPoint(securityExceptionHandler);

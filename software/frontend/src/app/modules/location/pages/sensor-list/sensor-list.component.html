@@ -1,26 +1,52 @@
-<div *ngIf="(locationSensorsLatestMeasurements$ | async) as sensors; else loading" class="container-xxxl">
+<div *ngIf="locationSensorsLatestMeasurements$ | async as sensors; else loading" class="container-xxxl">
   <table class="table bg-white rounded shadow-sm border-0">
     <thead>
-    <tr>
-      <th class="border-top-0">{{ 'location.sensor_list.name' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.last_contact' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.temperature' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.ir_temperature' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.humidity' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.brightness_current' | translate }}</th>
-      <th class="border-top-0">{{ 'location.sensor_list.battery_voltage' | translate }}</th>
-    </tr>
+      <tr>
+        <th class="border-top-0">{{ 'location.name' | translate }}</th>
+        <th class="border-top-0">{{ 'location.last_contact' | translate }}</th>
+        <th class="border-top-0">{{ 'location.temperature' | translate }}</th>
+        <th class="border-top-0">{{ 'location.ir_temperature' | translate }}</th>
+        <th class="border-top-0">{{ 'location.humidity' | translate }}</th>
+        <th class="border-top-0">{{ 'location.brightness_current' | translate }}</th>
+        <th class="border-top-0">{{ 'location.battery_voltage' | translate }}</th>
+      </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let sensor of sensors">
-      <td>{{ sensor.name }}</td>
-      <td><ucm-last-contact [dateString]="sensor.measurements ? sensor.measurements['time'] : null"></ucm-last-contact></td>
-      <td><ucm-measurement [value]="sensor.measurements ? sensor.measurements['temperature'] : null" unit="measurement.degrees_c"></ucm-measurement></td>
-      <td><ucm-measurement [value]="sensor.measurements ? sensor.measurements['ir_temperature'] : null" unit="measurement.degrees_c"></ucm-measurement></td>
-      <td><ucm-measurement [value]="sensor.measurements ? sensor.measurements['humidity'] : null" unit="measurement.relative_humidity"></ucm-measurement></td>
-      <td><ucm-measurement [value]="sensor.measurements ? sensor.measurements['brightness_current'] : null"></ucm-measurement></td>
-      <td><ucm-measurement [value]="sensor.measurements ? sensor.measurements['battery_voltage'] : null" unit="measurement.voltage"></ucm-measurement></td>
-    </tr>
+      <tr *ngFor="let sensor of sensors">
+        <td>{{ sensor.name }}</td>
+        <td>
+          <ucm-last-contact [dateString]="sensor.measurements ? sensor.measurements['time'] : null"></ucm-last-contact>
+        </td>
+        <td>
+          <ucm-measurement
+            [value]="sensor.measurements ? sensor.measurements['temperature'] : null"
+            unit="measurement.degrees_c"
+          ></ucm-measurement>
+        </td>
+        <td>
+          <ucm-measurement
+            [value]="sensor.measurements ? sensor.measurements['ir_temperature'] : null"
+            unit="measurement.degrees_c"
+          ></ucm-measurement>
+        </td>
+        <td>
+          <ucm-measurement
+            [value]="sensor.measurements ? sensor.measurements['humidity'] : null"
+            unit="measurement.relative_humidity"
+          ></ucm-measurement>
+        </td>
+        <td>
+          <ucm-measurement
+            [value]="sensor.measurements ? sensor.measurements['brightness_current'] : null"
+          ></ucm-measurement>
+        </td>
+        <td>
+          <ucm-measurement
+            [value]="sensor.measurements ? sensor.measurements['battery_voltage'] : null"
+            unit="measurement.voltage"
+          ></ucm-measurement>
+        </td>
+      </tr>
     </tbody>
   </table>
 </div>
@@ -29,7 +55,7 @@
   <div class="d-flex flex-column align-items-center mt-5">
     <div class="spinner-grow" role="status"></div>
     <h3 class="mt-3">
-      {{ 'admin.sensors.loading_sensors' | translate }}
+      {{ 'location.loading_measurements' | translate }}
     </h3>
   </div>
 </ng-template>

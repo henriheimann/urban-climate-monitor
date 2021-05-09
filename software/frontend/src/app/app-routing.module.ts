@@ -1,7 +1,7 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {FrontPageComponent} from './pages/front-page/front-page.component';
-import {ImprintDataProtectionComponent} from './pages/imprint-data-protection/imprint-data-protection.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { FrontPageComponent } from './pages/front-page/front-page.component';
+import { ImprintDataProtectionComponent } from './pages/imprint-data-protection/imprint-data-protection.component';
 
 const routes: Routes = [
   {
@@ -18,4 +18,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

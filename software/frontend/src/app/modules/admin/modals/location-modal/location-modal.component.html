@@ -1,5 +1,7 @@
 <div class="modal-header">
-  <h3 class="pull-left mb-0">{{ switchOnModelType('admin.locations.add_location', 'admin.locations.edit_location') | translate }}</h3>
+  <h3 class="pull-left mb-0">
+    {{ switchOnModelType('admin.locations.add_location', 'admin.locations.edit_location') | translate }}
+  </h3>
   <button type="button" class="close pull-right" (click)="modalRef.hide()">
     <span>&times;</span>
   </button>
@@ -8,18 +10,32 @@
   <div class="modal-body">
     <div class="form-group">
       <label for="inputName">{{ 'admin.locations.name' | translate }}</label>
-      <input type="text" class="form-control" id="inputName" formControlName="name">
+      <input type="text" class="form-control" id="inputName" formControlName="name" />
     </div>
     <div class="form-group">
       <label for="inputIcon">{{ 'admin.locations.icon' | translate }}</label>
-      <input type="file" class="form-control-file" id="inputIcon" (change)="onFileChange('icon', $event)" accept="image/png">
+      <input
+        type="file"
+        class="form-control-file"
+        id="inputIcon"
+        (change)="onFileChange('icon', $event)"
+        accept="image/png"
+      />
     </div>
     <div class="form-group">
       <label for="inputModel3d">{{ 'admin.locations.model3d' | translate }}</label>
-      <input type="file" class="form-control-file" id="inputModel3d" (change)="onFileChange('model3d', $event)" accept=".obj">
+      <input
+        type="file"
+        class="form-control-file"
+        id="inputModel3d"
+        (change)="onFileChange('model3d', $event)"
+        accept=".obj"
+      />
     </div>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" [disabled]="locationForm.invalid">{{ switchOnModelType('admin.locations.add_location', 'admin.locations.edit_location') | translate }}</button>
+    <button type="submit" class="btn btn-primary" [disabled]="locationForm.invalid">
+      {{ switchOnModelType('admin.locations.add_location', 'admin.locations.edit_location') | translate }}
+    </button>
   </div>
 </form>

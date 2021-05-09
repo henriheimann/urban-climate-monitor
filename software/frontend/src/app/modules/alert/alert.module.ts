@@ -3,16 +3,14 @@ import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
 import { AlertEffects } from './store/alert.effects';
 import { AlertDisplayComponent } from './components/alert-display/alert-display.component';
-import {StoreModule} from '@ngrx/store';
+import { StoreModule } from '@ngrx/store';
 import * as fromAlert from './store/alert.reducer';
-import {SharedModule} from '../shared/shared.module';
-import {AlertModule as NgxBootstrapAlertModule} from 'ngx-bootstrap/alert';
+import { SharedModule } from '../shared/shared.module';
+import { AlertModule as NgxBootstrapAlertModule } from 'ngx-bootstrap/alert';
 
 @NgModule({
   declarations: [AlertDisplayComponent],
-  exports: [
-    AlertDisplayComponent
-  ],
+  exports: [AlertDisplayComponent],
   imports: [
     CommonModule,
     EffectsModule.forFeature([AlertEffects]),
@@ -21,4 +19,4 @@ import {AlertModule as NgxBootstrapAlertModule} from 'ngx-bootstrap/alert';
     NgxBootstrapAlertModule
   ]
 })
-export class AlertModule { }
+export class AlertModule {}

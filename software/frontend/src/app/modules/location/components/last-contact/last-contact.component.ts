@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'ucm-last-contact',
@@ -6,16 +6,16 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./last-contact.component.css']
 })
 export class LastContactComponent {
-
   date: Date | undefined;
+
   difference: number | undefined;
+
   differenceUnit: string | undefined;
 
   iconColorClass = 'text-success';
 
   @Input()
   set dateString(dateString: string | null) {
-
     if (!dateString) {
       this.date = undefined;
       this.difference = undefined;
@@ -29,8 +29,8 @@ export class LastContactComponent {
     const millisecondDifference = new Date().getTime() - this.date.getTime();
     const secondDifference = Math.floor(millisecondDifference / 1000);
     const minuteDifference = Math.floor(secondDifference / 60);
-    const hourDifference = Math.floor(secondDifference / 60);
-    const dayDifference = Math.floor(secondDifference / 24);
+    const hourDifference = Math.floor(minuteDifference / 60);
+    const dayDifference = Math.floor(hourDifference / 24);
 
     if (minuteDifference <= 10) {
       this.iconColorClass = 'text-success';
@@ -56,5 +56,5 @@ export class LastContactComponent {
     }
   }
 
-  constructor() { }
+  constructor() {}
 }

@@ -24,4 +24,9 @@ public class Upload
 		this.filename = filename;
 		this.data = data;
 	}
+
+	public String getUrl()
+	{
+		return "/upload/" + id + "/" + filename;
+	}
 }

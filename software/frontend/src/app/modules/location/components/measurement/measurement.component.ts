@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'ucm-measurement',
@@ -6,12 +6,11 @@ import {Component, Input, OnInit} from '@angular/core';
   styleUrls: ['./measurement.component.css']
 })
 export class MeasurementComponent {
-
   @Input()
   value: any;
 
   @Input()
   unit: string | undefined;
 
-  constructor() { }
+  constructor() {}
 }

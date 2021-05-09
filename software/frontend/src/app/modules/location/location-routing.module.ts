@@ -1,7 +1,7 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {VisualisationComponent} from './pages/visualisation/visualisation.component';
-import {SensorListComponent} from './pages/sensor-list/sensor-list.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { VisualisationComponent } from './pages/visualisation/visualisation.component';
+import { SensorListComponent } from './pages/sensor-list/sensor-list.component';
 
 const routes: Routes = [
   {
@@ -27,4 +27,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class LocationRoutingModule { }
+export class LocationRoutingModule {}

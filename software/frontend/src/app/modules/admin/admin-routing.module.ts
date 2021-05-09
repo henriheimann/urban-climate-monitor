@@ -1,11 +1,11 @@
-import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
-import {UserManagementComponent} from './pages/user-management/user-management.component';
-import {LocationManagementComponent} from './pages/location-management/location-management.component';
-import {SensorManagementComponent} from './pages/sensor-management/sensor-management.component';
-import {AuthGuard} from '../auth/guards/auth.guard';
-import {RoleGuard} from '../auth/guards/role.guard';
-import {LoginPageComponent} from './pages/login-page/login-page.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { UserManagementComponent } from './pages/user-management/user-management.component';
+import { LocationManagementComponent } from './pages/location-management/location-management.component';
+import { SensorManagementComponent } from './pages/sensor-management/sensor-management.component';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
 
 const routes: Routes = [
   {
@@ -18,10 +18,7 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [
-      AuthGuard,
-      RoleGuard
-    ],
+    canActivate: [AuthGuard, RoleGuard],
     data: {
       role: 'ADMIN'
     },
@@ -46,4 +43,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AdminRoutingModule { }
+export class AdminRoutingModule {}

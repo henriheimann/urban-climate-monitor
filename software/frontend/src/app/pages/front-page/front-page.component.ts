@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {EntityCollectionService, EntityCollectionServiceFactory} from '@ngrx/data';
-import {Location} from '../../modules/shared/models/location.model';
-import {Observable} from 'rxjs';
-import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
+import { Component, OnInit } from '@angular/core';
+import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
+import { Location } from '../../modules/shared/models/location.model';
+import { Observable } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'ucm-index',
@@ -10,8 +11,8 @@ import {DomSanitizer, SafeResourceUrl} from '@angular/platform-browser';
   styleUrls: ['./front-page.component.scss']
 })
 export class FrontPageComponent implements OnInit {
-
   locationService: EntityCollectionService<Location>;
+
   locations$: Observable<Location[]>;
 
   constructor(EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory, private sanitizer: DomSanitizer) {
@@ -27,6 +28,6 @@ export class FrontPageComponent implements OnInit {
     if (!location) {
       return undefined;
     }
-    return this.sanitizer.bypassSecurityTrustResourceUrl('data:image/jpg;base64,' + location.icon.data);
+    return environment.backendUrl + location.iconUrl;
   }
 }

@@ -1,38 +1,34 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-import {AppRoutingModule} from './app-routing.module';
-import {AppComponent} from './app.component';
-import {HTTP_INTERCEPTORS, HttpClient, HttpClientModule} from '@angular/common/http';
-import {AdminModule} from './modules/admin/admin.module';
-import {HeaderComponent} from './components/header/header.component';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
-import {DefaultDataServiceConfig, EntityDataModule} from '@ngrx/data';
-import {StoreModule} from '@ngrx/store';
-import {EffectsModule} from '@ngrx/effects';
-import {AuthModule} from './modules/auth/auth.module';
-import {ModalModule} from 'ngx-bootstrap/modal';
-import {environment} from '../environments/environment';
-import {TokenInterceptor} from './modules/auth/interceptors/token.interceptor';
-import {StoreDevtoolsModule} from '@ngrx/store-devtools';
-import {AlertModule} from './modules/alert/alert.module';
-import {AlertModule as NgxBootstrapAlertModule} from 'ngx-bootstrap/alert';
-import {LocationModule} from './modules/location/location.module';
-import {ImprintDataProtectionComponent} from './pages/imprint-data-protection/imprint-data-protection.component';
-import {FrontPageComponent} from './pages/front-page/front-page.component';
-import {LoginPageComponent} from './modules/admin/pages/login-page/login-page.component';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
+import { AdminModule } from './modules/admin/admin.module';
+import { HeaderComponent } from './components/header/header.component';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { DefaultDataServiceConfig, EntityDataModule } from '@ngrx/data';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthModule } from './modules/auth/auth.module';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { environment } from '../environments/environment';
+import { TokenInterceptor } from './modules/auth/interceptors/token.interceptor';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { AlertModule } from './modules/alert/alert.module';
+import { AlertModule as NgxBootstrapAlertModule } from 'ngx-bootstrap/alert';
+import { LocationModule } from './modules/location/location.module';
+import { ImprintDataProtectionComponent } from './pages/imprint-data-protection/imprint-data-protection.component';
+import { FrontPageComponent } from './pages/front-page/front-page.component';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { FooterComponent } from './components/footer/footer.component';
 
 const customDataServiceConfig: DefaultDataServiceConfig = {
-  root: environment.backendUrl + '/'
+  root: `${environment.backendUrl}/`
 };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    FrontPageComponent,
-    ImprintDataProtectionComponent
-  ],
+  declarations: [AppComponent, HeaderComponent, FrontPageComponent, ImprintDataProtectionComponent, FooterComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -47,6 +43,7 @@ const customDataServiceConfig: DefaultDataServiceConfig = {
     }),
     StoreModule.forRoot({}),
     StoreDevtoolsModule.instrument(),
+    StoreRouterConnectingModule.forRoot(),
     EffectsModule.forRoot([]),
     EntityDataModule.forRoot({}), // Metadata will be added in each feature module by multi-provider
     AdminModule,
@@ -69,4 +66,4 @@ const customDataServiceConfig: DefaultDataServiceConfig = {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,7 +1,10 @@
 export class Alert {
   destination = 'main';
+
   type = 'danger';
+
   messageKey: string;
+
   messageParams: any = {};
 
   constructor(messageKey: string, destination?: string, messageParams?: any, type?: string) {

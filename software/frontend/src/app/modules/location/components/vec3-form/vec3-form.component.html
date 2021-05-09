@@ -1,0 +1,39 @@
+<form [formGroup]="vec3Form">
+  <table class="table table-sm table-borderless">
+    <tbody>
+      <tr>
+        <td class="font-weight-bold">{{ 'location.' + name + '_x' | translate }}</td>
+        <td *ngIf="!editing" class="text-right">{{ vec3Form.value['x'] | number: '1.2-2' }}</td>
+        <td *ngIf="editing" class="text-right"><input type="number" step="0.01" formControlName="x" /></td>
+      </tr>
+      <tr>
+        <td class="font-weight-bold">{{ 'location.' + name + '_y' | translate }}</td>
+        <td *ngIf="!editing" class="text-right">{{ vec3Form.value['y'] | number: '1.2-2' }}</td>
+        <td *ngIf="editing" class="text-right"><input type="number" step="0.01" formControlName="y" /></td>
+      </tr>
+      <tr>
+        <td class="font-weight-bold">{{ 'location.' + name + '_z' | translate }}</td>
+        <td *ngIf="!editing" class="text-right">{{ vec3Form.value['z'] | number: '1.2-2' }}</td>
+        <td *ngIf="editing" class="text-right"><input type="number" step="0.01" formControlName="z" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="row">
+    <div *ngIf="!editing; else editingPositionDiv" class="col text-center">
+      <i class="bi bi-pencil"></i>
+      <button class="btn btn-link text-dark" (click)="onStartEditing()" [disabled]="!editable">
+        {{ 'location.edit_' + name | translate }}
+      </button>
+    </div>
+    <ng-template #editingPositionDiv>
+      <div class="col text-center">
+        <button class="btn btn-primary" (click)="onSaveChanges()">
+          {{ 'location.save' | translate }}
+        </button>
+        <button class="ml-1 btn btn-link text-dark" (click)="onRevertChanges()">
+          {{ 'location.revert' | translate }}
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</form>

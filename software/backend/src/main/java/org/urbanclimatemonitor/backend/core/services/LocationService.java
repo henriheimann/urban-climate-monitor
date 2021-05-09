@@ -4,13 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorLatestMeasurementsDTO;
-import org.urbanclimatemonitor.backend.core.dto.shared.UploadDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.CreateOrUpdateLocationDTO;
 import org.urbanclimatemonitor.backend.core.dto.request.UpdateLocationSensorDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationMeasurementsDTO;
-import org.urbanclimatemonitor.backend.core.dto.result.LocationSensorDTO;
+import org.urbanclimatemonitor.backend.core.dto.result.*;
+import org.urbanclimatemonitor.backend.core.dto.shared.UploadDTO;
 import org.urbanclimatemonitor.backend.core.entities.Location;
 import org.urbanclimatemonitor.backend.core.entities.Sensor;
 import org.urbanclimatemonitor.backend.core.entities.Upload;
@@ -20,9 +17,11 @@ import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 import org.urbanclimatemonitor.backend.influxdb.InfluxDBService;
 import org.urbanclimatemonitor.backend.util.Streams;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class LocationService
@@ -46,6 +45,16 @@ public class LocationService
 		return LocationDTO.builder()
 				.id(location.getId())
 				.name(location.getName())
+				.iconUrl(location.getIcon().getUrl())
+				.model3dUrl(location.getModel3d().getUrl())
+				.build();
+	}
+
+	private LocationWithUploadsDTO entityToLocationWithUploadDto(Location location)
+	{
+		return LocationWithUploadsDTO.builder()
+				.id(location.getId())
+				.name(location.getName())
 				.icon(new UploadDTO(location.getIcon().getFilename(),
 						Base64.getEncoder().encodeToString(location.getIcon().getData())))
 				.model3d(new UploadDTO(location.getModel3d().getFilename(),
@@ -55,26 +64,20 @@ public class LocationService
 
 	private LocationSensorDTO entityToLocationSensorDTO(Sensor sensor)
 	{
-		float[] position = null;
-		float[] rotation = null;
+		float[] position;
+		float[] rotation;
 
-		if (sensor.getLocationPositionX() != null && sensor.getLocationPositionY() != null &&
-				sensor.getLocationPositionZ() != null) {
-			position = new float[]{
-					sensor.getLocationPositionX(),
-					sensor.getLocationPositionY(),
-					sensor.getLocationPositionZ()
-			};
-		}
+		position = new float[]{
+				sensor.getLocationPositionX(),
+				sensor.getLocationPositionY(),
+				sensor.getLocationPositionZ()
+		};
 
-		if (sensor.getLocationRotationX() != null && sensor.getLocationRotationY() != null &&
-				sensor.getLocationRotationZ() != null) {
-			rotation = new float[]{
-					sensor.getLocationPositionX(),
-					sensor.getLocationPositionY(),
-					sensor.getLocationRotationZ()
-			};
-		}
+		rotation = new float[]{
+				sensor.getLocationPositionX(),
+				sensor.getLocationPositionY(),
+				sensor.getLocationRotationZ()
+		};
 
 		return new LocationSensorDTO(sensor.getId(), sensor.getName(), position, rotation);
 	}
@@ -96,15 +99,15 @@ public class LocationService
 	}
 
 	@Transactional
-	public LocationDTO getLocation(long id)
+	public LocationWithUploadsDTO getLocation(long id)
 	{
 		return locationRepository.findById(id)
-				.map(this::entityToLocationDto)
+				.map(this::entityToLocationWithUploadDto)
 				.orElseThrow(() -> new CustomLocalizedException("location-not-found", HttpStatus.NOT_FOUND));
 	}
 
 	@Transactional
-	public LocationDTO createLocation(CreateOrUpdateLocationDTO createLocationDTO)
+	public LocationWithUploadsDTO createLocation(CreateOrUpdateLocationDTO createLocationDTO)
 	{
 		Location location = new Location(
 				createLocationDTO.getName(),
@@ -113,7 +116,7 @@ public class LocationService
 		);
 
 		locationRepository.save(location);
-		return entityToLocationDto(location);
+		return entityToLocationWithUploadDto(location);
 	}
 
 	@Transactional
@@ -125,7 +128,7 @@ public class LocationService
 	}
 
 	@Transactional
-	public LocationDTO updateLocation(long id, CreateOrUpdateLocationDTO updateLocationDTO)
+	public LocationWithUploadsDTO updateLocation(long id, CreateOrUpdateLocationDTO updateLocationDTO)
 	{
 		Location location = locationRepository.findById(id)
 			.orElseThrow(() -> new CustomLocalizedException("location-not-found", HttpStatus.NOT_FOUND));
@@ -135,7 +138,7 @@ public class LocationService
 		location.setModel3d(uploadDtoToUpload(updateLocationDTO.getModel3d()));
 
 		locationRepository.save(location);
-		return entityToLocationDto(location);
+		return entityToLocationWithUploadDto(location);
 	}
 
 	@Transactional
@@ -211,5 +214,24 @@ public class LocationService
 						ttnIdsToMeasurementsMap.get(entry.getKey())
 				))
 				.collect(Collectors.toList());
+	}
+
+	public LocationSensorLatestMeasurementsDTO getLocationSensorLatestMeasurements(long id, long sensorId)
+	{
+		Sensor sensor = sensorRepository.findById(sensorId)
+				.filter(potentialSensor -> Optional.ofNullable(potentialSensor.getLocation())
+						.map(location -> location.getId().equals(id)).orElse(false))
+				.orElseThrow(() -> new CustomLocalizedException("sensor-not-found", HttpStatus.NOT_FOUND));
+
+		String ttnId = sensor.getTtnId();
+
+		Map<SensorDataType, Object> measurementsMap =
+				influxDBService.getLatestMeasurements(ttnId, SensorDataType.setOfAllTypes());
+
+		return new LocationSensorLatestMeasurementsDTO(
+				sensor.getId(),
+				sensor.getName(),
+				measurementsMap
+		);
 	}
 }

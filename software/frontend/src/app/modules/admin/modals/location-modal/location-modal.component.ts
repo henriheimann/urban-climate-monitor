@@ -1,9 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Location} from '../../../shared/models/location.model';
-import {EntityCollectionService, EntityCollectionServiceFactory} from '@ngrx/data';
-import {BsModalRef} from 'ngx-bootstrap/modal';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {User} from '../../../shared/models/user.model';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Location } from '../../../shared/models/location.model';
+import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { User } from '../../../shared/models/user.model';
 
 @Component({
   selector: 'ucm-location-modal',
@@ -11,7 +11,6 @@ import {User} from '../../../shared/models/user.model';
   styleUrls: ['./location-modal.component.css']
 })
 export class LocationModalComponent implements OnInit {
-
   locationForm = new FormGroup({
     name: new FormControl('', Validators.required),
     icon: new FormControl(null, Validators.required),
@@ -20,8 +19,11 @@ export class LocationModalComponent implements OnInit {
 
   locationService: EntityCollectionService<Location>;
 
-  constructor(public modalRef: BsModalRef, EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory,
-              private cd: ChangeDetectorRef) {
+  constructor(
+    public modalRef: BsModalRef,
+    EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory,
+    private cd: ChangeDetectorRef
+  ) {
     this.locationService = EntityCollectionServiceFactoryClass.create<Location>('Location');
   }
 
@@ -30,40 +32,48 @@ export class LocationModalComponent implements OnInit {
   switchOnModelType(addKey: string, editKey: string): string {
     if (this.location !== undefined) {
       return editKey;
-    } else {
-      return addKey;
     }
+    return addKey;
   }
 
   ngOnInit(): void {
     if (this.location) {
-      this.locationForm.setValue({
-        name: this.location.name,
-        icon: this.location.icon,
-        model3d: this.location.model3d
+      this.locationService.getByKey(this.location.id).subscribe((location) => {
+        this.location = location;
+        this.locationForm.setValue({
+          name: this.location.name,
+          icon: this.location.icon,
+          model3d: this.location.model3d
+        });
       });
     }
   }
 
   onSubmit(): void {
     if (this.location) {
-      this.locationService.update({
-        id: this.location.id,
-        name: this.locationForm.get('name')?.value,
-        icon: this.locationForm.get('icon')?.value,
-        model3d: this.locationForm.get('model3d')?.value
-      }).subscribe(() => {
-        this.modalRef.hide();
-      });
+      this.locationService
+        .update({
+          id: this.location.id,
+          name: this.locationForm.get('name')?.value,
+          icon: this.locationForm.get('icon')?.value,
+          model3d: this.locationForm.get('model3d')?.value
+        })
+        .subscribe(() => {
+          this.modalRef.hide();
+        });
     } else {
-      this.locationService.add({
-        id: null,
-        name: this.locationForm.get('name')?.value,
-        icon: this.locationForm.get('icon')?.value,
-        model3d: this.locationForm.get('model3d')?.value
-      }).subscribe(() => {
-        this.modalRef.hide();
-      });
+      this.locationService
+        .add({
+          id: null,
+          name: this.locationForm.get('name')?.value,
+          icon: this.locationForm.get('icon')?.value,
+          model3d: this.locationForm.get('model3d')?.value,
+          iconUrl: null,
+          model3dUrl: null
+        })
+        .subscribe(() => {
+          this.modalRef.hide();
+        });
     }
   }
 
@@ -86,7 +96,7 @@ export class LocationModalComponent implements OnInit {
           }
         });
 
-        // need to run CD since file load runs outside of zone
+        // Need to run CD since file load runs outside of zone
         this.cd.markForCheck();
       };
     }

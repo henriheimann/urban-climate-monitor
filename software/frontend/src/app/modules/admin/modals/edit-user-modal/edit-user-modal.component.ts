@@ -1,11 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {MustMatch} from '../../validators/must-match.validator';
-import {Observable} from 'rxjs';
-import {Location} from '../../../shared/models/location.model';
-import {EntityCollectionService, EntityCollectionServiceFactory} from '@ngrx/data';
-import {User} from '../../../shared/models/user.model';
-import {BsModalRef} from 'ngx-bootstrap/modal';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { MustMatch } from '../../validators/must-match.validator';
+import { Observable } from 'rxjs';
+import { Location } from '../../../shared/models/location.model';
+import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
+import { User } from '../../../shared/models/user.model';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'ucm-edit-user-modal',
@@ -13,7 +13,6 @@ import {BsModalRef} from 'ngx-bootstrap/modal';
   styleUrls: ['./edit-user-modal.component.css']
 })
 export class EditUserModalComponent implements OnInit {
-
   addUserForm = new FormGroup({
     isAdmin: new FormControl(false, Validators.required),
     locationsWithPermission: new FormControl([])
@@ -22,7 +21,9 @@ export class EditUserModalComponent implements OnInit {
   user: User | undefined;
 
   locations$: Observable<Location[]>;
+
   locationService: EntityCollectionService<Location>;
+
   userService: EntityCollectionService<User>;
 
   constructor(public modalRef: BsModalRef, EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory) {

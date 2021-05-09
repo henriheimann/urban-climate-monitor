@@ -2,7 +2,11 @@
   <h5 class="text-light">{{ 'front_page.no_locations' | translate }}</h5>
   <a [routerLink]="['admin', 'login']" class="text-light">{{ 'front_page.go_to_administration' | translate }}</a>
 </div>
-<div *ngFor="let location of (locations$ | async)" class="card m-5" style="width: 300px; height: 300px; border-radius: 10px">
+<div
+  *ngFor="let location of locations$ | async"
+  class="card m-5"
+  style="width: 300px; height: 300px; border-radius: 10px"
+>
   <a [routerLink]="['location', location.id]">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-center">

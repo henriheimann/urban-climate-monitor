@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {TranslateService} from '@ngx-translate/core';
-import {Store} from '@ngrx/store';
-import {loadUserFromLocalStorage} from './modules/auth/store/auth.actions';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { Store } from '@ngrx/store';
+import { loadUserFromLocalStorage } from './modules/auth/store/auth.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ucm-root',
@@ -10,7 +10,6 @@ import {Router} from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
   constructor(translate: TranslateService, private store: Store, private router: Router) {
     translate.setDefaultLang('en');
     translate.use('en');
@@ -18,6 +17,10 @@ export class AppComponent implements OnInit {
 
   isIndex(): boolean {
     return this.router.url === '/';
+  }
+
+  isVisualisation(): boolean {
+    return this.router.url.indexOf('visualisation') !== -1;
   }
 
   ngOnInit(): void {

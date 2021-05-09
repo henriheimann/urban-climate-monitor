@@ -17,15 +17,24 @@
     "go_to_administration": "Go to Administration"
   },
   "location": {
-    "sensor_list": {
-      "name": "Name",
-      "last_contact": "Last Contact",
-      "temperature": "Temperature",
-      "ir_temperature": "IR Temperature",
-      "humidity": "Humidity",
-      "brightness_current": "Brightness",
-      "battery_voltage": "Battery Voltage"
-    }
+    "name": "Name",
+    "last_contact": "Last Contact",
+    "temperature": "Temperature",
+    "ir_temperature": "IR Temperature",
+    "humidity": "Humidity",
+    "brightness_current": "Brightness",
+    "battery_voltage": "Battery Voltage",
+    "position_x": "Position X",
+    "position_y": "Position Y",
+    "position_z": "Position Z",
+    "rotation_x": "Rotation X",
+    "rotation_y": "Rotation Y",
+    "rotation_z": "Rotation Z",
+    "edit_position": "Edit Position",
+    "edit_rotation": "Edit Rotation",
+    "save": "Save Changes",
+    "revert": "Revert",
+    "loading_measurements": "Loading measurements..."
   },
   "admin": {
     "users": {
