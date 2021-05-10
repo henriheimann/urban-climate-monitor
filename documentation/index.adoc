@@ -3,6 +3,7 @@ Henri Heimann <henriheimann@gmail.com>
 :toc: left
 :icons:
 :lang: en
+:stylesheet: styles.css
 
 ifdef::env-github[]
 :imagesdir: https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets
@@ -11,14 +12,26 @@ ifndef::env-github[]
 :imagesdir: ../assets
 endif::[]
 
-== Overview
+== Introduction
+
+Developed as a climate monitoring solution for the Prosper III area in Bottrop, the Urban Climate Monitor project provides a complete package of hardware and software components to log and visualize long-term measurements of temperature, humidity and brightness data over wide urban areas.
+
+The solution is comprised of a specially developed hardware, named Sensor Node, which is equipped with an SHT31 temperature and humidity sensor, a photo-sensing circuit with two amplification factors and optionally a MLX90614 infrared temperature sensor for remote temperature sensing. These Sensor Nodes are powered by two AAA-batteries for an estimated battery life of multiple years for measurements every 10 minutes and enclosed in a 3d-printable case. Measurements are transmitted using an RFM95 module via The Things Network, a global open LoraWAN network and MQTT to a web-solution consisting of a Spring-Boot backend, Postgresql and InfluxDB databases and an Angular frontend for visualization.
+
+An overview of the complete system is shown in the following deployment diagram:
 
 .System Overview
 image::system-overview.svg[System Overview]
+
+== Quick Start
 
 == Hardware
 include::hardware.adoc[]
 
 == Backend
 include::backend.adoc[]
+
+== Frontend
+
+== Deployment
 
