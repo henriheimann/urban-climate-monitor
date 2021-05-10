@@ -1,8 +1,8 @@
 package org.urbanclimatemonitor.backend.test;
 
 import lombok.experimental.UtilityClass;
-import org.urbanclimatemonitor.backend.core.entities.Location;
-import org.urbanclimatemonitor.backend.core.entities.Sensor;
+import org.urbanclimatemonitor.backend.entities.Location;
+import org.urbanclimatemonitor.backend.entities.Sensor;
 import org.urbanclimatemonitor.backend.ttn.dto.TTNDeviceDTO;
 
 @UtilityClass

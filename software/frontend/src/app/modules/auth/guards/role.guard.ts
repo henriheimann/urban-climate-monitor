@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { selectLoggedInUser } from '../store/auth.selectors';
 import { Store } from '@ngrx/store';
@@ -15,7 +15,7 @@ export class RoleGuard implements CanActivate {
 
   constructor(private store: Store, private router: Router) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
     const { role } = route.data;
     return this.loggedInUser$.pipe(
       map((loggedInUser) => {

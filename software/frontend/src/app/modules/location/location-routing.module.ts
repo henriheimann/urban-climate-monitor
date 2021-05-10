@@ -1,23 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { VisualisationComponent } from './pages/visualisation/visualisation.component';
-import { SensorListComponent } from './pages/sensor-list/sensor-list.component';
+import { SensorListPageComponent } from './components/sensor-list-page/sensor-list-page.component';
+import { VisualisationPageComponent } from './components/visualisation-page/visualisation-page.component';
 
 const routes: Routes = [
   {
-    path: 'location/:id',
-    redirectTo: 'location/:id/visualisation'
+    path: 'location/:locationId',
+    redirectTo: 'location/:locationId/visualisation'
   },
   {
-    path: 'location/:id',
+    path: 'location/:locationId',
     children: [
       {
         path: 'visualisation',
-        component: VisualisationComponent
+        component: VisualisationPageComponent
       },
       {
         path: 'sensors',
-        component: SensorListComponent
+        component: SensorListPageComponent
       }
     ]
   }

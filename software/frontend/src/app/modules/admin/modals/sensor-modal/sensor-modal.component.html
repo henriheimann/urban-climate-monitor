@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
       <label for="inputLocation">{{ 'admin.sensors.location' | translate }}</label>
-      <ng-select id="inputLocation" formControlName="location">
+      <ng-select id="inputLocation" formControlName="locationId">
         <ng-option *ngFor="let location of locations$ | async" [value]="location.id">{{ location.name }}</ng-option>
       </ng-select>
     </div>

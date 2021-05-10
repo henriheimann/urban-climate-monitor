@@ -11,8 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.InfluxDBConfigurationProperties;
 import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
-import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataResolution;
-import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
+import org.urbanclimatemonitor.backend.controller.requests.SensorDataResolution;
+import org.urbanclimatemonitor.backend.controller.requests.SensorDataType;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 import javax.annotation.PostConstruct;
@@ -159,7 +159,8 @@ public class InfluxDBService
 		QueryResult.Result result = queryResult.getResults().get(0);
 
 		if (result.getSeries() == null) {
-			throw new CustomLocalizedException("TODO");
+			return ttnDeviceIds.stream()
+					.collect(Collectors.toMap(ttnDeviceId -> ttnDeviceId, ttnDeviceId -> Map.of()));
 		}
 
 		Map<String, Map<SensorDataType, Object>> sensorsMap = new HashMap<>();

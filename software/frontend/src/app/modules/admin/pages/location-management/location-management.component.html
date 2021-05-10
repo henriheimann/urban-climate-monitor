@@ -23,7 +23,7 @@
             <img height="50" [src]="icon" />
           </span>
         </td>
-        <td class="align-middle">{{ location.model3dUrl }}</td>
+        <td class="align-middle">{{ location.model3d.filename }}</td>
         <td class="align-middle text-right">
           <button class="btn btn-link text-dark p-0 mr-4" (click)="onEditLocationButtonClicked(location)">
             {{ 'admin.locations.edit' | translate }}

@@ -3,7 +3,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 import { SensorKeysService } from '../../services/sensor-keys.service';
 import { Observable } from 'rxjs';
 import { SensorKeys } from '../../models/sensor-keys.model';
-import { Sensor } from '../../../shared/models/sensor.model';
+import { SensorModel } from '../../../shared/models/sensor.model';
 
 @Component({
   selector: 'ucm-sensor-keys-modal',
@@ -11,7 +11,7 @@ import { Sensor } from '../../../shared/models/sensor.model';
   styleUrls: ['./sensor-keys-modal.component.css']
 })
 export class SensorKeysModalComponent implements OnInit {
-  sensor: Sensor | null = null;
+  sensor: SensorModel | null = null;
 
   sensorKeys$: Observable<SensorKeys> | null = null;
 

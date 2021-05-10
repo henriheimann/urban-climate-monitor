@@ -16,13 +16,13 @@ import {
   refreshUserTokenSuccess
 } from './auth.actions';
 import { AuthService } from '../services/auth.service';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
-import { User } from '../../shared/models/user.model';
+import { UserModel } from '../../shared/models/user.model';
 import { dispatchAlert } from '../../alert/store/alert.actions';
 import { Store } from '@ngrx/store';
 import { selectAuthState } from './auth.selectors';
 import { Router } from '@angular/router';
 import { Alert } from '../../alert/models/alert.model';
+import { UserService } from '../../shared/services/user.service';
 
 @Injectable()
 export class AuthEffects {
@@ -59,7 +59,7 @@ export class AuthEffects {
   loginUserFailure$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loginUserFailure),
-      map((action) => dispatchAlert({ alert: new Alert('alert.invalid_credentials', 'login') }))
+      map(() => dispatchAlert({ alert: new Alert('alert.invalid_credentials', 'login') }))
     )
   );
 
@@ -125,8 +125,8 @@ export class AuthEffects {
       ofType(AuthActions.logoutUser),
       withLatestFrom(this.store.select(selectAuthState)),
       switchMap(([, state]) => {
-        if (state.refreshToken != null) {
-          return this.authService.revokeRefreshToken(state.refreshToken).pipe(
+        if (state.token != null) {
+          return this.authService.revokeToken(state.token).pipe(
             map(() => {
               this.authService.clearLocalStorage();
               return logoutUserSuccess();
@@ -182,15 +182,11 @@ export class AuthEffects {
     { dispatch: false }
   );
 
-  private userService: EntityCollectionService<User>;
-
   constructor(
     private actions$: Actions,
     private store: Store,
     private authService: AuthService,
     private router: Router,
-    private EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory
-  ) {
-    this.userService = EntityCollectionServiceFactoryClass.create<User>('User');
-  }
+    private userService: UserService
+  ) {}
 }

@@ -1,0 +1,76 @@
+<div class="bg-white rounded shadow-sm border-0 mr-4 mt-4" style="width: 380px">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ sensor?.name }}</h5>
+      <button type="button" class="close" (click)="onCloseClicked()">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div *ngIf="sensor?.measurements; let measurements" class="modal-body container">
+      <table class="table table-sm table-borderless mb-0">
+        <tbody>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.last_contact' | translate }}</td>
+            <td class="text-right">
+              <ucm-last-contact [dateString]="measurements['time']"></ucm-last-contact>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.temperature' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="measurements['temperature']" unit="measurement.degrees_c"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.ir_temperature' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="measurements['ir_temperature']" unit="measurement.degrees_c"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.humidity' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="measurements['humidity']" unit="measurement.relative_humidity"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.brightness_current' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="measurements['brightness_current']"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'location.battery_voltage' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="measurements['battery_voltage']" unit="measurement.voltage"></ucm-measurement>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-body container">
+      <ucm-vec3
+        name="position"
+        [editable]="(editingMode$ | async) !== 'rotate'"
+        [vec3]="(modifiedPosition$ | async) || [0, 0, 0]"
+        (editingChange)="onEditingChange($event, 'translate')"
+        (vec3Change)="onPositionChange($event)"
+        (saveChanges)="onSaveChanges()"
+        (revertChanges)="onRevertChanges()"
+      ></ucm-vec3>
+    </div>
+
+    <div class="modal-body container">
+      <ucm-vec3
+        name="rotation"
+        [editable]="(editingMode$ | async) !== 'translate'"
+        [vec3]="(modifiedRotation$ | async) || [0, 0, 0]"
+        (editingChange)="onEditingChange($event, 'rotate')"
+        (vec3Change)="onRotationChange($event)"
+        (saveChanges)="onSaveChanges()"
+        (revertChanges)="onRevertChanges()"
+      ></ucm-vec3>
+    </div>
+  </div>
+</div>

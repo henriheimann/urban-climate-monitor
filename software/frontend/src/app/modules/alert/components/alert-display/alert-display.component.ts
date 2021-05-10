@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectAlertsForDestination } from '../../store/alert.selectors';
 import { Observable } from 'rxjs';

@@ -9,18 +9,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.urbanclimatemonitor.backend.config.properties.InitialisationConfigurationProperties;
 import org.urbanclimatemonitor.backend.config.properties.OAuthConfigurationProperties;
-import org.urbanclimatemonitor.backend.core.dto.request.CreateUserDTO;
-import org.urbanclimatemonitor.backend.core.entities.Role;
-import org.urbanclimatemonitor.backend.core.repositories.LocationRepository;
-import org.urbanclimatemonitor.backend.core.repositories.SensorRepository;
-import org.urbanclimatemonitor.backend.core.repositories.UserRepository;
-import org.urbanclimatemonitor.backend.core.services.UserService;
-import org.urbanclimatemonitor.backend.test.mocks.TTNWireMockConfig;
+import org.urbanclimatemonitor.backend.controller.requests.CreateUserRequest;
+import org.urbanclimatemonitor.backend.entities.Role;
+import org.urbanclimatemonitor.backend.repositories.LocationRepository;
+import org.urbanclimatemonitor.backend.repositories.SensorRepository;
+import org.urbanclimatemonitor.backend.repositories.UploadRepository;
+import org.urbanclimatemonitor.backend.repositories.UserRepository;
+import org.urbanclimatemonitor.backend.services.UserService;
 
+import javax.print.attribute.standard.Media;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
@@ -28,9 +30,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.nio.charset.Charset.defaultCharset;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.util.StreamUtils.copyToByteArray;
 import static org.springframework.util.StreamUtils.copyToString;
@@ -60,6 +64,9 @@ public class BaseIntegrationTest
 	LocationRepository locationRepository;
 
 	@Autowired
+	UploadRepository uploadRepository;
+
+	@Autowired
 	UserService userService;
 
 	private Map<String, String> tokenCache;
@@ -76,7 +83,9 @@ public class BaseIntegrationTest
 		userRepository.deleteAll();
 		sensorRepository.deleteAll();
 		locationRepository.deleteAll();
-		userService.createUser(new CreateUserDTO(initialisationProperties.getAdmin().getUsername(),
+		uploadRepository.deleteAll();
+
+		userService.createUser(new CreateUserRequest(initialisationProperties.getAdmin().getUsername(),
 				initialisationProperties.getAdmin().getPassword(), Role.ADMIN));
 	}
 
@@ -86,6 +95,7 @@ public class BaseIntegrationTest
 		userRepository.deleteAll();
 		sensorRepository.deleteAll();
 		locationRepository.deleteAll();
+		uploadRepository.deleteAll();
 	}
 
 	protected void clearTokenForUsername(String username)
@@ -106,7 +116,7 @@ public class BaseIntegrationTest
 					.queryParam("username", username)
 					.queryParam("password", password)
 					.queryParam("grant_type", "password")
-					.with(httpBasic(oAuthProperties.getJwt().getClientId(), oAuthProperties.getJwt().getClientSecret())))
+					.with(httpBasic(oAuthProperties.getClientId(), oAuthProperties.getClientSecret())))
 					.andDo(log(log))
 					.andExpect(status().isOk())
 					.andReturn()
@@ -150,15 +160,38 @@ public class BaseIntegrationTest
 				""".formatted(name)));
 	}
 
-	protected String loadUploadBase64Encoded(String folder, String filename) throws IOException
+	protected byte[] loadUpload(String folder, String filename) throws IOException
 	{
-		byte[] data = copyToByteArray(BaseIntegrationTest.class.getClassLoader().getResourceAsStream(
+		return copyToByteArray(BaseIntegrationTest.class.getClassLoader().getResourceAsStream(
 				"uploads/" + folder + "/" + filename));
-		return Base64.getEncoder().encodeToString(data);
+	}
+
+	protected int createUpload(String folder, String filename, MediaType mediaType) throws Exception
+	{
+		MockMultipartFile file = new MockMultipartFile(
+				"file",
+				filename,
+				mediaType.toString(),
+				loadUpload(folder, filename)
+		);
+
+		String content = this.mockMvc.perform(multipart("/upload")
+				.file(file)
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken()))
+				.andDo(log(log))
+				.andExpect(status().isOk())
+				.andReturn()
+				.getResponse()
+				.getContentAsString();
+
+		return JsonPath.read(content, "$.id");
 	}
 
 	protected ResultActions createLocation(String name, String iconFilename, String model3dFilename) throws Exception
 	{
+		long iconUploadId = createUpload("icons", iconFilename, MediaType.IMAGE_PNG);
+		long model3dUploadId = createUpload("models", model3dFilename, MediaType.TEXT_PLAIN);
+
 		return this.mockMvc.perform(post("/location")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken())
 				.contentType(MediaType.APPLICATION_JSON)
@@ -166,15 +199,13 @@ public class BaseIntegrationTest
 				{
 					"name": "%s",
 					"icon": {
-						"filename": "%s",
-						"data": "%s"
+						"id": "%d"
 					},
 					"model3d": {
-						"filename": "%s",
-						"data": "%s"
-					}
+						"id": "%d"
+					},
+					"sensors": []
 				}
-				""".formatted(name, iconFilename, loadUploadBase64Encoded("icons", iconFilename), model3dFilename,
-						loadUploadBase64Encoded("models", model3dFilename))));
+				""".formatted(name, iconUploadId, model3dUploadId)));
 	}
 }

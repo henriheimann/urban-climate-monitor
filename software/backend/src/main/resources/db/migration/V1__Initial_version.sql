@@ -1,7 +1,7 @@
 CREATE TABLE uploads
 (
     id                  SERIAL UNIQUE NOT NULL,
-    filename            VARCHAR(255) NOT NULL,
+    filename            VARCHAR(256) NOT NULL,
     data                BYTEA NOT NULL,
 
     PRIMARY KEY (id)
@@ -9,9 +9,9 @@ CREATE TABLE uploads
 
 CREATE TABLE users
 (
-    username            VARCHAR(255) UNIQUE NOT NULL,
-    password            VARCHAR(255) NOT NULL,
-    role                VARCHAR(255) NOT NULL,
+    username            VARCHAR(256) UNIQUE NOT NULL,
+    password            VARCHAR(256) NOT NULL,
+    role                VARCHAR(256) NOT NULL,
 
     PRIMARY KEY (username)
 );
@@ -19,7 +19,7 @@ CREATE TABLE users
 CREATE TABLE locations
 (
     id                  SERIAL UNIQUE NOT NULL,
-    name                VARCHAR(255) UNIQUE NOT NULL,
+    name                VARCHAR(256) UNIQUE NOT NULL,
     icon_id             BIGINT NOT NULL,
     model3d_id          BIGINT NOT NULL,
 
@@ -31,8 +31,8 @@ CREATE TABLE locations
 CREATE TABLE sensors
 (
     id                  SERIAL UNIQUE NOT NULL,
-    name                VARCHAR(255),
-    ttn_id              VARCHAR(255) UNIQUE,
+    name                VARCHAR(256),
+    ttn_id              VARCHAR(256) UNIQUE,
     location_id         BIGINT DEFAULT NULL,
     location_positionx  FLOAT DEFAULT 0,
     location_positiony  FLOAT DEFAULT 0,
@@ -47,7 +47,7 @@ CREATE TABLE sensors
 
 CREATE TABLE user_locations_with_permission
 (
-    user_username       VARCHAR(255) NOT NULL,
+    user_username       VARCHAR(256) NOT NULL,
     location_id         BIGINT NOT NULL,
 
     PRIMARY KEY (user_username, location_id),
@@ -55,8 +55,20 @@ CREATE TABLE user_locations_with_permission
     FOREIGN KEY (location_id) REFERENCES locations (id)
 );
 
-CREATE TABLE oauth_refresh_token (
-    token_id            VARCHAR(255),
+CREATE TABLE oauth_access_token
+(
+    token_id            VARCHAR(256),
     token               BYTEA,
-    authentication      BYTEA
+    authentication_id   VARCHAR(256),
+    user_name           VARCHAR(256),
+    client_id           VARCHAR(256),
+    authentication      BYTEA,
+    refresh_token       VARCHAR(256)
+);
+
+CREATE TABLE oauth_refresh_token
+(
+    token_id           VARCHAR(256),
+    token              BYTEA,
+    authentication     BYTEA
 );

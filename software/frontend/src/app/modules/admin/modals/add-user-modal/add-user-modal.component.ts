@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 import { MustMatch } from '../../validators/must-match.validator';
-import { Observable } from 'rxjs';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
-import { Location } from '../../../shared/models/location.model';
-import { User } from '../../../shared/models/user.model';
+import { UserModel } from '../../../shared/models/user.model';
+import { LocationService } from '../../../shared/services/location.service';
+import { UserService } from '../../../shared/services/user.service';
 
 @Component({
   selector: 'ucm-user-modal',
@@ -26,24 +25,16 @@ export class AddUserModalComponent implements OnInit {
     }
   );
 
-  locations$: Observable<Location[]>;
+  locations$ = this.locationService.entities$;
 
-  locationService: EntityCollectionService<Location>;
-
-  userService: EntityCollectionService<User>;
-
-  constructor(public modalRef: BsModalRef, EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory) {
-    this.locationService = EntityCollectionServiceFactoryClass.create<Location>('Location');
-    this.userService = EntityCollectionServiceFactoryClass.create<User>('User');
-    this.locations$ = this.locationService.entities$;
-  }
+  constructor(public modalRef: BsModalRef, private locationService: LocationService, private userService: UserService) {}
 
   ngOnInit(): void {
     this.locationService.getAll();
   }
 
   onSubmit(): void {
-    const user: User = {
+    const user: UserModel = {
       username: this.addUserForm.get('username')?.value,
       password: this.addUserForm.get('password')?.value,
       role: this.addUserForm.get('isAdmin')?.value === true ? 'ADMIN' : 'USER',

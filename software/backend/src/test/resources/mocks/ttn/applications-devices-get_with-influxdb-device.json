@@ -1,0 +1,37 @@
+{
+  "devices": [
+    {
+      "app_id": "ucm-ttn-app-id",
+      "dev_id": "device-001",
+      "lorawan_device": {
+        "app_eui": "2D42890323AC1323",
+        "dev_eui": "D9A5D8C71C10D21A",
+        "app_id": "ucm-ttn-app-id",
+        "dev_id": "device-001",
+        "dev_addr": "260157F1",
+        "nwk_s_key": "570B4D15DDCFD28D2FFC4B90DEA48d2D",
+        "app_s_key": "5E84BB636C7082BFC37EFFF250A0F620",
+        "app_key": "",
+        "disable_f_cnt_check": true,
+        "activation_constraints": "local"
+      }
+    },
+    {
+      "app_id": "ucm-ttn-app-id",
+      "dev_id": "002-pcb-prototype",
+      "lorawan_device": {
+        "app_eui": "2D42890323AC1323",
+        "dev_eui": "9CD67D0FEA2DC57E",
+        "app_id": "ucm-ttn-app-id",
+        "dev_id": "device-002",
+        "dev_addr": "2601BB69",
+        "nwk_s_key": "90BEE95C75DEBADDA8AB8V91BFEE1238",
+        "app_s_key": "4E7C735867B1FB62768FD81942CFB51E",
+        "app_key": "",
+        "disable_f_cnt_check": true,
+        "uses32_bit_f_cnt": true,
+        "activation_constraints": "local"
+      }
+    }
+  ]
+}

@@ -20,6 +20,4 @@ export class HexDisplayComponent {
       ?.map((str) => `0x${str}`)
       .join(', ')}}`;
   }
-
-  constructor() {}
 }

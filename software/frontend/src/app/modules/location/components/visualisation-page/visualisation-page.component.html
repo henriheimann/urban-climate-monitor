@@ -1,0 +1,13 @@
+<div #canvasWrapper id="canvasWrapper">
+  <canvas
+    #rendererCanvas
+    id="rendererCanvas"
+    (pointerup)="onCanvasMouseUp($event)"
+    (pointerdown)="onCanvasMouseDown()"
+    (pointermove)="onCanvasMouseMove()"
+  ></canvas>
+
+  <div id="sensorPopupWrapper" *ngIf="this.locationState?.selectedSensor">
+    <ucm-sensor-detail></ucm-sensor-detail>
+  </div>
+</div>

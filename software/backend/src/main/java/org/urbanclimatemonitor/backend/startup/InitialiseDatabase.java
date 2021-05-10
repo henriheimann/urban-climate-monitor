@@ -3,15 +3,10 @@ package org.urbanclimatemonitor.backend.startup;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.urbanclimatemonitor.backend.config.properties.InitialisationConfigurationProperties;
-import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
-import org.urbanclimatemonitor.backend.core.dto.request.CreateUserDTO;
-import org.urbanclimatemonitor.backend.core.dto.request.UpdateUserDTO;
-import org.urbanclimatemonitor.backend.core.entities.Role;
-import org.urbanclimatemonitor.backend.core.services.UserService;
-import org.urbanclimatemonitor.backend.influxdb.InfluxDBService;
-import org.urbanclimatemonitor.backend.ttn.TTNService;
-
-import java.util.Set;
+import org.urbanclimatemonitor.backend.controller.requests.CreateUserRequest;
+import org.urbanclimatemonitor.backend.controller.requests.UpdateUserRequest;
+import org.urbanclimatemonitor.backend.entities.Role;
+import org.urbanclimatemonitor.backend.services.UserService;
 
 @Component
 public class InitialiseDatabase implements CommandLineRunner
@@ -31,10 +26,10 @@ public class InitialiseDatabase implements CommandLineRunner
 	{
 		if (properties.getAdmin() != null) {
 			if (!userService.checkUserExists(properties.getAdmin().getUsername())) {
-				userService.createUser(new CreateUserDTO(properties.getAdmin().getUsername(),
+				userService.createUser(new CreateUserRequest(properties.getAdmin().getUsername(),
 						properties.getAdmin().getPassword(), Role.ADMIN));
 			} else {
-				userService.updateUser(properties.getAdmin().getUsername(), new UpdateUserDTO(Role.ADMIN));
+				userService.updateUser(properties.getAdmin().getUsername(), new UpdateUserRequest(Role.ADMIN));
 				userService.updateUserPasswordInternal(properties.getAdmin().getUsername(),
 						properties.getAdmin().getPassword());
 			}

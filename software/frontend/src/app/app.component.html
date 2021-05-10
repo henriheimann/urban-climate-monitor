@@ -1,19 +1,16 @@
-<ng-container *ngIf="isIndex()">
-  <div class="background"></div>
-  <main class="d-flex flex-wrap justify-content-center align-content-center without-navbar">
-    <router-outlet></router-outlet>
-  </main>
-</ng-container>
+<div *ngIf="splash" class="background"></div>
+<ucm-header *ngIf="!splash"></ucm-header>
+<main
+  [ngClass]="
+    splash
+      ? 'd-flex flex-wrap justify-content-center align-content-center without-navbar'
+      : isVisualisation()
+      ? 'fix-height'
+      : 'container-fluid py-3'
+  "
+>
+  <ucm-alert-display *ngIf="!splash" destination="main"></ucm-alert-display>
+  <router-outlet></router-outlet>
+</main>
 
-<ng-container *ngIf="!isIndex()">
-  <ucm-header></ucm-header>
-  <main *ngIf="!isVisualisation()" class="container-fluid py-3">
-    <ucm-alert-display destination="main"></ucm-alert-display>
-    <router-outlet></router-outlet>
-  </main>
-  <main *ngIf="isVisualisation()" class="fix-height">
-    <router-outlet></router-outlet>
-  </main>
-</ng-container>
-
-<ucm-footer></ucm-footer>
+<ucm-footer [lightTextColor]="(routeData | async)?.splash"></ucm-footer>

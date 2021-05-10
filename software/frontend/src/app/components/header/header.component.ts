@@ -4,14 +4,13 @@ import { Store } from '@ngrx/store';
 import { selectLoggedInUser } from '../../modules/auth/store/auth.selectors';
 import { logoutUser } from '../../modules/auth/store/auth.actions';
 import { Router } from '@angular/router';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
-import { Location } from '../../modules/shared/models/location.model';
+import { LocationModel } from '../../modules/shared/models/location.model';
 import { Observable } from 'rxjs';
-import { Dictionary } from '@ngrx/entity';
 import { map } from 'rxjs/operators';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { LoginModalComponent } from '../../modules/auth/modals/login-modal/login-modal.component';
 import { environment } from '../../../environments/environment';
+import { LocationService } from '../../modules/shared/services/location.service';
 
 @Component({
   selector: 'ucm-header',
@@ -21,22 +20,16 @@ import { environment } from '../../../environments/environment';
 export class HeaderComponent implements OnInit {
   user$ = this.store.select(selectLoggedInUser);
 
-  locationService: EntityCollectionService<Location>;
+  locations$ = this.locationService.entities$;
 
-  locations$: Observable<Location[]>;
-
-  locationsMap$: Observable<Dictionary<Location>>;
+  locationsMap$ = this.locationService.entityMap$;
 
   constructor(
     private modalService: BsModalService,
     private store: Store,
     private router: Router,
-    EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory
-  ) {
-    this.locationService = EntityCollectionServiceFactoryClass.create<Location>('Location');
-    this.locations$ = this.locationService.entities$;
-    this.locationsMap$ = this.locationService.entityMap$;
-  }
+    private locationService: LocationService
+  ) {}
 
   onLoginButtonClicked(): void {
     this.modalService.show(LoginModalComponent, { class: 'modal-dialog-centered' });
@@ -50,16 +43,16 @@ export class HeaderComponent implements OnInit {
     return this.router.url.startsWith(route);
   }
 
-  getRouteLocation(): Observable<Location | undefined> {
+  getRouteLocation(): Observable<LocationModel | undefined> {
     const locationId = this.getRouteLocationId();
     return this.locationsMap$.pipe(map((locationsMap) => locationsMap[locationId]));
   }
 
-  getLocationIcon(location: Location | undefined): SafeResourceUrl | undefined {
+  getLocationIcon(location: LocationModel | undefined): SafeResourceUrl | undefined {
     if (!location) {
       return undefined;
     }
-    return environment.backendUrl + location.iconUrl;
+    return environment.backendUrl + location.icon.url;
   }
 
   getRouteLocationIcon(): Observable<SafeResourceUrl | undefined> {

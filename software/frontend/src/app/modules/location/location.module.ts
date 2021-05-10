@@ -2,32 +2,35 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { LocationRoutingModule } from './location-routing.module';
-import { VisualisationComponent } from './pages/visualisation/visualisation.component';
-import { SensorListComponent } from './pages/sensor-list/sensor-list.component';
 import { SharedModule } from '../shared/shared.module';
 import { LastContactComponent } from './components/last-contact/last-contact.component';
 import { MeasurementComponent } from './components/measurement/measurement.component';
-import { SensorPopupComponent } from './components/sensor-popup/sensor-popup.component';
 import { FormsModule } from '@angular/forms';
-import { Vec3FormComponent } from './components/vec3-form/vec3-form.component';
 import { EffectsModule } from '@ngrx/effects';
 import { LocationEffects } from './store/location.effects';
+import { SensorListPageComponent } from './components/sensor-list-page/sensor-list-page.component';
+import { VisualisationSensorDetailComponent } from './components/sensor-visualisation-detail/visualisation-sensor-detail.component';
+import { Vec3Component } from './components/vec3/vec3.component';
+import { VisualisationPageComponent } from './components/visualisation-page/visualisation-page.component';
+import { StoreModule } from '@ngrx/store';
+import * as fromLocation from './store/location.reducer';
 
 @NgModule({
   declarations: [
-    VisualisationComponent,
-    SensorListComponent,
+    SensorListPageComponent,
     LastContactComponent,
     MeasurementComponent,
-    SensorPopupComponent,
-    Vec3FormComponent
+    Vec3Component,
+    VisualisationPageComponent,
+    VisualisationSensorDetailComponent
   ],
   imports: [
     CommonModule,
     SharedModule,
     LocationRoutingModule,
     FormsModule,
-    EffectsModule.forFeature([LocationEffects, LocationEffects])
+    StoreModule.forFeature(fromLocation.locationFeatureKey, fromLocation.reducer),
+    EffectsModule.forFeature([LocationEffects])
   ]
 })
 export class LocationModule {}

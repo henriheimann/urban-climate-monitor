@@ -14,23 +14,11 @@
     </div>
     <div class="form-group">
       <label for="inputIcon">{{ 'admin.locations.icon' | translate }}</label>
-      <input
-        type="file"
-        class="form-control-file"
-        id="inputIcon"
-        (change)="onFileChange('icon', $event)"
-        accept="image/png"
-      />
+      <ucm-file-upload id="inputIcon" accept="image/png" formControlName="icon"></ucm-file-upload>
     </div>
     <div class="form-group">
       <label for="inputModel3d">{{ 'admin.locations.model3d' | translate }}</label>
-      <input
-        type="file"
-        class="form-control-file"
-        id="inputModel3d"
-        (change)="onFileChange('model3d', $event)"
-        accept=".obj"
-      />
+      <ucm-file-upload id="inputModel3d" accept=".obj" formControlName="model3d"></ucm-file-upload>
     </div>
   </div>
   <div class="modal-footer">

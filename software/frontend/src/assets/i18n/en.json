@@ -13,8 +13,13 @@
     }
   },
   "front_page": {
-    "no_locations": "No Locations have been added yet...",
+    "loading_locations": "Loading Locations...",
+    "no_locations": "No locations have been added yet...",
     "go_to_administration": "Go to Administration"
+  },
+  "backend_not_available": {
+    "title": "Backend not available...",
+    "click_to_retry": "Click to Retry"
   },
   "location": {
     "name": "Name",

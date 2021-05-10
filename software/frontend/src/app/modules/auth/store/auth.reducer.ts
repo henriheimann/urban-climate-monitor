@@ -1,6 +1,6 @@
-import { createAction, createReducer, on } from '@ngrx/store';
+import { createReducer, on } from '@ngrx/store';
 import * as AuthActions from './auth.actions';
-import { User } from '../../shared/models/user.model';
+import { UserModel } from '../../shared/models/user.model';
 
 export const authFeatureKey = 'auth';
 
@@ -8,7 +8,7 @@ export interface AuthState {
   token: string | null;
   refreshToken: string | null;
 
-  user: User | null;
+  user: UserModel | null;
 
   loggingIn: boolean;
   refreshingToken: boolean;

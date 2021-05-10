@@ -1,10 +1,10 @@
-import { Upload } from './upload.model';
+import { SensorModel } from './sensor.model';
+import { UploadModel } from '../../upload/models/upload.model';
 
-export interface Location {
+export interface LocationModel {
   id: number | null;
   name: string;
-  icon: Upload;
-  model3d: Upload;
-  iconUrl: string | null;
-  model3dUrl: string | null;
+  icon: UploadModel;
+  model3d: UploadModel;
+  sensors: SensorModel[];
 }

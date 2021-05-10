@@ -2,7 +2,7 @@ package org.urbanclimatemonitor.backend.test.mockito;
 
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.urbanclimatemonitor.backend.core.entities.Sensor;
+import org.urbanclimatemonitor.backend.entities.Sensor;
 
 public class SaveSensorAnswer implements Answer<Sensor>
 {

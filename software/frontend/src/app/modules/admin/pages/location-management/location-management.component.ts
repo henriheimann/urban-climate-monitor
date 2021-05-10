@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
 import { BsModalService } from 'ngx-bootstrap/modal';
-import { Location } from '../../../shared/models/location.model';
+import { LocationModel } from '../../../shared/models/location.model';
 import { LocationModalComponent } from '../../modals/location-modal/location-modal.component';
 import { SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../../environments/environment';
+import { LocationService } from '../../../shared/services/location.service';
 
 @Component({
   selector: 'ucm-location-management',
@@ -14,46 +12,38 @@ import { environment } from '../../../../../environments/environment';
   styleUrls: ['./location-management.component.css']
 })
 export class LocationManagementComponent implements OnInit {
-  locations$: Observable<Location[]>;
+  locations$ = this.locationService.entities$;
+  loading$ = this.locationService.loading$;
 
-  loading$: Observable<boolean> | Store<boolean>;
-
-  locationService: EntityCollectionService<Location>;
-
-  constructor(
-    private modalService: BsModalService,
-    EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory
-  ) {
-    this.locationService = EntityCollectionServiceFactoryClass.create<Location>('Location');
-    this.locations$ = this.locationService.entities$;
-    this.loading$ = this.locationService.loading$;
-  }
+  constructor(private modalService: BsModalService, private locationService: LocationService) {}
 
   ngOnInit(): void {
     this.locationService.getAll();
   }
 
-  getLocationIcon(location: Location | undefined): SafeResourceUrl | undefined {
+  getLocationIcon(location: LocationModel | undefined): SafeResourceUrl | undefined {
     if (!location) {
       return undefined;
     }
-    return environment.backendUrl + location.iconUrl;
+    return environment.backendUrl + location.icon.url;
   }
 
   onAddLocationButtonClicked(): void {
     this.modalService.show(LocationModalComponent, {
-      class: 'modal-dialog-centered'
+      class: 'modal-dialog-centered',
+      ignoreBackdropClick: true
     });
   }
 
-  onEditLocationButtonClicked(location: Location): void {
+  onEditLocationButtonClicked(location: LocationModel): void {
     this.modalService.show(LocationModalComponent, {
       class: 'modal-dialog-centered',
+      ignoreBackdropClick: true,
       initialState: { location }
     });
   }
 
-  onDeleteLocationButtonClicked(location: Location): void {
+  onDeleteLocationButtonClicked(location: LocationModel): void {
     this.locationService.delete(location);
   }
 }

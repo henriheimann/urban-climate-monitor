@@ -5,16 +5,10 @@
   </button>
 </div>
 <div class="modal-body" *ngIf="sensorKeys$ | async; let sensorKeys">
-  <ucm-hex-output
-    name="{{ 'admin.sensors.device_address' | translate }}"
-    [hex]="sensorKeys.deviceAddress"
-  ></ucm-hex-output>
+  <ucm-hex-output name="{{ 'admin.sensors.device_address' | translate }}" [hex]="sensorKeys.deviceAddress"></ucm-hex-output>
   <ucm-hex-output
     name="{{ 'admin.sensors.application_session_key' | translate }}"
     [hex]="sensorKeys.applicationSessionKey"
   ></ucm-hex-output>
-  <ucm-hex-output
-    name="{{ 'admin.sensors.network_session_key' | translate }}"
-    [hex]="sensorKeys.networkSessionKey"
-  ></ucm-hex-output>
+  <ucm-hex-output name="{{ 'admin.sensors.network_session_key' | translate }}" [hex]="sensorKeys.networkSessionKey"></ucm-hex-output>
 </div>

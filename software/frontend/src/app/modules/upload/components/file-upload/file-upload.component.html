@@ -1,0 +1,13 @@
+<div *ngIf="uploading">
+  <span class="spinner-border spinner-border-sm" role="status"></span>
+  <span class="ml-2">{{ uploadingText }}</span>
+</div>
+
+<div *ngIf="!uploading && fileUpload == null">
+  <input type="file" class="form-control-file" (change)="onFileChange($event)" [accept]="accept" [disabled]="disabled || uploading" />
+</div>
+
+<div *ngIf="!uploading && fileUpload != null" class="d-flex align-items-center">
+  <span>{{ uploadedFileText }} {{ fileUpload.filename }}</span>
+  <button class="ml-2 btn btn-link text-danger p-0" (click)="onRemove()" [disabled]="disabled">{{ removeText }}</button>
+</div>

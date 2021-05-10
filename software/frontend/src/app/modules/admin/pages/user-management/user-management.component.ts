@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
-import { Observable } from 'rxjs';
-import { User } from '../../../shared/models/user.model';
-import { Store } from '@ngrx/store';
+import { UserModel } from '../../../shared/models/user.model';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { AddUserModalComponent } from '../../modals/add-user-modal/add-user-modal.component';
 import { EditUserModalComponent } from '../../modals/edit-user-modal/edit-user-modal.component';
+import { UserService } from '../../../shared/services/user.service';
 
 @Component({
   selector: 'ucm-user-management',
@@ -13,20 +11,10 @@ import { EditUserModalComponent } from '../../modals/edit-user-modal/edit-user-m
   styleUrls: ['./user-management.component.css']
 })
 export class UserManagementComponent implements OnInit {
-  users$: Observable<User[]>;
+  users$ = this.userService.entities$;
+  loading$ = this.userService.loading$;
 
-  loading$: Observable<boolean> | Store<boolean>;
-
-  userService: EntityCollectionService<User>;
-
-  constructor(
-    private modalService: BsModalService,
-    EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory
-  ) {
-    this.userService = EntityCollectionServiceFactoryClass.create<User>('User');
-    this.users$ = this.userService.entities$;
-    this.loading$ = this.userService.loading$;
-  }
+  constructor(private modalService: BsModalService, private userService: UserService) {}
 
   ngOnInit(): void {
     this.userService.getAll();
@@ -36,14 +24,14 @@ export class UserManagementComponent implements OnInit {
     this.modalService.show(AddUserModalComponent, { class: 'modal-dialog-centered' });
   }
 
-  onEditUserButtonClicked(user: User): void {
+  onEditUserButtonClicked(user: UserModel): void {
     this.modalService.show(EditUserModalComponent, {
       class: 'modal-dialog-centered',
       initialState: { user }
     });
   }
 
-  onDeleteUserButtonClicked(user: User): void {
+  onDeleteUserButtonClicked(user: UserModel): void {
     this.userService.delete(user);
   }
 }

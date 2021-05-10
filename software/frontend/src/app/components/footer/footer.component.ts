@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'ucm-footer',
@@ -7,9 +6,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./footer.component.css']
 })
 export class FooterComponent {
-  constructor(private router: Router) {}
-
-  isIndex(): boolean {
-    return this.router.url === '/';
-  }
+  @Input()
+  lightTextColor = false;
 }

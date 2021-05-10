@@ -1,14 +1,12 @@
 package org.urbanclimatemonitor.backend.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.urbanclimatemonitor.backend.core.entities.User;
-import org.urbanclimatemonitor.backend.core.repositories.UserRepository;
+import org.urbanclimatemonitor.backend.entities.User;
+import org.urbanclimatemonitor.backend.repositories.UserRepository;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 @Service

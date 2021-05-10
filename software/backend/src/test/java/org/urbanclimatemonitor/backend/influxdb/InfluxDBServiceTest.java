@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.urbanclimatemonitor.backend.config.properties.TTNConfigurationProperties;
-import org.urbanclimatemonitor.backend.core.dto.enums.SensorDataType;
+import org.urbanclimatemonitor.backend.controller.requests.SensorDataType;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 import java.util.Map;
@@ -40,12 +40,5 @@ class InfluxDBServiceTest
 
 		assertThat(latestMeasurements).containsEntry(SensorDataType.TEMPERATURE, 23.04);
 		assertThat(latestMeasurements).hasSize(1);
-	}
-
-	@Test
-	public void getLatestMeasurements_throwsAnException_forInvalidDeviceId()
-	{
-		assertThatThrownBy(() -> influxDBService.getLatestMeasurements("invalid", Set.of(SensorDataType.TEMPERATURE)))
-				.isInstanceOf(CustomLocalizedException.class);
 	}
 }

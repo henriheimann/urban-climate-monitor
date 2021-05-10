@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { LoginModalComponent } from '../../../auth/modals/login-modal/login-modal.component';
 import { Store } from '@ngrx/store';
-import { selectIsLoggedIn, selectLoggingIn } from '../../../auth/store/auth.selectors';
+import { selectIsLoggedIn } from '../../../auth/store/auth.selectors';
 import { take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 

@@ -11,9 +11,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.urbanclimatemonitor.backend.config.properties.OAuthConfigurationProperties;
 import org.urbanclimatemonitor.backend.security.exception.CustomWebResponseExceptionTranslator;
 
@@ -51,10 +50,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory()
-				.withClient(properties.getJwt().getClientId())
-				.secret(passwordEncoder.encode(properties.getJwt().getClientSecret()))
-				.accessTokenValiditySeconds(properties.getJwt().getTokenValiditySeconds())
-				.refreshTokenValiditySeconds(properties.getJwt().getRefreshTokenValiditySeconds())
+				.withClient(properties.getClientId())
+				.secret(passwordEncoder.encode(properties.getClientSecret()))
+				.accessTokenValiditySeconds(properties.getTokenValiditySeconds())
+				.refreshTokenValiditySeconds(properties.getRefreshTokenValiditySeconds())
 				.authorizedGrantTypes("password", "refresh_token")
 				.scopes("all");
 	}
@@ -62,37 +61,25 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints)
 	{
-		endpoints
-				.reuseRefreshTokens(false)
-				.accessTokenConverter(accessTokenConverter())
-				.tokenStore(tokenStore())
+		endpoints.tokenServices(tokenServices())
 				.userDetailsService(userService)
 				.authenticationManager(authenticationManager)
 				.exceptionTranslator(customWebResponseExceptionTranslator);
 	}
 
 	@Bean
-	public JwtAccessTokenConverter accessTokenConverter()
+	@Primary
+	public DefaultTokenServices tokenServices()
 	{
-		JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
-		accessTokenConverter.setSigningKey(properties.getJwt().getSigningKey());
-		return accessTokenConverter;
+		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+		defaultTokenServices.setTokenStore(tokenStore());
+		defaultTokenServices.setSupportRefreshToken(true);
+		return defaultTokenServices;
 	}
 
 	@Bean
-	public ManageableJwtTokenStore tokenStore()
+	public TokenStore tokenStore()
 	{
-		return new ManageableJwtTokenStore(accessTokenConverter(), jdbcTokenStore());
-	}
-
-	@Bean
-	public InMemoryTokenStore inMemoryTokenStore()
-	{
-		return new InMemoryTokenStore();
-	}
-
-	@Bean
-	public JdbcTokenStore jdbcTokenStore() {
 		return new JdbcTokenStore(dataSource);
 	}
 }

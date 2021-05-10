@@ -7,16 +7,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("urbanclimatemonitor.oauth")
 public class OAuthConfigurationProperties
 {
-	@Data
-	public static class JwtProperties
-	{
-		private String clientId;
-		private String clientSecret;
-		private String signingKey;
-		private int tokenValiditySeconds;
-		private int refreshTokenValiditySeconds;
-	}
-
 	private String resourceId;
-	private JwtProperties jwt;
+	private String clientId;
+	private String clientSecret;
+	private String signingKey;
+	private int tokenValiditySeconds;
+	private int refreshTokenValiditySeconds;
 }

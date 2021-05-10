@@ -1,11 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MustMatch } from '../../validators/must-match.validator';
-import { Observable } from 'rxjs';
-import { Location } from '../../../shared/models/location.model';
-import { EntityCollectionService, EntityCollectionServiceFactory } from '@ngrx/data';
-import { User } from '../../../shared/models/user.model';
+import { UserModel } from '../../../shared/models/user.model';
 import { BsModalRef } from 'ngx-bootstrap/modal';
+import { LocationService } from '../../../shared/services/location.service';
+import { UserService } from '../../../shared/services/user.service';
 
 @Component({
   selector: 'ucm-edit-user-modal',
@@ -18,19 +16,11 @@ export class EditUserModalComponent implements OnInit {
     locationsWithPermission: new FormControl([])
   });
 
-  user: User | undefined;
+  user: UserModel | undefined;
 
-  locations$: Observable<Location[]>;
+  locations$ = this.locationService.entities$;
 
-  locationService: EntityCollectionService<Location>;
-
-  userService: EntityCollectionService<User>;
-
-  constructor(public modalRef: BsModalRef, EntityCollectionServiceFactoryClass: EntityCollectionServiceFactory) {
-    this.locationService = EntityCollectionServiceFactoryClass.create<Location>('Location');
-    this.userService = EntityCollectionServiceFactoryClass.create<User>('User');
-    this.locations$ = this.locationService.entities$;
-  }
+  constructor(public modalRef: BsModalRef, private locationService: LocationService, private userService: UserService) {}
 
   ngOnInit(): void {
     this.locationService.getAll();

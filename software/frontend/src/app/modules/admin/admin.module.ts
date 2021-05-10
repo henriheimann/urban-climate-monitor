@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ENTITY_METADATA_TOKEN } from '@ngrx/data';
-import { User } from '../shared/models/user.model';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
 import { AdminRoutingModule } from './admin-routing.module';
 import { SharedModule } from '../shared/shared.module';
@@ -15,9 +13,10 @@ import { SensorModalComponent } from './modals/sensor-modal/sensor-modal.compone
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { SensorKeysModalComponent } from './modals/sensor-keys-modal/sensor-keys-modal.component';
 import { HexDisplayComponent } from './components/hex-display/hex-display.component';
+import { UploadModule } from '../upload/upload.module';
 
 @NgModule({
-  imports: [CommonModule, SharedModule, AdminRoutingModule, NgSelectModule],
+  imports: [CommonModule, SharedModule, AdminRoutingModule, NgSelectModule, UploadModule],
   declarations: [
     UserManagementComponent,
     LocationManagementComponent,
@@ -29,19 +28,6 @@ import { HexDisplayComponent } from './components/hex-display/hex-display.compon
     LoginPageComponent,
     SensorKeysModalComponent,
     HexDisplayComponent
-  ],
-  providers: [
-    {
-      provide: ENTITY_METADATA_TOKEN,
-      multi: true,
-      useValue: {
-        User: {
-          selectId: (user: User) => user.username
-        },
-        Location: {},
-        Sensor: {}
-      }
-    }
   ]
 })
 export class AdminModule {}

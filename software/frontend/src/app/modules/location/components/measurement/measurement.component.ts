@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'ucm-measurement',
@@ -11,6 +11,4 @@ export class MeasurementComponent {
 
   @Input()
   unit: string | undefined;
-
-  constructor() {}
 }
