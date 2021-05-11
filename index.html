@@ -448,7 +448,7 @@ ol li ul, ol li ol {
 
 dl dt {
     margin-bottom: .3125em;
-    font-weight: bold
+    font-weight: 500
 }
 
 dl dd {
@@ -566,7 +566,7 @@ h1 strong, h2 strong, h3 strong, #toctitle strong, .sidebarblock>.content>.title
 }
 
 *:not(pre)>code {
-    font-size: .9375em;
+    font-size: .8em;
     font-style: normal!important;
     letter-spacing: 0;
     padding: .1em .5ex;
@@ -1353,7 +1353,7 @@ th.valign-middle, td.valign-middle {
 }
 
 table thead th, table tfoot th {
-    font-weight: bold
+    font-weight: 500
 }
 
 tbody tr th {
@@ -2007,7 +2007,15 @@ p {
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_quick_start">Quick Start</a></li>
+<li><a href="#_quick_start">Quick Start</a>
+<ul class="sectlevel2">
+<li><a href="#_ttn_setup">TTN Setup</a></li>
+<li><a href="#_development_environment">Development Environment</a></li>
+<li><a href="#_hardware_fabrication">Hardware Fabrication</a></li>
+<li><a href="#_embedded_software">Embedded Software</a></li>
+<li><a href="#_assembly">Assembly</a></li>
+</ul>
+</li>
 <li><a href="#_hardware">Hardware</a>
 <ul class="sectlevel2">
 <li><a href="#_schematics">Schematics</a></li>
@@ -2015,9 +2023,14 @@ p {
 <li><a href="#_plots">Plots</a></li>
 </ul>
 </li>
-<li><a href="#_backend">Backend</a></li>
-<li><a href="#_frontend">Frontend</a></li>
-<li><a href="#_deployment">Deployment</a></li>
+<li><a href="#_backend_2">Backend</a></li>
+<li><a href="#_frontend_2">Frontend</a></li>
+<li><a href="#_deployment">Deployment</a>
+<ul class="sectlevel2">
+<li><a href="#_stages">Stages</a></li>
+<li><a href="#_environment_variables">Environment Variables</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -2029,7 +2042,7 @@ p {
 <p>Developed as a climate monitoring solution for the Prosper III area in Bottrop, the Urban Climate Monitor project provides a complete package of hardware and software components to log and visualize long-term measurements of temperature, humidity and brightness data over wide urban areas.</p>
 </div>
 <div class="paragraph">
-<p>The solution is comprised of a specially developed hardware, named Sensor Node, which is equipped with an SHT31 temperature and humidity sensor, a photo-sensing circuit with two amplification factors and optionally a MLX90614 infrared temperature sensor for remote temperature sensing. These Sensor Nodes are powered by two AAA-batteries for an estimated battery life of multiple years for measurements every 10 minutes and enclosed in a 3d-printable case. Measurements are transmitted using an RFM95 module via The Things Network, a global open LoraWAN network and MQTT to a web-solution consisting of a Spring-Boot backend, Postgresql and InfluxDB databases and an Angular frontend for visualization.</p>
+<p>The solution is comprised of a specially developed hardware, named Sensor Node, which is equipped with an SHT31 temperature and humidity sensor, a photo-sensing circuit with two amplification factors and optionally a MLX90614 infrared temperature sensor for remote temperature sensing. These Sensor Nodes are powered by two AAA-batteries for an estimated battery life of multiple years for measurements every 10 minutes and enclosed in a 3d-printable case. Measurements are transmitted using an RFM95 module via The Things Network, a global open LoraWAN network and MQTT to a web solution consisting of a Spring-Boot backend, Postgresql and InfluxDB databases and an Angular frontend for visualization.</p>
 </div>
 <div class="paragraph">
 <p>An overview of the complete system is shown in the following deployment diagram:</p>
@@ -2045,7 +2058,285 @@ p {
 <div class="sect1">
 <h2 id="_quick_start">Quick Start</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_ttn_setup">TTN Setup</h3>
+<div class="paragraph">
+<p>The system requires a The Things Network application.</p>
+</div>
+<div class="listingblock">
+<div class="title">TTN Payload Decoder Function</div>
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">function decode_int16(byte_high, byte_low) {
+  var int16 = ((byte_high &lt;&lt; 8) | byte_low);
+  if (int16 == 32767) {
+    return null;
+  } else {
+    return int16 / 100.0;
+  }
+}
 
+function Decoder(bytes, port) {
+  var decoded = {};
+
+  decoded.temperature = decode_int16(bytes[1], bytes[0]);
+  decoded.humidity = decode_int16(bytes[3], bytes[2]);
+  decoded.ir_temperature = decode_int16(bytes[5],  bytes[4]);
+  decoded.brightness_current = (bytes[9] &lt;&lt; 24) | (bytes[8] &lt;&lt; 16) | (bytes[7] &lt;&lt; 8) | bytes[6];
+  decoded.battery_voltage = bytes[10] / 10.0;
+
+  return decoded;
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_development_environment">Development Environment</h3>
+<div class="paragraph">
+<p>For Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range.</p>
+</div>
+<div class="sect3">
+<h4 id="_backend">Backend</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Environment variables</dt>
+<dd>
+<p>Make sure to export the following environment variables before starting the backend.</p>
+</dd>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 1%;">
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Example Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_DEVICE_ADDRESS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, 0x00, 0x00, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Device address of this sensor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_APPLICATION_SESSION_KEY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, &#8230;&#8203;, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key for accessing TTN, do not share!</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_NETWORK_SESSION_KEY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, &#8230;&#8203;, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key for accessing TTN, do not share!</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Running the backend</dt>
+<dd>
+<p><code>TODO</code></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_frontend">Frontend</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Environment variables</dt>
+<dd>
+<p>Make sure to export the following environment variables before starting the frontend.</p>
+</dd>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 1%;">
+<col>
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Variable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Example Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Running the frontend</dt>
+<dd>
+<p><code>TODO</code></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hardware_fabrication">Hardware Fabrication</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_embedded_software">Embedded Software</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Environment variables</dt>
+<dd>
+<p>Make sure to export the following environment variables before proceeding. The values for these are unique per Sensor and can be obtained from the administration section of the frontend. For that purpose, create a new or view an existing sensor and click the Keys button under TTN Keys.</p>
+</dd>
+</dl>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 1%;">
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Example Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_DEVICE_ADDRESS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, 0x00, 0x00, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Device address of this sensor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_APPLICATION_SESSION_KEY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, &#8230;&#8203;, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key for accessing TTN, do not share!</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_KEYS_NETWORK_SESSION_KEY</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">{0x00, &#8230;&#8203;, 0x00}</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Key for accessing TTN, do not share!</p></td>
+</tr>
+</tbody>
+</table>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Prerequisites</dt>
+<dd>
+<p><code>cmake</code> and <code>gcc-arm-none-eabi</code> are required to build the embedded software.</p>
+</dd>
+<dt class="hdlist1">Go to software directory</dt>
+<dd>
+<p><code>cd &lt;project root&gt;/software/embedded/sensor-node/</code></p>
+</dd>
+<dt class="hdlist1">Create build directory</dt>
+<dd>
+<p><code>cmake -E make_directory build &amp;&amp; cd build</code></p>
+</dd>
+<dt class="hdlist1">Run CMake</dt>
+<dd>
+<p><code>cmake .. -DCMAKE_BUILD_TYPE=Release</code></p>
+</dd>
+<dt class="hdlist1">Run CMake build</dt>
+<dd>
+<p><code>cmake --build . --config Release</code></p>
+</dd>
+<dt class="hdlist1">Flash onto hardware</dt>
+<dd>
+<p>Use the STM32 ST-Link utility to flash the created binary onto the microcontroller. You will need an ST-Link programmer and an adapter from your programmer to SWD (2x5 1.27mm) (for example <a href="https://www.adafruit.com/product/2094">this one</a> from Adafruit). For the first flashing of a brand new microcontroller, you may need to use ST-Link utility to disable the Option Byte <code>nBoost0_SW_Cfg</code>. For later flashings, you can use any other utility such as OpenOCD which can be directly done from your IDE.</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_assembly">Assembly</h3>
+<div class="sect3">
+<h4 id="_required_parts">Required Parts</h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 1%;">
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Count</th>
+<th class="tableblock halign-left valign-top">Part</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fabricated and assembled Sensor Node PCB</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3d-printed and painted case upper half</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3d-printed and painted case lower half</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Acrylic glass sheet with dimensions 1x3cm and a depth of no more than 1.5mm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Self-adhesive logo label</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2x M2 screws with a length of 6mm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4x M3 screws with a length of 16mm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2x AAA batteries</p></td>
+</tr>
+</tbody>
+</table>
+<div class="imageblock">
+<div class="content">
+<img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/parts-overview-cable-ties.jpeg" alt="Parts for Assembly">
+</div>
+<div class="title">Figure 2. Overview of all Parts</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_assembly_steps">Assembly Steps</h4>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Add acrylic glass sheet</dt>
+<dd>
+<p>Glue the acrylic glass sheet into the matching cutout of the upper half of the case from the inside.</p>
+</dd>
+<dt class="hdlist1">Add logo</dt>
+<dd>
+<p>Apply the self-adhesive logo sticker next to the cutout from the outside.</p>
+</dd>
+<dt class="hdlist1">Mount PCB</dt>
+<dd>
+<p>Screw the PCB onto the lower half of the case using the two M2 screws. You will need to apply a lot of pressure to force these into the 3d-printed screw holes.</p>
+</dd>
+<dt class="hdlist1">Insert batteries</dt>
+<dd>
+<p>If haven done so already, insert the two AAA batteries into the holder. You should have flashed the firmware and verified that sensor successfully communicates with TTN and the Urban Climate Monitor web solution by now.</p>
+</dd>
+<dt class="hdlist1">Close the case</dt>
+<dd>
+<p>Place the lower half of the case in the upper half of the case and screw them together using the 4 M3 screws.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2071,13 +2362,13 @@ p {
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/hardware/plots/sensor-node-top.svg" alt="Top Plot" width="450">
 </div>
-<div class="title">Figure 2. Top</div>
+<div class="title">Figure 3. Top</div>
 </div>
 <div class="imageblock left">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/hardware/plots/sensor-node-bottom.svg" alt="Bottom Plot" width="450">
 </div>
-<div class="title">Figure 3. Bottom</div>
+<div class="title">Figure 4. Bottom</div>
 </div>
 </div>
 </div>
@@ -2085,13 +2376,13 @@ p {
 </div>
 </div>
 <div class="sect1">
-<h2 id="_backend">Backend</h2>
+<h2 id="_backend_2">Backend</h2>
 <div class="sectionbody">
 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_frontend">Frontend</h2>
+<h2 id="_frontend_2">Frontend</h2>
 <div class="sectionbody">
 
 </div>
@@ -2099,13 +2390,252 @@ p {
 <div class="sect1">
 <h2 id="_deployment">Deployment</h2>
 <div class="sectionbody">
-
+<div class="sect2">
+<h3 id="_stages">Stages</h3>
+<div class="paragraph">
+<p>Four different stages are provided for the development, testing and deployment of the Urban Climate Monitor web solution infrastructure. Three of which are meant to be used for local and CI/CD environments and one is used for the actual production environment. All stages require <code>.env</code> files present alongside their run scripts. These <code>.env</code> files are not committed to the git repository and must be manually created and filled with the required values as outlined in section <a href="#_environment_variables">Environment Variables</a>. All deployment scripts use Docker Compose.</p>
+</div>
+<div class="sect3">
+<h4 id="_local_dev">Local Dev</h4>
+<div class="paragraph">
+<p><code>deployment/local-dev/deploy-local-dev.sh</code> deploys a local development environment including PostgreSQL and InfluxDB databases, and a Telegraf instance. It provides the required infrastructure required to manually start up the Urban Climate Monitor frontend and backend in your desired IDEs. Test PostgreSQL and InfluxDB databases are also initialized with the required test data to run all backend tests. An example <code>.env</code> file for this stage is given in the <a href="#_quick_start">Quick Start</a> section.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_local_test">Local Test</h4>
+<div class="paragraph">
+<p><code>deployment/local-test/deploy-local-test.sh</code> deploys a local testing environment with test PostgreSQL and InfluxDB databases. This environment is used for testing during execution of the CI/CD pipelines.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_local_production">Local Production</h4>
+<div class="paragraph">
+<p><code>deployment/local-production/deploy-local-production.sh</code> deploys an environment mimicking the real production environment up to a high degree. It includes the Nginx reverse proxy, Telegraf, Grafana, the PostgreSQL and InfluxDB databases and the frontend and backend Docker containers. The frontend and backend containers are build during the execution of the script. This local production deployment can be used to verify the complete web solution before the actual deployment to production.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_production">Production</h4>
+<div class="paragraph">
+<p><code>deployment/production/deploy.sh</code> deploys the complete web solution to a webserver. This includes Certbot for SSL certificate validation, the Nginx reverse proxy, Telegraf, Grafana, the PostgreSQL and InfluxDB databases and the frontend and backend Docker containers. The frontend and backend containers are build during the execution of the script.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_environment_variables">Environment Variables</h3>
+<div class="paragraph">
+<p>The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding <code>.env</code> file.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 18.1818%;">
+<col style="width: 18.1818%;">
+<col style="width: 27.2727%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.0909%;">
+<col style="width: 9.091%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Recommended Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">L-Dev</th>
+<th class="tableblock halign-left valign-top">L-Test</th>
+<th class="tableblock halign-left valign-top">L-Prod</th>
+<th class="tableblock halign-left valign-top">Prod</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-influxdb</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used by the Telegraf container to access InfluxDB, must be set to ucm-influxdb to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8086</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port on which the InfluxDB will be available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metrics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the InfluxDB database used.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_TEST_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metricstest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the InfluxDB database used for test.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_ADMIN_USER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">admin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the InfluxDB user which is used for the initialization.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_ADMIN_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of the InfluxDB admin user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_USER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the InfluxDB user which is used for access from Telegraf and the backend.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_USER_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of the InfluxDB user user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TELEGRAF_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-telegraf</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used to access Telegraf, must be set to ucm-telegraf to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_REGION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu (for Europe)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The TTN region prefix of the TTN application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the TTN application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_ACCESS_KEY</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An access key for the TTN application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_EUI</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The application EUI of the TTN application.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_DEVICE_ID_PREFIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26011 (for Europe)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The prefix used for generation of TTN devices when creating new sensors via the frontend.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-postgres</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used by the backend container to access Postgres, must be set to ucm-postgres to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5432</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port on which the PostgreSQL database will be available.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_USER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the Postgres user which is used for access from the backend.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of the Postgres user.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the Postgres database used.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_TEST_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucmtest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the Postgres database used for test.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-05-10 19:03:32 UTC
+Last updated 2021-05-11 15:40:32 UTC
 </div>
 </div>
 </body>
