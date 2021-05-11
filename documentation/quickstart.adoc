@@ -1,0 +1,142 @@
+=== TTN Setup
+
+The system requires a The Things Network application.
+
+.TTN Payload Decoder Function
+[source,javascript]
+----
+function decode_int16(byte_high, byte_low) {
+  var int16 = ((byte_high << 8) | byte_low);
+  if (int16 == 32767) {
+    return null;
+  } else {
+    return int16 / 100.0;
+  }
+}
+
+function Decoder(bytes, port) {
+  var decoded = {};
+
+  decoded.temperature = decode_int16(bytes[1], bytes[0]);
+  decoded.humidity = decode_int16(bytes[3], bytes[2]);
+  decoded.ir_temperature = decode_int16(bytes[5],  bytes[4]);
+  decoded.brightness_current = (bytes[9] << 24) | (bytes[8] << 16) | (bytes[7] << 8) | bytes[6];
+  decoded.battery_voltage = bytes[10] / 10.0;
+
+  return decoded;
+}
+----
+
+=== Development Environment
+
+For Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range.
+
+==== Backend
+
+Environment variables:: Make sure to export the following environment variables before starting the backend.
+
+[cols="1,~,~"]
+|===
+|Variable |Example Value |Description 
+
+| TTN_KEYS_DEVICE_ADDRESS
+| {0x00, 0x00, 0x00, 0x00}
+| Device address of this sensor
+
+| TTN_KEYS_APPLICATION_SESSION_KEY
+| {0x00, ..., 0x00}
+| Key for accessing TTN, do not share!
+
+| TTN_KEYS_NETWORK_SESSION_KEY
+| {0x00, ..., 0x00}
+| Key for accessing TTN, do not share!
+|===
+
+Running the backend:: `TODO`
+
+
+==== Frontend
+
+Environment variables:: Make sure to export the following environment variables before starting the frontend.
+
+[cols="1,~,~"]
+|===
+|Variable |Example Value |Description 
+|===
+
+Running the frontend:: `TODO`
+
+=== Hardware Fabrication
+
+=== Embedded Software
+
+Environment variables:: Make sure to export the following environment variables before proceeding. The values for these are unique per Sensor and can be obtained from the administration section of the frontend. For that purpose, create a new or view an existing sensor and click the Keys button under TTN Keys.
+
+[cols="1,~,~"]
+|===
+|Variable |Example Value |Description 
+
+| TTN_KEYS_DEVICE_ADDRESS
+| {0x00, 0x00, 0x00, 0x00}
+| Device address of this sensor
+
+| TTN_KEYS_APPLICATION_SESSION_KEY
+| {0x00, ..., 0x00}
+| Key for accessing TTN, do not share!
+
+| TTN_KEYS_NETWORK_SESSION_KEY
+| {0x00, ..., 0x00}
+| Key for accessing TTN, do not share!
+|===
+
+Prerequisites:: `cmake` and `gcc-arm-none-eabi` are required to build the embedded software.
+Go to software directory:: `cd <project root>/software/embedded/sensor-node/`
+Create build directory:: `cmake -E make_directory build && cd build`
+Run CMake:: `cmake .. -DCMAKE_BUILD_TYPE=Release`
+Run CMake build:: `cmake --build . --config Release`
+Flash onto hardware:: Use the STM32 ST-Link utility to flash the created binary onto the microcontroller. You will need an ST-Link programmer and an adapter from your programmer to SWD (2x5 1.27mm) (for example https://www.adafruit.com/product/2094[this one] from Adafruit). For the first flashing of a brand new microcontroller, you may need to use ST-Link utility to disable the Option Byte `nBoost0_SW_Cfg`. For later flashings, you can use any other utility such as OpenOCD which can be directly done from your IDE.
+
+=== Assembly
+
+==== Required Parts
+
+[cols="1,~"]
+|===
+|Count |Part
+
+|1
+|Fabricated and assembled Sensor Node PCB
+
+|1
+|3d-printed and painted case upper half
+
+|1
+|3d-printed and painted case lower half
+
+|1
+|Acrylic glass sheet with dimensions 1x3cm and a depth of no more than 1.5mm
+
+|1
+|Self-adhesive logo label 
+
+|2
+|2x M2 screws with a length of 6mm
+
+|4
+|4x M3 screws with a length of 16mm
+
+|2
+|2x AAA batteries
+
+|===
+
+.Overview of all Parts
+image::parts-overview-cable-ties.jpeg[Parts for Assembly]
+
+==== Assembly Steps
+
+Add acrylic glass sheet:: Glue the acrylic glass sheet into the matching cutout of the upper half of the case from the inside.
+Add logo:: Apply the self-adhesive logo sticker next to the cutout from the outside.
+Mount PCB:: Screw the PCB onto the lower half of the case using the two M2 screws. You will need to apply a lot of pressure to force these into the 3d-printed screw holes.
+Insert batteries:: If haven done so already, insert the two AAA batteries into the holder. You should have flashed the firmware and verified that sensor successfully communicates with TTN and the Urban Climate Monitor web solution by now. 
+Close the case:: Place the lower half of the case in the upper half of the case and screw them together using the 4 M3 screws.

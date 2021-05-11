@@ -1,0 +1,189 @@
+=== Stages
+
+Four different stages are provided for the development, testing and deployment of the Urban Climate Monitor web solution infrastructure. Three of which are meant to be used for local and CI/CD environments and one is used for the actual production environment. All stages require `.env` files present alongside their run scripts. These `.env` files are not committed to the git repository and must be manually created and filled with the required values as outlined in section <<Environment Variables>>. All deployment scripts use Docker Compose.
+
+==== Local Dev
+
+`deployment/local-dev/deploy-local-dev.sh` deploys a local development environment including PostgreSQL and InfluxDB databases, and a Telegraf instance. It provides the required infrastructure required to manually start up the Urban Climate Monitor frontend and backend in your desired IDEs. Test PostgreSQL and InfluxDB databases are also initialized with the required test data to run all backend tests. An example `.env` file for this stage is given in the <<Quick Start>> section.
+
+==== Local Test
+
+`deployment/local-test/deploy-local-test.sh` deploys a local testing environment with test PostgreSQL and InfluxDB databases. This environment is used for testing during execution of the CI/CD pipelines.
+
+==== Local Production
+
+`deployment/local-production/deploy-local-production.sh` deploys an environment mimicking the real production environment up to a high degree. It includes the Nginx reverse proxy, Telegraf, Grafana, the PostgreSQL and InfluxDB databases and the frontend and backend Docker containers. The frontend and backend containers are build during the execution of the script. This local production deployment can be used to verify the complete web solution before the actual deployment to production.
+
+==== Production
+
+`deployment/production/deploy.sh` deploys the complete web solution to a webserver. This includes Certbot for SSL certificate validation, the Nginx reverse proxy, Telegraf, Grafana, the PostgreSQL and InfluxDB databases and the frontend and backend Docker containers. The frontend and backend containers are build during the execution of the script.
+
+=== Environment Variables
+
+The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding `.env` file.
+
+[cols="2,2,3,1,1,1,1"]
+|===
+|Variable |Recommended Value |Description |L-Dev |L-Test |L-Prod |Prod
+
+|INFLUXDB_HOST
+|ucm-influxdb
+|Host used by the Telegraf container to access InfluxDB, must be set to ucm-influxdb to mirror Docker Compose container name.
+|✓
+|✓
+|✓
+|✓
+
+|INFLUXDB_PORT
+|8086
+|Port on which the InfluxDB will be available.
+|✓
+|✓
+|✓
+|✓
+
+|INFLUXDB_DB
+|metrics
+|Name of the InfluxDB database used.
+|✓
+|✕
+|✓
+|✓
+
+|INFLUXDB_TEST_DB
+|metricstest
+|Name of the InfluxDB database used for test.
+|✓
+|✓
+|✕
+|✕
+
+|INFLUXDB_ADMIN_USER
+|admin
+|Name of the InfluxDB user which is used for the initialization.
+|✓
+|✓
+|✓
+|✓
+
+|INFLUXDB_ADMIN_PASSWORD
+|
+|Password of the InfluxDB admin user.
+|✓
+|✓
+|✓
+|✓
+
+|INFLUXDB_USER
+|user
+|Name of the InfluxDB user which is used for access from Telegraf and the backend.
+|✓
+|✓
+|✓
+|✓
+
+|INFLUXDB_USER_PASSWORD
+|
+|Password of the InfluxDB user user.
+|✓
+|✓
+|✓
+|✓
+
+|TELEGRAF_HOST
+|ucm-telegraf
+|Host used to access Telegraf, must be set to ucm-telegraf to mirror Docker Compose container name.
+|✓
+|✓
+|✓
+|✓
+
+|TTN_REGION
+|eu (for Europe)
+|The TTN region prefix of the TTN application.
+|✓
+|✕
+|✓
+|✓
+
+|TTN_APP_ID
+|
+|The ID of the TTN application.
+|✓
+|✕
+|✓
+|✓
+
+|TTN_APP_ACCESS_KEY
+|
+|An access key for the TTN application.
+|✓
+|✕
+|✓
+|✓
+
+|TTN_APP_EUI
+|
+|The application EUI of the TTN application.
+|✓
+|✕
+|✓
+|✓
+
+|TTN_DEVICE_ID_PREFIX
+|26011 (for Europe)
+|The prefix used for generation of TTN devices when creating new sensors via the frontend.
+|✓
+|✕
+|✓
+|✓
+
+|POSTGRES_HOST
+|ucm-postgres
+|Host used by the backend container to access Postgres, must be set to ucm-postgres to mirror Docker Compose container name.
+|✓
+|✓
+|✓
+|✓
+
+|POSTGRES_PORT
+|5432
+|Port on which the PostgreSQL database will be available.
+|✓
+|✓
+|✓
+|✓
+
+|POSTGRES_USER
+|user
+|Name of the Postgres user which is used for access from the backend.
+|✓
+|✓
+|✓
+|✓
+
+|POSTGRES_PASSWORD
+|
+|Password of the Postgres user.
+|✓
+|✓
+|✓
+|✓
+
+|POSTGRES_DB
+|ucm
+|Name of the Postgres database used.
+|✓
+|✕
+|✓
+|✓
+
+|POSTGRES_TEST_DB
+|ucmtest
+|Name of the Postgres database used for test.
+|✓
+|✓
+|✕
+|✕
+
+|===
