@@ -78,6 +78,6 @@ public class LocationController
 	@GetMapping("/location/{id}/measurements")
 	public LocationMeasurementsResponse getLocationMeasurements(@PathVariable long id, @Valid @RequestBody GetLocationMeasurementsRequest getLocationMeasurementsRequest)
 	{
-		return locationService.getLocationMeasurements(id);
+		return locationService.getLocationMeasurements(id, getLocationMeasurementsRequest);
 	}
 }

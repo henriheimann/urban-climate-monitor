@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.controller.requests.CreateOrUpdateLocationRequest;
+import org.urbanclimatemonitor.backend.controller.requests.GetLocationMeasurementsRequest;
 import org.urbanclimatemonitor.backend.controller.requests.SensorDataType;
 import org.urbanclimatemonitor.backend.controller.responses.LocationMeasurementsResponse;
 import org.urbanclimatemonitor.backend.controller.responses.LocationResponse;
@@ -177,8 +178,19 @@ public class LocationService
 	}
 
 	@Transactional
-	public LocationMeasurementsResponse getLocationMeasurements(long id)
+	public LocationMeasurementsResponse getLocationMeasurements(long id, GetLocationMeasurementsRequest getLocationMeasurementsRequest)
 	{
+		Location location = locationRepository.findById(id)
+				.orElseThrow(() -> new CustomLocalizedException("location-not-found", HttpStatus.NOT_FOUND));
+
+		Set<String> ttnIds = location.getSensors().stream()
+				.map(Sensor::getTtnId)
+				.collect(Collectors.toSet());
+
+		influxDBService.getMeasurementsForPeriod(ttnIds, getLocationMeasurementsRequest.getType(),
+				getLocationMeasurementsRequest.getResolution(), getLocationMeasurementsRequest.getFrom(),
+				getLocationMeasurementsRequest.getTo());
+
 		return null;
 	}
 }

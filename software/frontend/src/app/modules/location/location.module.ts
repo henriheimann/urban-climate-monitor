@@ -14,6 +14,8 @@ import { Vec3Component } from './components/vec3/vec3.component';
 import { VisualisationPageComponent } from './components/visualisation-page/visualisation-page.component';
 import { StoreModule } from '@ngrx/store';
 import * as fromLocation from './store/location.reducer';
+import { MeasurementsSelectorComponent } from './components/measurements-selector/measurements-selector.component';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
   declarations: [
@@ -22,13 +24,15 @@ import * as fromLocation from './store/location.reducer';
     MeasurementComponent,
     Vec3Component,
     VisualisationPageComponent,
-    VisualisationSensorDetailComponent
+    VisualisationSensorDetailComponent,
+    MeasurementsSelectorComponent
   ],
   imports: [
     CommonModule,
     SharedModule,
     LocationRoutingModule,
     FormsModule,
+    NgxSliderModule,
     StoreModule.forFeature(fromLocation.locationFeatureKey, fromLocation.reducer),
     EffectsModule.forFeature([LocationEffects])
   ]

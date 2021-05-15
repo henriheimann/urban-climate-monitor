@@ -7,6 +7,9 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.influxdb.querybuilder.Select;
+import org.influxdb.querybuilder.SelectionQueryImpl;
+import org.influxdb.querybuilder.WhereNested;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.InfluxDBConfigurationProperties;
@@ -16,12 +19,14 @@ import org.urbanclimatemonitor.backend.controller.requests.SensorDataType;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
 
 import javax.annotation.PostConstruct;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.time;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
 import static org.influxdb.querybuilder.time.DurationLiteral.*;
 
 @Service
@@ -53,62 +58,6 @@ public class InfluxDBService
 
 		log.info("Connected to InfluxDB!");
 	}
-
-	private Object groupByColumnFromDataResolution(SensorDataResolution dataResolution)
-	{
-		return switch (dataResolution) {
-			case MINUTES -> time(1L, MINUTE);
-			case HOURS -> time(1L, HOUR);
-			case DAYS -> time(1L, DAY);
-			case WEEKS -> time(1L, WEEK);
-		};
-	}
-
-	/*private Query buildSensorValuesQuery(List<String> ttnDeviceIds, SensorDataType dataType,
-	                                     SensorDataResolution dataResolution, ZonedDateTime from, ZonedDateTime to)
-	{
-		SelectionQueryImpl selectionQuery = select();
-
-		for (String column: columnsFromDataType(dataType)) {
-			selectionQuery = selectionQuery.mean(column);
-		}
-
-		@SuppressWarnings("rawtypes")
-		WhereNested nestedWhere = selectionQuery
-				.from(properties.getDb(), "mqtt_consumer")
-				.where(gte("time", from.format(ISO_OFFSET_DATE_TIME)))
-				.and(lte("time", to.format(ISO_OFFSET_DATE_TIME)))
-				.andNested();
-
-		boolean isFirst = true;
-		for (String ttnDeviceId: ttnDeviceIds) {
-			String topic = "urban-climate-monitor/devices/%s/up".formatted(ttnDeviceId);
-			if (isFirst) {
-				isFirst = false;
-				nestedWhere = nestedWhere.and(eq("topic", topic));
-			} else {
-				nestedWhere = nestedWhere.or(eq("topic", topic));
-			}
-		}
-
-		return nestedWhere
-				.close()
-				.groupBy(groupByColumnFromDataResolution(dataResolution))
-				.fill("linear");
-	}*/
-
-
-
-	/*public void selectSensorValues(String ttnDeviceId)
-	{
-		Query query = buildSensorValuesQuery(List.of(ttnDeviceId), SensorDataType.HUMIDITY, SensorDataResolution.WEEKS,
-				ZonedDateTime.of(LocalDateTime.of(2021, 2, 1, 0, 0, 0), ZoneId.of("Europe/Berlin")),
-				ZonedDateTime.of(LocalDateTime.of(2021, 3, 1, 0, 0, 0), ZoneId.of("Europe/Berlin")));
-
-		QueryResult queryResult = influxDB.query(query);
-		queryResult.getResults().forEach(result ->
-				result.getSeries().forEach(series -> System.out.println(series)));
-	}*/
 
 	private String getAppId() {
 		if (properties.getAppIdForTesting() != null) {
@@ -188,5 +137,53 @@ public class InfluxDBService
 		}
 
 		return sensorsMap;
+	}
+
+	private Object groupByColumnFromDataResolution(SensorDataResolution dataResolution)
+	{
+		return switch (dataResolution) {
+			case MINUTES -> time(1L, MINUTE);
+			case HOURS -> time(1L, HOUR);
+			case DAYS -> time(1L, DAY);
+			case WEEKS -> time(1L, WEEK);
+		};
+	}
+
+	public Map<String, Map<String, Object>> getMeasurementsForPeriod(Set<String> ttnDeviceIds, SensorDataType dataType,
+	                                                                 SensorDataResolution dataResolution,
+	                                                                 ZonedDateTime from, ZonedDateTime to)
+	{
+		SelectionQueryImpl selectionQuery = select();
+		selectionQuery.mean(dataType.getColumnName());
+
+		@SuppressWarnings("rawtypes")
+		WhereNested nestedWhere = selectionQuery
+				.from(properties.getDb(), "mqtt_consumer")
+				.where(gte("time", from.format(ISO_OFFSET_DATE_TIME)))
+				.and(lte("time", to.format(ISO_OFFSET_DATE_TIME)))
+				.andNested();
+
+		boolean isFirst = true;
+		for (String ttnDeviceId: ttnDeviceIds) {
+			String topic = "urban-climate-monitor/devices/%s/up".formatted(ttnDeviceId);
+			if (isFirst) {
+				isFirst = false;
+				nestedWhere = nestedWhere.and(eq("topic", topic));
+			} else {
+				nestedWhere = nestedWhere.or(eq("topic", topic));
+			}
+		}
+
+		Query query = nestedWhere.close().groupBy(groupByColumnFromDataResolution(dataResolution))
+				.fill("linear");
+		QueryResult queryResult;
+
+		try {
+			queryResult = influxDB.query(query);
+		} catch (InfluxDBException exception) {
+			throw new CustomLocalizedException(exception, "influxdb-query-error");
+		}
+
+		return null;
 	}
 }

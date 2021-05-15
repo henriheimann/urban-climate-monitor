@@ -38,18 +38,6 @@ Environment variables:: Make sure to export the following environment variables 
 [cols="1,~,~"]
 |===
 |Variable |Example Value |Description 
-
-| TTN_KEYS_DEVICE_ADDRESS
-| {0x00, 0x00, 0x00, 0x00}
-| Device address of this sensor
-
-| TTN_KEYS_APPLICATION_SESSION_KEY
-| {0x00, ..., 0x00}
-| Key for accessing TTN, do not share!
-
-| TTN_KEYS_NETWORK_SESSION_KEY
-| {0x00, ..., 0x00}
-| Key for accessing TTN, do not share!
 |===
 
 Running the backend:: `TODO`

@@ -53,7 +53,6 @@ export class VisualisationSensorDetailComponent implements OnInit {
   }
 
   onPositionChange($event: number[]): void {
-    console.log('onPositionChange');
     this.store.dispatch(setModifiedPosition({ position: $event }));
   }
 
