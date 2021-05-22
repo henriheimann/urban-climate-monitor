@@ -11,3 +11,7 @@ export const selectEditingMode = createSelector(selectLocationState, (state: Loc
 export const selectModifiedPosition = createSelector(selectLocationState, (state: LocationState) => state.modifiedPosition);
 
 export const selectModifiedRotation = createSelector(selectLocationState, (state: LocationState) => state.modifiedRotation);
+
+export const selectLoadingMeasurements = createSelector(selectLocationState, (state: LocationState) => state.loadingMeasurements);
+
+export const selectLoadedMeasurements = createSelector(selectLocationState, (state: LocationState) => state.loadedMeasurements);

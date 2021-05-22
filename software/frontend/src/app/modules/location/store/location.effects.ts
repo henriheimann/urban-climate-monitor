@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { filter, switchMap, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { LocationService } from '../../shared/services/location.service';
-import { saveChanges } from './location.actions';
+import { loadMeasurements, loadMeasurementsFailure, loadMeasurementsSuccess, saveChanges } from './location.actions';
 import { selectLocationState } from './location.selectors';
 import { selectRouteParam } from '../../shared/store/router.selectors';
+import { of } from 'rxjs';
 
 @Injectable()
 export class LocationEffects {
@@ -44,6 +45,23 @@ export class LocationEffects {
         })
       ),
     { dispatch: false }
+  );
+
+  loadMeasurements$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadMeasurements),
+      withLatestFrom(this.store.select(selectRouteParam('locationId')).pipe(filter((locationId) => locationId != null))),
+      switchMap(([action, locationId]) => {
+        if (locationId) {
+          return this.locationService.loadMeasurements(parseInt(locationId), action.measurementsType, action.timeframe).pipe(
+            map((measurements) => loadMeasurementsSuccess({ measurements })),
+            catchError(() => of(loadMeasurementsFailure()))
+          );
+        } else {
+          return of(loadMeasurementsFailure());
+        }
+      })
+    )
   );
 
   constructor(private actions$: Actions, private store: Store, private locationService: LocationService) {}

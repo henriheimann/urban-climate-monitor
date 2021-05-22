@@ -11,6 +11,7 @@ import org.urbanclimatemonitor.backend.controller.responses.SensorResponse;
 import org.urbanclimatemonitor.backend.controller.responses.SensorKeysResponse;
 import org.urbanclimatemonitor.backend.entities.Location;
 import org.urbanclimatemonitor.backend.entities.Sensor;
+import org.urbanclimatemonitor.backend.influxdb.InfluxDBService;
 import org.urbanclimatemonitor.backend.repositories.LocationRepository;
 import org.urbanclimatemonitor.backend.repositories.SensorRepository;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
@@ -41,12 +42,15 @@ class SensorServiceTest
 	@Mock
 	private TTNService ttnService;
 
+	@Mock
+	private InfluxDBService influxDBService;
+
 	private SensorService sensorService;
 
 	@BeforeEach
 	public void setUp()
 	{
-		sensorService = new SensorService(sensorRepository, locationRepository, ttnService);
+		sensorService = new SensorService(sensorRepository, locationRepository, ttnService, influxDBService);
 	}
 
 	@Test

@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { selectEditingMode, selectModifiedPosition, selectModifiedRotation, selectSelectedSensor } from '../../store/location.selectors';
+import {
+  selectEditingMode,
+  selectLocationState,
+  selectModifiedPosition,
+  selectModifiedRotation,
+  selectSelectedSensor
+} from '../../store/location.selectors';
 import { SensorModel } from '../../../shared/models/sensor.model';
 import {
   revertChanges,
@@ -10,27 +16,45 @@ import {
   setModifiedPosition,
   setModifiedRotation
 } from '../../store/location.actions';
+import { SensorService } from '../../../shared/services/sensor.service';
+import { map, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'ucm-sensor-detail',
   templateUrl: './visualisation-sensor-detail.component.html',
   styleUrls: ['./visualisation-sensor-detail.component.css']
 })
-export class VisualisationSensorDetailComponent implements OnInit {
-  selectedSensor$ = this.store.select(selectSelectedSensor);
+export class VisualisationSensorDetailComponent {
   editingMode$ = this.store.select(selectEditingMode);
   modifiedPosition$ = this.store.select(selectModifiedPosition);
   modifiedRotation$ = this.store.select(selectModifiedRotation);
 
-  sensor: SensorModel | null = null;
+  selectedSensor$ = this.store.select(selectSelectedSensor);
 
-  constructor(private store: Store) {}
+  selectedSensorMeasurements$ = this.store.select(selectLocationState).pipe(
+    map((locationState) => {
+      if (locationState.selectedSensor?.id && locationState.loadedMeasurements?.entries) {
+        const selectedEntry = locationState.loadedMeasurements.entries[locationState.selectedMeasurementsIndex];
+        if (selectedEntry) {
+          return {
+            id: locationState.selectedSensor.id,
+            timestamp: selectedEntry.timestamp
+          };
+        }
+      }
+      return undefined;
+    }),
+    switchMap((info) => {
+      if (info) {
+        return this.sensorService.loadMeasurements(info.id, info.timestamp);
+      } else {
+        return of(undefined);
+      }
+    })
+  );
 
-  ngOnInit(): void {
-    this.selectedSensor$.subscribe((sensor) => {
-      this.sensor = sensor;
-    });
-  }
+  constructor(private store: Store, private sensorService: SensorService) {}
 
   onCloseClicked(): void {
     this.store.dispatch(selectSensor({ sensor: null }));

@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.urbanclimatemonitor.backend.controller.requests.CreateOrUpdateSensorRequest;
+import org.urbanclimatemonitor.backend.controller.requests.GetLocationMeasurementsRequest;
+import org.urbanclimatemonitor.backend.controller.requests.GetSensorMeasurementsRequest;
+import org.urbanclimatemonitor.backend.controller.responses.SensorMeasurementsResponse;
 import org.urbanclimatemonitor.backend.controller.responses.SensorResponse;
 import org.urbanclimatemonitor.backend.controller.responses.SensorKeysResponse;
 import org.urbanclimatemonitor.backend.exception.CustomLocalizedException;
@@ -75,5 +78,12 @@ public class SensorController
 	public SensorKeysResponse getSensorKeys(@PathVariable long id)
 	{
 		return sensorService.getSensorKeys(id);
+	}
+
+	@Operation(summary = "Get all measurements of a specific point in time of a single sensor")
+	@PostMapping("/sensor/{id}/measurements")
+	public SensorMeasurementsResponse getSensorMeasurements(@PathVariable long id, @Valid @RequestBody GetSensorMeasurementsRequest getSensorMeasurementsRequest)
+	{
+		return sensorService.getSensorMeasurements(id, getSensorMeasurementsRequest);
 	}
 }

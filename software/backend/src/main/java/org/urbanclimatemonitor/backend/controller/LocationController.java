@@ -74,8 +74,8 @@ public class LocationController
 		return locationService.updateLocation(id, updateLocationRequest);
 	}
 
-	@Operation(summary = "Get measurements of all sensors of a location")
-	@GetMapping("/location/{id}/measurements")
+	@Operation(summary = "Get measurements of a specific type over a period of time of all sensors of a location")
+	@PostMapping("/location/{id}/measurements")
 	public LocationMeasurementsResponse getLocationMeasurements(@PathVariable long id, @Valid @RequestBody GetLocationMeasurementsRequest getLocationMeasurementsRequest)
 	{
 		return locationService.getLocationMeasurements(id, getLocationMeasurementsRequest);

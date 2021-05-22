@@ -1,30 +1,94 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Options } from '@angular-slider/ngx-slider';
+import { MeasurementsTimeframe } from '../../models/measurements-timeframe';
+import { MeasurementsType } from '../../models/measurements-type';
+import { Store } from '@ngrx/store';
+import { selectLocationState } from '../../store/location.selectors';
+import { loadMeasurements, selectMeasurementsIndex } from '../../store/location.actions';
+import { LocationMeasurementsModel } from '../../../shared/models/location-measurements.model';
 
 @Component({
   selector: 'ucm-measurements-selector',
   templateUrl: './measurements-selector.component.html',
   styleUrls: ['./measurements-selector.component.scss']
 })
-export class MeasurementsSelectorComponent {
-  dateRange: Date[] = this.createDateRange();
-  value: number = this.dateRange[0].getTime();
-  options: Options = {
-    stepsArray: this.dateRange.map((date: Date) => {
-      return { value: date.getTime() };
-    }),
+export class MeasurementsSelectorComponent implements OnInit {
+  measurementsTypes = MeasurementsType;
+  measurementsTimeframes = MeasurementsTimeframe;
+
+  selectedMeasurementsType: MeasurementsType | undefined;
+  selectedMeasurementsTimeframe: MeasurementsTimeframe | undefined;
+
+  loadedMeasurements: LocationMeasurementsModel | undefined;
+
+  sliderSelectedIndex = 0;
+  sliderOptions: Options = {
+    stepsArray: [
+      {
+        value: 0
+      }
+    ],
     translate: (value: number): string => {
-      return new Date(value).toDateString();
+      if (this.loadedMeasurements?.entries[value].timestamp) {
+        return new Date(this.loadedMeasurements?.entries[value].timestamp).toLocaleString();
+      } else {
+        return '';
+      }
     }
   };
 
-  createDateRange(): Date[] {
-    const dates: Date[] = [];
-    for (let i: number = 1; i <= 31; i++) {
-      dates.push(new Date(2018, 5, i));
-    }
-    return dates;
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    this.store.dispatch(
+      loadMeasurements({
+        measurementsType: MeasurementsType.TEMPERATURE,
+        timeframe: MeasurementsTimeframe.LAST_6_HOURS
+      })
+    );
+
+    this.store.select(selectLocationState).subscribe((locationState) => {
+      this.selectedMeasurementsType = locationState.selectedMeasurementsType;
+      this.selectedMeasurementsTimeframe = locationState.selectedMeasurementsTimeframe;
+      this.sliderSelectedIndex = locationState.selectedMeasurementsIndex;
+
+      this.loadedMeasurements = locationState.loadedMeasurements;
+      if (this.loadedMeasurements?.entries) {
+        const entries = this.loadedMeasurements.entries;
+        const newOptions: Options = Object.assign({}, this.sliderOptions);
+        newOptions.stepsArray = entries.map((entry, index) => {
+          return {
+            value: index
+          };
+        });
+        this.sliderOptions = newOptions;
+      }
+    });
   }
 
-  constructor() {}
+  onTimeframeSelect(measurementsTimeframe: string): void {
+    this.store.dispatch(
+      loadMeasurements({
+        measurementsType: this.selectedMeasurementsType || MeasurementsType.TEMPERATURE,
+        timeframe: (measurementsTimeframe as unknown) as MeasurementsTimeframe
+      })
+    );
+  }
+
+  onTypeSelect(measurementsType: string): void {
+    this.store.dispatch(
+      loadMeasurements({
+        measurementsType: (measurementsType as unknown) as MeasurementsType,
+        timeframe: this.selectedMeasurementsTimeframe || MeasurementsTimeframe.LAST_6_HOURS
+      })
+    );
+  }
+
+  onSliderChange(): void {
+    this.store.dispatch(
+      selectMeasurementsIndex({
+        index: this.sliderSelectedIndex
+      })
+    );
+  }
 }

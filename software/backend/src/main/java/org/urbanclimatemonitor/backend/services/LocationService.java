@@ -19,9 +19,8 @@ import org.urbanclimatemonitor.backend.repositories.LocationRepository;
 import org.urbanclimatemonitor.backend.repositories.UploadRepository;
 import org.urbanclimatemonitor.backend.util.Streams;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -187,10 +186,22 @@ public class LocationService
 				.map(Sensor::getTtnId)
 				.collect(Collectors.toSet());
 
-		influxDBService.getMeasurementsForPeriod(ttnIds, getLocationMeasurementsRequest.getType(),
-				getLocationMeasurementsRequest.getResolution(), getLocationMeasurementsRequest.getFrom(),
-				getLocationMeasurementsRequest.getTo());
+		Map<ZonedDateTime, Map<String, Object>> measurements =
+				influxDBService.getMeasurementsForPeriod(ttnIds, getLocationMeasurementsRequest.getType(),
+						getLocationMeasurementsRequest.getResolution(), getLocationMeasurementsRequest.getFrom(),
+						getLocationMeasurementsRequest.getTo());
 
-		return null;
+		List<LocationMeasurementsResponse.Entry> entries = new ArrayList<>();
+
+		Map<String, Long> ttnIdsToSensorIdsMap = location.getSensors().stream()
+				.collect(Collectors.toMap(Sensor::getTtnId, Sensor::getId));
+
+		measurements.forEach((date, dateValues) -> {
+			Map<Long, Object> valueMap = new HashMap<>();
+			dateValues.forEach((ttnDeviceId, value) -> valueMap.put(ttnIdsToSensorIdsMap.get(ttnDeviceId), value));
+			entries.add(new LocationMeasurementsResponse.Entry(date, valueMap));
+		});
+
+		return new LocationMeasurementsResponse(entries);
 	}
 }

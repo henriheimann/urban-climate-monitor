@@ -1,34 +1,43 @@
 <div class="container-xxxl">
   <div class="bg-white rounded shadow-sm border-0 mr-3 ml-3">
     <div class="d-flex align-items-stretch">
-      <div class="border-right p-3 d-flex align-items-center">
+      <div class="border-right p-3 d-flex align-items-center justify-content-center" style="width: 160px">
         <div class="dropup">
-          <button class="btn bg-white dropdown-toggle p-0 pr-2" type="button" data-toggle="dropdown">
-            <i class="bi bi-clock"></i>
-            Last 6 hours
+          <button class="btn bg-white dropdown-toggle p-0" type="button" data-toggle="dropdown">
+            <i class="bi bi-clock pr-1"></i>
+            {{ 'location.' + (selectedMeasurementsTimeframe || '').toLowerCase() | translate }}
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item">Last 6 hours</a>
-            <a class="dropdown-item">Last 6 hours</a>
+            <a
+              *ngFor="let measurementsTimeframe of measurementsTimeframes | keyvalue"
+              class="dropdown-item"
+              (click)="onTimeframeSelect(measurementsTimeframe.value)"
+              >{{ 'location.' + measurementsTimeframe.key.toLowerCase() | translate }}</a
+            >
           </div>
         </div>
       </div>
-      <div class="border-right p-3 d-flex align-items-center">
+      <div class="border-right p-3 d-flex align-items-center justify-content-center" style="width: 160px">
         <div class="dropup">
-          <button class="btn bg-white dropdown-toggle p-0 pr-2" type="button" data-toggle="dropdown">
-            <i class="bi bi-thermometer-half"></i>
-            Temperature
+          <button class="btn bg-white dropdown-toggle p-0" type="button" data-toggle="dropdown">
+            <i *ngIf="selectedMeasurementsType == measurementsTypes.TEMPERATURE" class="bi bi-thermometer-half pr-1"></i>
+            <i *ngIf="selectedMeasurementsType == measurementsTypes.HUMIDITY" class="bi bi-droplet-half pr-1"></i>
+            <i *ngIf="selectedMeasurementsType == measurementsTypes.BRIGHTNESS_CURRENT" class="bi bi-brightness-high pr-1"></i>
+            {{ 'location.' + (selectedMeasurementsType || '').toLowerCase() | translate }}
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item">Temperature</a>
-            <a class="dropdown-item">Temperature</a>
+            <a
+              *ngFor="let measurementsType of measurementsTypes | keyvalue"
+              class="dropdown-item"
+              (click)="onTypeSelect(measurementsType.value)"
+              >{{ 'location.' + measurementsType.key.toLowerCase() | translate }}
+            </a>
           </div>
         </div>
       </div>
       <div class="flex-grow-1 p-3 custom-slider">
-        <ngx-slider [(value)]="value" [options]="options"></ngx-slider>
+        <ngx-slider [(value)]="sliderSelectedIndex" [options]="sliderOptions" (userChange)="onSliderChange()"></ngx-slider>
       </div>
     </div>
   </div>
-
 </div>

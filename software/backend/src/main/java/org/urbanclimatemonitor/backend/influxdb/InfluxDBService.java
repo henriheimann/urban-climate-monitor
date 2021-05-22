@@ -7,9 +7,6 @@ import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
-import org.influxdb.querybuilder.Select;
-import org.influxdb.querybuilder.SelectionQueryImpl;
-import org.influxdb.querybuilder.WhereNested;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.urbanclimatemonitor.backend.config.properties.InfluxDBConfigurationProperties;
@@ -23,11 +20,10 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static org.influxdb.querybuilder.BuiltQuery.QueryBuilder.*;
-import static org.influxdb.querybuilder.time.DurationLiteral.*;
 
 @Service
 @EnableConfigurationProperties(InfluxDBConfigurationProperties.class)
@@ -59,7 +55,8 @@ public class InfluxDBService
 		log.info("Connected to InfluxDB!");
 	}
 
-	private String getAppId() {
+	private String getAppId()
+	{
 		if (properties.getAppIdForTesting() != null) {
 			return properties.getAppIdForTesting();
 		} else {
@@ -67,32 +64,37 @@ public class InfluxDBService
 		}
 	}
 
-	public Map<SensorDataType, Object> getLatestMeasurements(String ttnDeviceId, Set<SensorDataType> dataTypes)
+	private String groupByColumnFromDataResolution(SensorDataResolution dataResolution)
 	{
-		return getLatestMeasurements(Set.of(ttnDeviceId), dataTypes).get(ttnDeviceId);
+		return switch (dataResolution) {
+			case MINUTES -> "1m";
+			case HOURS -> "1h";
+			case DAYS -> "1d";
+			case WEEKS -> "1w";
+		};
 	}
 
-	public Map<String, Map<SensorDataType, Object>> getLatestMeasurements(Set<String> ttnDeviceIds, Set<SensorDataType> dataTypes)
+	private StringBuilder createBasicQueryBuilder(String selectString, Set<String> ttnDeviceIds)
 	{
 		StringBuilder queryBuilder = new StringBuilder();
 
 		queryBuilder.append("SELECT ");
-		Set<String> columnNames = dataTypes.stream()
-				.map(SensorDataType::getColumnName)
-				.collect(Collectors.toSet());
-		queryBuilder.append(String.join(", ", columnNames));
-
+		queryBuilder.append(selectString);
 		queryBuilder.append(" FROM mqtt_consumer");
 
-		queryBuilder.append(" WHERE ");
+		queryBuilder.append(" WHERE (");
 		Set<String> whereClauses = ttnDeviceIds.stream()
 				.map(ttnDeviceId -> "topic = '" + getAppId() + "/devices/" + ttnDeviceId + "/up'")
 				.collect(Collectors.toSet());
 		queryBuilder.append(String.join(" OR ", whereClauses));
+		queryBuilder.append(")");
 
-		queryBuilder.append(" GROUP BY topic ORDER BY DESC LIMIT 1");
+		return queryBuilder;
+	}
 
-		Query query = new Query(queryBuilder.toString(), properties.getDb());
+	private QueryResult.Result executeQuery(String queryString)
+	{
+		Query query = new Query(queryString, properties.getDb());
 		QueryResult queryResult;
 
 		try {
@@ -105,9 +107,14 @@ public class InfluxDBService
 			throw new CustomLocalizedException("influxdb-query-error");
 		}
 
-		QueryResult.Result result = queryResult.getResults().get(0);
+		return queryResult.getResults().get(0);
+	}
 
-		if (result.getSeries() == null) {
+	private Map<String, Map<SensorDataType, Object>> extractSensorMapFromQueryResult(Set<String> ttnDeviceIds,
+	                                                                                 Set<SensorDataType> dataTypes,
+	                                                                                 QueryResult.Result queryResult)
+	{
+		if (queryResult.getSeries() == null) {
 			return ttnDeviceIds.stream()
 					.collect(Collectors.toMap(ttnDeviceId -> ttnDeviceId, ttnDeviceId -> Map.of()));
 		}
@@ -117,7 +124,7 @@ public class InfluxDBService
 		final int prefixLength = (getAppId() + "/devices/").length();
 		final int postfixLength = "/up".length();
 
-		for (QueryResult.Series series: result.getSeries()) {
+		for (QueryResult.Series series: queryResult.getSeries()) {
 			String topic = series.getTags().get("topic");
 			String ttnDeviceId = series.getTags().get("topic").substring(prefixLength, topic.length() - postfixLength);
 
@@ -139,51 +146,97 @@ public class InfluxDBService
 		return sensorsMap;
 	}
 
-	private Object groupByColumnFromDataResolution(SensorDataResolution dataResolution)
+	public Map<SensorDataType, Object> getLatestMeasurements(String ttnDeviceId, Set<SensorDataType> dataTypes)
 	{
-		return switch (dataResolution) {
-			case MINUTES -> time(1L, MINUTE);
-			case HOURS -> time(1L, HOUR);
-			case DAYS -> time(1L, DAY);
-			case WEEKS -> time(1L, WEEK);
-		};
+		return getLatestMeasurements(Set.of(ttnDeviceId), dataTypes).get(ttnDeviceId);
 	}
 
-	public Map<String, Map<String, Object>> getMeasurementsForPeriod(Set<String> ttnDeviceIds, SensorDataType dataType,
-	                                                                 SensorDataResolution dataResolution,
-	                                                                 ZonedDateTime from, ZonedDateTime to)
+	public Map<String, Map<SensorDataType, Object>> getLatestMeasurements(Set<String> ttnDeviceIds,
+	                                                                      Set<SensorDataType> dataTypes)
 	{
-		SelectionQueryImpl selectionQuery = select();
-		selectionQuery.mean(dataType.getColumnName());
+		Set<String> columnNames = dataTypes.stream()
+				.map(SensorDataType::getColumnName)
+				.collect(Collectors.toSet());
 
-		@SuppressWarnings("rawtypes")
-		WhereNested nestedWhere = selectionQuery
-				.from(properties.getDb(), "mqtt_consumer")
-				.where(gte("time", from.format(ISO_OFFSET_DATE_TIME)))
-				.and(lte("time", to.format(ISO_OFFSET_DATE_TIME)))
-				.andNested();
+		StringBuilder queryBuilder = createBasicQueryBuilder(String.join(", ", columnNames), ttnDeviceIds);
+		queryBuilder.append(" GROUP BY topic ORDER BY DESC LIMIT 1");
 
-		boolean isFirst = true;
-		for (String ttnDeviceId: ttnDeviceIds) {
-			String topic = "urban-climate-monitor/devices/%s/up".formatted(ttnDeviceId);
-			if (isFirst) {
-				isFirst = false;
-				nestedWhere = nestedWhere.and(eq("topic", topic));
-			} else {
-				nestedWhere = nestedWhere.or(eq("topic", topic));
+		QueryResult.Result result = executeQuery(queryBuilder.toString());
+		return extractSensorMapFromQueryResult(ttnDeviceIds, dataTypes, result);
+	}
+
+	public Map<SensorDataType, Object> getMeasurementsForPointInTime(String ttnDeviceId, Set<SensorDataType> dataTypes,
+	                                                                 ZonedDateTime timestamp)
+	{
+		return getMeasurementsForPointInTime(Set.of(ttnDeviceId), dataTypes, timestamp).get(ttnDeviceId);
+	}
+
+	public Map<String, Map<SensorDataType, Object>> getMeasurementsForPointInTime(Set<String> ttnDeviceIds,
+	                                                                              Set<SensorDataType> dataTypes,
+	                                                                              ZonedDateTime timestamp)
+	{
+		Set<String> columnNames = dataTypes.stream()
+				.map(SensorDataType::getColumnName)
+				.collect(Collectors.toSet());
+
+		StringBuilder queryBuilder = createBasicQueryBuilder(String.join(", ", columnNames), ttnDeviceIds);
+		queryBuilder.append(" AND time = '");
+		queryBuilder.append(timestamp.format(ISO_OFFSET_DATE_TIME));
+		queryBuilder.append("'");
+		queryBuilder.append(" GROUP BY topic");
+
+		QueryResult.Result result = executeQuery(queryBuilder.toString());
+		return extractSensorMapFromQueryResult(ttnDeviceIds, dataTypes, result);
+	}
+
+	public Map<ZonedDateTime, Map<String, Object>> getMeasurementsForPeriod(Set<String> ttnDeviceIds,
+	                                                                        SensorDataType dataType,
+	                                                                        SensorDataResolution dataResolution,
+	                                                                        ZonedDateTime from, ZonedDateTime to)
+	{
+		StringBuilder queryBuilder = createBasicQueryBuilder("mean(" + dataType.getColumnName() + ")", ttnDeviceIds);
+		queryBuilder.append(" AND time >= '");
+		queryBuilder.append(from.format(ISO_OFFSET_DATE_TIME));
+		queryBuilder.append("' AND time <= '");
+		queryBuilder.append(to.format(ISO_OFFSET_DATE_TIME));
+		queryBuilder.append("'");
+		queryBuilder.append(" GROUP BY time(");
+		queryBuilder.append(groupByColumnFromDataResolution(dataResolution));
+		queryBuilder.append("),topic fill(linear)");
+
+		QueryResult.Result result = executeQuery(queryBuilder.toString());
+
+		if (result.getSeries() == null) {
+			return Map.of();
+		}
+
+		Map<ZonedDateTime, Map<String, Object>> datesMap = new TreeMap<>();
+
+		final int prefixLength = (getAppId() + "/devices/").length();
+		final int postfixLength = "/up".length();
+
+		for (QueryResult.Series series: result.getSeries()) {
+			String topic = series.getTags().get("topic");
+			String ttnDeviceId = series.getTags().get("topic").substring(prefixLength, topic.length() - postfixLength);
+
+			for (int valueIndex = 0; valueIndex < series.getValues().size(); valueIndex++) {
+				ZonedDateTime time = ZonedDateTime.parse((String)series.getValues().get(valueIndex).get(0));
+				Object mean = series.getValues().get(valueIndex).get(1);
+
+				if (mean != null) {
+					Map<String, Object> valuesMap;
+					if (!datesMap.containsKey(time)) {
+						valuesMap = new HashMap<>();
+						datesMap.put(time, valuesMap);
+					} else {
+						valuesMap = datesMap.get(time);
+					}
+
+					valuesMap.put(ttnDeviceId, mean);
+				}
 			}
 		}
 
-		Query query = nestedWhere.close().groupBy(groupByColumnFromDataResolution(dataResolution))
-				.fill("linear");
-		QueryResult queryResult;
-
-		try {
-			queryResult = influxDB.query(query);
-		} catch (InfluxDBException exception) {
-			throw new CustomLocalizedException(exception, "influxdb-query-error");
-		}
-
-		return null;
+		return datesMap;
 	}
 }
