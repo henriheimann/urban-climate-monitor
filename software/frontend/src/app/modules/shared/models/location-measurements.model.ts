@@ -2,7 +2,11 @@ export interface LocationMeasurementsModel {
   entries: [
     {
       timestamp: string;
-      values: { [id: number]: any };
+      measurements: {
+        [sensor_id: number]: {
+          [measurement_id: string]: any;
+        };
+      };
     }
   ];
 }

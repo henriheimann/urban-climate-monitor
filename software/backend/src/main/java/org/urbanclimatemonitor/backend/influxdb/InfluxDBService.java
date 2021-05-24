@@ -165,36 +165,16 @@ public class InfluxDBService
 		return extractSensorMapFromQueryResult(ttnDeviceIds, dataTypes, result);
 	}
 
-	public Map<SensorDataType, Object> getMeasurementsForPointInTime(String ttnDeviceId, Set<SensorDataType> dataTypes,
-	                                                                 ZonedDateTime timestamp)
-	{
-		return getMeasurementsForPointInTime(Set.of(ttnDeviceId), dataTypes, timestamp).get(ttnDeviceId);
-	}
-
-	public Map<String, Map<SensorDataType, Object>> getMeasurementsForPointInTime(Set<String> ttnDeviceIds,
-	                                                                              Set<SensorDataType> dataTypes,
-	                                                                              ZonedDateTime timestamp)
-	{
-		Set<String> columnNames = dataTypes.stream()
-				.map(SensorDataType::getColumnName)
-				.collect(Collectors.toSet());
-
-		StringBuilder queryBuilder = createBasicQueryBuilder(String.join(", ", columnNames), ttnDeviceIds);
-		queryBuilder.append(" AND time = '");
-		queryBuilder.append(timestamp.format(ISO_OFFSET_DATE_TIME));
-		queryBuilder.append("'");
-		queryBuilder.append(" GROUP BY topic");
-
-		QueryResult.Result result = executeQuery(queryBuilder.toString());
-		return extractSensorMapFromQueryResult(ttnDeviceIds, dataTypes, result);
-	}
-
-	public Map<ZonedDateTime, Map<String, Object>> getMeasurementsForPeriod(Set<String> ttnDeviceIds,
-	                                                                        SensorDataType dataType,
+	public Map<ZonedDateTime, Map<String, Map<SensorDataType, Object>>> getMeasurementsForPeriod(Set<String> ttnDeviceIds,
+	                                                                        Set<SensorDataType> dataTypes,
 	                                                                        SensorDataResolution dataResolution,
 	                                                                        ZonedDateTime from, ZonedDateTime to)
 	{
-		StringBuilder queryBuilder = createBasicQueryBuilder("mean(" + dataType.getColumnName() + ")", ttnDeviceIds);
+		Set<String> columnNames = dataTypes.stream()
+				.map(dataType -> "mean(" + dataType.getColumnName() + ") as " + dataType.getColumnName())
+				.collect(Collectors.toSet());
+
+		StringBuilder queryBuilder = createBasicQueryBuilder(String.join(", ", columnNames), ttnDeviceIds);
 		queryBuilder.append(" AND time >= '");
 		queryBuilder.append(from.format(ISO_OFFSET_DATE_TIME));
 		queryBuilder.append("' AND time <= '");
@@ -210,7 +190,7 @@ public class InfluxDBService
 			return Map.of();
 		}
 
-		Map<ZonedDateTime, Map<String, Object>> datesMap = new TreeMap<>();
+		Map<ZonedDateTime, Map<String, Map<SensorDataType, Object>>> datesMap = new TreeMap<>();
 
 		final int prefixLength = (getAppId() + "/devices/").length();
 		final int postfixLength = "/up".length();
@@ -220,19 +200,36 @@ public class InfluxDBService
 			String ttnDeviceId = series.getTags().get("topic").substring(prefixLength, topic.length() - postfixLength);
 
 			for (int valueIndex = 0; valueIndex < series.getValues().size(); valueIndex++) {
-				ZonedDateTime time = ZonedDateTime.parse((String)series.getValues().get(valueIndex).get(0));
-				Object mean = series.getValues().get(valueIndex).get(1);
 
-				if (mean != null) {
-					Map<String, Object> valuesMap;
-					if (!datesMap.containsKey(time)) {
-						valuesMap = new HashMap<>();
-						datesMap.put(time, valuesMap);
+				Map<SensorDataType, Object> valuesMap = new HashMap<>();
+				ZonedDateTime time = null;
+
+				for (int columnIndex = 0; columnIndex < series.getColumns().size(); columnIndex++) {
+					String columnName = series.getColumns().get(columnIndex);
+
+					if (columnName.equals(SensorDataType.TIME.getColumnName())) {
+						time = ZonedDateTime.parse((String)series.getValues().get(valueIndex).get(columnIndex));
 					} else {
-						valuesMap = datesMap.get(time);
+						SensorDataType dataType = SensorDataType.forColumnName(columnName);
+						if (dataTypes.contains(dataType)) {
+							Object value = series.getValues().get(valueIndex).get(columnIndex);
+							if (value != null) {
+								valuesMap.put(dataType, value);
+							}
+						}
+					}
+				}
+
+				if (time != null && !valuesMap.isEmpty()) {
+					Map<String, Map<SensorDataType, Object>> sensorsMap;
+					if (!datesMap.containsKey(time)) {
+						sensorsMap = new HashMap<>();
+						datesMap.put(time, sensorsMap);
+					} else {
+						sensorsMap = datesMap.get(time);
 					}
 
-					valuesMap.put(ttnDeviceId, mean);
+					sensorsMap.put(ttnDeviceId, valuesMap);
 				}
 			}
 		}

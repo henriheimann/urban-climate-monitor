@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   selectEditingMode,
@@ -7,7 +7,6 @@ import {
   selectModifiedRotation,
   selectSelectedSensor
 } from '../../store/location.selectors';
-import { SensorModel } from '../../../shared/models/sensor.model';
 import {
   revertChanges,
   saveChanges,
@@ -17,8 +16,7 @@ import {
   setModifiedRotation
 } from '../../store/location.actions';
 import { SensorService } from '../../../shared/services/sensor.service';
-import { map, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'ucm-sensor-detail',
@@ -29,27 +27,24 @@ export class VisualisationSensorDetailComponent {
   editingMode$ = this.store.select(selectEditingMode);
   modifiedPosition$ = this.store.select(selectModifiedPosition);
   modifiedRotation$ = this.store.select(selectModifiedRotation);
-
   selectedSensor$ = this.store.select(selectSelectedSensor);
 
-  selectedSensorMeasurements$ = this.store.select(selectLocationState).pipe(
-    map((locationState) => {
-      if (locationState.selectedSensor?.id && locationState.loadedMeasurements?.entries) {
-        const selectedEntry = locationState.loadedMeasurements.entries[locationState.selectedMeasurementsIndex];
-        if (selectedEntry) {
-          return {
-            id: locationState.selectedSensor.id,
-            timestamp: selectedEntry.timestamp
-          };
-        }
-      }
-      return undefined;
-    }),
-    switchMap((info) => {
-      if (info) {
-        return this.sensorService.loadMeasurements(info.id, info.timestamp);
+  selectedSensorTimestamp$ = this.store.select(selectLocationState).pipe(
+    map((state) => {
+      if (state.loadedMeasurements?.entries) {
+        return new Date(state.loadedMeasurements.entries[state.selectedMeasurementsIndex].timestamp).toLocaleString();
       } else {
-        return of(undefined);
+        return undefined;
+      }
+    })
+  );
+
+  selectedSensorMeasurements$ = this.store.select(selectLocationState).pipe(
+    map((state) => {
+      if (state.loadedMeasurements?.entries && state.selectedSensor?.id) {
+        return state.loadedMeasurements.entries[state.selectedMeasurementsIndex].measurements[state.selectedSensor.id];
+      } else {
+        return undefined;
       }
     })
   );

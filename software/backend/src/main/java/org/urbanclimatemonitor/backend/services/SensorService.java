@@ -4,10 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.urbanclimatemonitor.backend.controller.requests.CreateOrUpdateSensorRequest;
-import org.urbanclimatemonitor.backend.controller.requests.GetSensorMeasurementsRequest;
 import org.urbanclimatemonitor.backend.controller.requests.SensorDataType;
-import org.urbanclimatemonitor.backend.controller.responses.LocationMeasurementsResponse;
-import org.urbanclimatemonitor.backend.controller.responses.SensorMeasurementsResponse;
 import org.urbanclimatemonitor.backend.controller.responses.SensorResponse;
 import org.urbanclimatemonitor.backend.controller.responses.SensorKeysResponse;
 import org.urbanclimatemonitor.backend.entities.Sensor;
@@ -165,17 +162,5 @@ public class SensorService
 				ttnDeviceDTO.getLorawanDevice().getApplicationSessionKey(),
 				ttnDeviceDTO.getLorawanDevice().getNetworkSessionKey()
 		);
-	}
-
-	@Transactional(noRollbackFor = {CustomLocalizedExceptionWithoutRollback.class})
-	public SensorMeasurementsResponse getSensorMeasurements(long id, GetSensorMeasurementsRequest getSensorMeasurementsRequest)
-	{
-		Sensor sensor = sensorRepository.findById(id).orElseThrow(() ->
-				new CustomLocalizedException("sensor-not-found", HttpStatus.NOT_FOUND));
-
-		Map<SensorDataType, Object> measurements = influxDBService.getMeasurementsForPointInTime(sensor.getTtnId(),
-				SensorDataType.setOfAllTypes(), getSensorMeasurementsRequest.getTimestamp());
-
-		return new SensorMeasurementsResponse(getSensorMeasurementsRequest.getTimestamp(), measurements);
 	}
 }

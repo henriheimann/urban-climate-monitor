@@ -46,8 +46,11 @@ public enum SensorDataType
 
 	public static Set<SensorDataType> setOfAllTypes()
 	{
-		Set<SensorDataType> set = new HashSet<>();
-		Collections.addAll(set, SensorDataType.values());
-		return set;
+		return Set.of(TEMPERATURE, IR_TEMPERATURE, HUMIDITY, BRIGHTNESS_CURRENT, BATTERY_VOLTAGE, TIME);
+	}
+
+	public static Set<SensorDataType> setOfAllTypesWithoutTime()
+	{
+		return Set.of(TEMPERATURE, IR_TEMPERATURE, HUMIDITY, BRIGHTNESS_CURRENT, BATTERY_VOLTAGE);
 	}
 }

@@ -1,5 +1,7 @@
-<span *ngIf="value; else no_value">
-  {{ value }}
+<span *ngIf="value; else no_value" style="white-space: nowrap">
+  <span>
+    {{ value | number: '1.2-2' }}
+  </span>
   <span *ngIf="unit">
     {{ ' ' + (unit | translate) }}
   </span>

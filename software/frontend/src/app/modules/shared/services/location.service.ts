@@ -61,8 +61,6 @@ export class LocationService extends EntityCollectionServiceBase<LocationModel> 
       resolution
     };
 
-    console.log(JSON.stringify(request));
-
     return request;
   }
 

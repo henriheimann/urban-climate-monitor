@@ -12,43 +12,56 @@
         <span>&times;</span>
       </button>
     </div>
-    <div *ngIf="selectedSensorMeasurements$ | async; let measurements" class="modal-body container border-bottom">
-      <p class="font-weight-bold mb-1">{{ 'location.values_at' | translate }}: {{ measurements.timestamp }}</p>
+    <div *ngIf="selectedSensorMeasurements$ | async; let measurements; else: no_measurements" class="modal-body container border-bottom">
+      <table class="table table-sm table-borderless mb-2">
+        <tr>
+          <td class="font-weight-bold mb-2">{{ 'location.measurements_at' | translate }} {{ selectedSensorTimestamp$ | async }}</td>
+        </tr>
+      </table>
       <table class="table table-sm table-borderless mb-0">
         <tbody>
           <tr>
             <td class="font-weight-bold">{{ 'location.temperature' | translate }}</td>
             <td class="text-right">
-              <ucm-measurement [value]="measurements.values['temperature']" unit="measurement.degrees_c"></ucm-measurement>
+              <ucm-measurement [value]="measurements['temperature']" unit="measurement.degrees_c"></ucm-measurement>
             </td>
           </tr>
           <tr>
             <td class="font-weight-bold">{{ 'location.ir_temperature' | translate }}</td>
             <td class="text-right">
-              <ucm-measurement [value]="measurements.values['ir_temperature']" unit="measurement.degrees_c"></ucm-measurement>
+              <ucm-measurement [value]="measurements['ir_temperature']" unit="measurement.degrees_c"></ucm-measurement>
             </td>
           </tr>
           <tr>
             <td class="font-weight-bold">{{ 'location.humidity' | translate }}</td>
             <td class="text-right">
-              <ucm-measurement [value]="measurements.values['humidity']" unit="measurement.relative_humidity"></ucm-measurement>
+              <ucm-measurement [value]="measurements['humidity']" unit="measurement.relative_humidity"></ucm-measurement>
             </td>
           </tr>
           <tr>
             <td class="font-weight-bold">{{ 'location.brightness_current' | translate }}</td>
             <td class="text-right">
-              <ucm-measurement [value]="measurements.values['brightness_current']"></ucm-measurement>
+              <ucm-measurement [value]="measurements['brightness_current']"></ucm-measurement>
             </td>
           </tr>
           <tr>
             <td class="font-weight-bold">{{ 'location.battery_voltage' | translate }}</td>
             <td class="text-right">
-              <ucm-measurement [value]="measurements.values['battery_voltage']" unit="measurement.voltage"></ucm-measurement>
+              <ucm-measurement [value]="measurements['battery_voltage']" unit="measurement.voltage"></ucm-measurement>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <ng-template #no_measurements>
+      <div class="modal-body container border-bottom">
+        <table class="table table-sm table-borderless mb-0">
+          <tr>
+            <td class="font-weight-bold mb-2">{{ 'location.no_measurements_available' | translate }}</td>
+          </tr>
+        </table>
+      </div>
+    </ng-template>
 
     <div class="modal-body container">
       <ucm-vec3

@@ -13,7 +13,10 @@ export class LocationModalComponent implements OnInit {
   locationForm = new FormGroup({
     name: new FormControl('', Validators.required),
     icon: new FormControl(null),
-    model3d: new FormControl(null)
+    model3d: new FormControl(null),
+
+    // Hidden controls
+    id: new FormControl(null)
   });
 
   location: LocationModel | undefined;
@@ -31,7 +34,7 @@ export class LocationModalComponent implements OnInit {
     if (this.location) {
       this.locationService.getByKey(this.location.id).subscribe((location) => {
         this.location = location;
-        this.locationForm.setValue(location);
+        this.locationForm.patchValue(location);
       });
     }
   }

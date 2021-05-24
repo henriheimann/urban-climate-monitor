@@ -13,6 +13,7 @@ import { selectLocationState } from '../../store/location.selectors';
 import { selectSensor, setModifiedPosition, setModifiedRotation } from '../../store/location.actions';
 import { SensorModel } from '../../../shared/models/sensor.model';
 import { LocationState } from '../../store/location.reducer';
+import { Shader, Vector3 } from 'three';
 
 @Component({
   selector: 'ucm-visualisation-page',
@@ -49,6 +50,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private raycaster!: THREE.Raycaster;
 
   private locationModelGroup: THREE.Group | undefined;
+  private locationModelMaterial: THREE.MeshPhongMaterial | undefined;
   private sensorsGroup: THREE.Group | undefined;
 
   private frameId: number | null = null;
@@ -67,6 +69,8 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.animate();
 
     this.locationState$.subscribe((state) => {
+      this.updateLocationModelShaderUniforms(state);
+
       const previousOrCurrentSelectedSensor = state.selectedSensor || this.locationState?.selectedSensor;
       this.locationState = state;
 
@@ -122,14 +126,100 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
 
     this.raycaster = new THREE.Raycaster();
 
-    const ambientLight = new THREE.AmbientLight(0x222222);
+    const ambientLight = new THREE.AmbientLight(0x888888);
     this.scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff);
+    const directionalLight = new THREE.DirectionalLight(0x888888);
     directionalLight.position.x = 5;
     directionalLight.position.y = 3;
     directionalLight.position.z = 4;
     this.scene.add(directionalLight);
+
+    this.locationModelMaterial = new THREE.MeshPhongMaterial();
+    this.locationModelMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms['sensorData'] = {
+        value: [
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          },
+          {
+            position: new Vector3(0, 0, 0),
+            color: new Vector3(0, 0, 0)
+          }
+        ]
+      };
+      shader.uniforms['sensorCount'] = {
+        value: 0
+      };
+
+      shader.vertexShader = `#define DISTANCE\nvarying vec3 vWorldPosition;\n` + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <envmap_vertex>',
+        `#include <envmap_vertex>\nvWorldPosition = worldPosition.xyz;\n`
+      );
+
+      shader.fragmentShader =
+        `
+        struct SensorData {
+          vec3 position;
+          vec3 color;
+        };
+        uniform SensorData sensorData[10];
+        uniform int sensorCount;
+
+        varying vec3 vWorldPosition;
+        ` + shader.fragmentShader;
+      shader.fragmentShader = shader.fragmentShader.replace(
+        `vec4 diffuseColor = vec4( diffuse, opacity );`,
+        `
+        vec3 accumulatedColor = diffuse;
+        for (int i = 0 ; i < sensorCount; ++i) {
+          vec3 difference = vWorldPosition - sensorData[i].position;
+          float distance = length(difference);
+          float distanceClamped = 1.0f - clamp(distance * 0.35f, 0.0f, 1.0f);
+          accumulatedColor = mix(accumulatedColor, sensorData[i].color, distanceClamped) + sensorData[i].color * distanceClamped;
+        }
+        vec4 diffuseColor = vec4(diffuse * accumulatedColor, opacity);
+        `
+      );
+
+      if (this.locationModelMaterial) {
+        this.locationModelMaterial.userData.shader = shader;
+      }
+    };
 
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
@@ -140,8 +230,8 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.transformControls.addEventListener('change', () => {
       this.onTransformControlsChanged();
     });
-    this.transformControls.setTranslationSnap(0.1);
-    this.transformControls.setRotationSnap(1);
+    //this.transformControls.setTranslationSnap(0.1);
+    //this.transformControls.setRotationSnap(1);
 
     this.scene.add(this.transformControls);
 
@@ -157,9 +247,18 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       if (location) {
         const loader = new OBJLoader();
         loader.loadAsync(environment.backendUrl + location.model3d.url).then((group) => {
+          group.traverse((object) => {
+            if (object instanceof THREE.Mesh) {
+              object.material = this.locationModelMaterial;
+            }
+          });
           this.locationModelGroup = group;
           this.scene.add(this.locationModelGroup);
         });
+
+        if (this.locationState) {
+          this.updateLocationModelShaderUniforms(this.locationState);
+        }
 
         const sensorMeshes = location.sensors.map((sensor) => new SensorMesh(sensor));
 
@@ -202,6 +301,78 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(width, height);
+  }
+
+  private updateLocationModelShaderUniforms(state: LocationState): void {
+    if (state.loadedMeasurements != undefined) {
+      const measurements = state.loadedMeasurements.entries[state.selectedMeasurementsIndex].measurements;
+
+      const sensorData = [];
+
+      const getColor = (measurement: number) => {
+        const c1 = new THREE.Color('#df3615');
+        const c2 = new THREE.Color('#ee732e');
+        const c3 = new THREE.Color('#48aaab');
+        const c4 = new THREE.Color('#048399');
+
+        const min = state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0;
+        const max = state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0;
+
+        const c1Value = max;
+        const c2Value = min + ((max - min) * 2.0) / 3.0;
+        const c3Value = min + (max - min) / 3.0;
+        const c4Value = min;
+
+        const color = new THREE.Color();
+
+        const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
+          return (value - lowerBound) / (upperBound - lowerBound);
+        };
+
+        if (measurement < c3Value) {
+          color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
+        } else if (measurement < c2Value) {
+          color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
+        } else {
+          color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
+        }
+
+        return color;
+      };
+
+      if (this.sensorsGroup?.children) {
+        for (const child of this.sensorsGroup.children) {
+          if (child instanceof SensorMesh) {
+            const id = child.getSensor().id;
+            if (id != null) {
+              let measurementsForSensor;
+              if (measurements[id]) {
+                measurementsForSensor = measurements[id][state.selectedMeasurementsType];
+              } else {
+                measurementsForSensor = undefined;
+              }
+
+              if (measurementsForSensor) {
+                sensorData.push({
+                  position: child.position,
+                  color: getColor(measurementsForSensor)
+                });
+              }
+            }
+          }
+        }
+      }
+
+      if (this.locationModelMaterial) {
+        const shader = this.locationModelMaterial.userData.shader;
+        if (shader) {
+          sensorData.forEach((value, index) => {
+            shader.uniforms['sensorData'].value[index] = value;
+          });
+          shader.uniforms['sensorCount'].value = sensorData.length;
+        }
+      }
+    }
   }
 
   private getSensorMeshForSensor(sensor: SensorModel): SensorMesh | undefined {

@@ -15,3 +15,14 @@ export const selectModifiedRotation = createSelector(selectLocationState, (state
 export const selectLoadingMeasurements = createSelector(selectLocationState, (state: LocationState) => state.loadingMeasurements);
 
 export const selectLoadedMeasurements = createSelector(selectLocationState, (state: LocationState) => state.loadedMeasurements);
+
+export const selectSelectedMeasurementsInfo = createSelector(selectLocationState, (state: LocationState) => {
+  if (state.loadedMeasurementsMin != undefined && state.loadedMeasurementsMax != undefined) {
+    return {
+      min: state.loadedMeasurementsMin[state.selectedMeasurementsType],
+      max: state.loadedMeasurementsMax[state.selectedMeasurementsType],
+      type: state.selectedMeasurementsType
+    };
+  }
+  return undefined;
+});

@@ -22,3 +22,9 @@
   bottom: 20px;
   width: 100%;
 }
+
+#legendWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

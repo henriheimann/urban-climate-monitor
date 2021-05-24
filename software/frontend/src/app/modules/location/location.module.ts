@@ -16,6 +16,7 @@ import { StoreModule } from '@ngrx/store';
 import * as fromLocation from './store/location.reducer';
 import { MeasurementsSelectorComponent } from './components/measurements-selector/measurements-selector.component';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { VisualisationLegendComponent } from './components/visualisation-legend/visualisation-legend.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     Vec3Component,
     VisualisationPageComponent,
     VisualisationSensorDetailComponent,
-    MeasurementsSelectorComponent
+    MeasurementsSelectorComponent,
+    VisualisationLegendComponent
   ],
   imports: [
     CommonModule,

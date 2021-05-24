@@ -16,7 +16,5 @@ public class GetLocationMeasurementsRequest
 
 	private ZonedDateTime to;
 
-	private SensorDataType type;
-
 	private SensorDataResolution resolution;
 }

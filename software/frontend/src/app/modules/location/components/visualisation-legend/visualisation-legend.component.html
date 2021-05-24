@@ -1,0 +1,23 @@
+<div class="d-flex flex-column" style="width: 14px; height: 150px; margin-left: 2rem; margin-top: 5rem">
+  <div class="flex-grow-1" style="background: linear-gradient(180deg, #df3615 0%, #ee732e 100%)">
+    <ucm-measurement
+      [value]="max"
+      [unit]="unit"
+      style="position: absolute; left: calc(100% + 6px); transform: translate(0, -50%)"
+    ></ucm-measurement>
+  </div>
+  <div class="flex-grow-1" style="background: linear-gradient(180deg, #ee732e 0%, #48aaab 100%)">
+    <ucm-measurement
+      [value]="(min + max) / 2"
+      [unit]="unit"
+      style="position: absolute; left: calc(100% + 6px); transform: translate(0, 50%)"
+    ></ucm-measurement>
+  </div>
+  <div class="flex-grow-1" style="background: linear-gradient(180deg, #48aaab 0%, #048399 100%)">
+    <ucm-measurement
+      [value]="min"
+      [unit]="unit"
+      style="position: absolute; left: calc(100% + 6px); bottom: 0; transform: translate(0, 50%)"
+    ></ucm-measurement>
+  </div>
+</div>

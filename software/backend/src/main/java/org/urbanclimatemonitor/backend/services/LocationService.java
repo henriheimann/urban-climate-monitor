@@ -186,8 +186,8 @@ public class LocationService
 				.map(Sensor::getTtnId)
 				.collect(Collectors.toSet());
 
-		Map<ZonedDateTime, Map<String, Object>> measurements =
-				influxDBService.getMeasurementsForPeriod(ttnIds, getLocationMeasurementsRequest.getType(),
+		Map<ZonedDateTime, Map<String, Map<SensorDataType, Object>>> measurements =
+				influxDBService.getMeasurementsForPeriod(ttnIds, SensorDataType.setOfAllTypesWithoutTime(),
 						getLocationMeasurementsRequest.getResolution(), getLocationMeasurementsRequest.getFrom(),
 						getLocationMeasurementsRequest.getTo());
 
@@ -197,7 +197,7 @@ public class LocationService
 				.collect(Collectors.toMap(Sensor::getTtnId, Sensor::getId));
 
 		measurements.forEach((date, dateValues) -> {
-			Map<Long, Object> valueMap = new HashMap<>();
+			Map<Long, Map<SensorDataType, Object>> valueMap = new HashMap<>();
 			dateValues.forEach((ttnDeviceId, value) -> valueMap.put(ttnIdsToSensorIdsMap.get(ttnDeviceId), value));
 			entries.add(new LocationMeasurementsResponse.Entry(date, valueMap));
 		});
