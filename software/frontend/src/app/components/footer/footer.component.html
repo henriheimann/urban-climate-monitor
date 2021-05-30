@@ -1,9 +1,5 @@
-<div class="d-flex flex-row-reverse">
-  <a
-    class="mr-3"
-    [class.text-light]="lightTextColor"
-    [class.text-dark]="!lightTextColor"
-    [routerLink]="['/imprint-data-protection']"
+<div class="d-flex flex-row-reverse footer" [class.absolute-position-footer]="absolutePosition">
+  <a class="mr-3" [class.text-light]="lightTextColor" [class.text-dark]="!lightTextColor" [routerLink]="['/imprint-data-protection']"
     >Imprint & Data Protection</a
   >
 </div>

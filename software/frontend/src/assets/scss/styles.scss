@@ -42,6 +42,10 @@ $container-max-widths: (
   box-shadow: none !important;
 }
 
+.btn:focus {
+  box-shadow: none !important;
+}
+
 .table {
   thead th {
     border-bottom: $table-border-width solid $table-header-border-color;

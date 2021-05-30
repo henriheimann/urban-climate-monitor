@@ -1,16 +1,16 @@
-<div *ngIf="splash" class="background"></div>
-<ucm-header *ngIf="!splash"></ucm-header>
+<div *ngIf="fullscreen" class="background"></div>
+<ucm-header *ngIf="!fullscreen"></ucm-header>
 <main
   [ngClass]="
-    splash
+    fullscreen
       ? 'd-flex flex-wrap justify-content-center align-content-center without-navbar'
-      : isVisualisation()
+      : fullcontent
       ? 'fix-height'
       : 'container-fluid py-3'
   "
 >
-  <ucm-alert-display *ngIf="!splash" destination="main"></ucm-alert-display>
+  <ucm-alert-display *ngIf="!fullscreen && !fullcontent" destination="main"></ucm-alert-display>
   <router-outlet></router-outlet>
 </main>
 
-<ucm-footer [lightTextColor]="(routeData | async)?.splash"></ucm-footer>
+<ucm-footer [lightTextColor]="fullscreen" [absolutePosition]="fullcontent"></ucm-footer>

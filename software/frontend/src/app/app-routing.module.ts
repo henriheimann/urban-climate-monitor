@@ -9,7 +9,7 @@ export const routes: Routes = [
     path: '',
     component: FrontPageComponent,
     data: {
-      splash: true
+      fullscreen: true
     }
   },
   {
@@ -20,7 +20,7 @@ export const routes: Routes = [
     path: 'backend-not-available',
     component: BackendNotAvailablePageComponent,
     data: {
-      splash: true
+      fullscreen: true
     }
   }
 ];

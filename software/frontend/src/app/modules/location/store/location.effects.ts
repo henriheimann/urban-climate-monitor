@@ -17,9 +17,11 @@ export class LocationEffects {
         ofType(saveChanges),
         withLatestFrom(
           this.store.select(selectLocationState),
-          this.store.select(selectRouteParam('locationId')).pipe(
-            filter((locationId) => locationId != null),
-            switchMap((locationId) => this.locationService.getByKey(locationId))
+          this.locationService.entityMap$.pipe(
+            withLatestFrom(this.store.select(selectRouteParam('locationId'))),
+            map(([entityMap, locationId]) => {
+              return locationId != undefined ? entityMap[locationId] : undefined;
+            })
           )
         ),
         tap(([, state, location]) => {

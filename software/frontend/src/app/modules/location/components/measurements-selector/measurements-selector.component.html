@@ -1,4 +1,4 @@
-<div class="container-xxxl">
+<div class="container-xxxl mb-4">
   <div class="bg-white rounded shadow-sm border-0 mr-3 ml-3">
     <div class="d-flex align-items-stretch">
       <div class="border-right p-3 d-flex align-items-center justify-content-center" style="width: 160px">
@@ -36,7 +36,16 @@
         </div>
       </div>
       <div class="flex-grow-1 p-3 custom-slider">
-        <ngx-slider [(value)]="sliderSelectedIndex" [options]="sliderOptions" (userChange)="onSliderChange()"></ngx-slider>
+        <ngx-slider
+          *ngIf="loadedMeasurements !== undefined && loadedMeasurements.entries.length > 0; else no_measurements"
+          [(value)]="sliderSelectedIndex"
+          [options]="sliderOptions"
+          (userChange)="onSliderChange()"
+        >
+        </ngx-slider>
+        <ng-template #no_measurements>
+          {{ 'location.no_measurements_for_selection' }}
+        </ng-template>
       </div>
     </div>
   </div>

@@ -15,8 +15,9 @@ import {
   setModifiedPosition,
   setModifiedRotation
 } from '../../store/location.actions';
-import { SensorService } from '../../../shared/services/sensor.service';
-import { map } from 'rxjs/operators';
+import { filter, map, withLatestFrom } from 'rxjs/operators';
+import { selectLoggedInUser } from '../../../auth/store/auth.selectors';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'ucm-sensor-detail',
@@ -28,6 +29,18 @@ export class VisualisationSensorDetailComponent {
   modifiedPosition$ = this.store.select(selectModifiedPosition);
   modifiedRotation$ = this.store.select(selectModifiedRotation);
   selectedSensor$ = this.store.select(selectSelectedSensor);
+
+  userHasEditPermission$ = this.store.select(selectLoggedInUser).pipe(
+    withLatestFrom(
+      this.activatedRoute.params.pipe(
+        filter((params) => params?.locationId != undefined),
+        map((params) => params.locationId)
+      )
+    ),
+    map(([user, locationId]) => {
+      return user != null && (user.role == 'ADMIN' || user.locationsWithPermission.indexOf(locationId) != -1);
+    })
+  );
 
   selectedSensorTimestamp$ = this.store.select(selectLocationState).pipe(
     map((state) => {
@@ -49,7 +62,7 @@ export class VisualisationSensorDetailComponent {
     })
   );
 
-  constructor(private store: Store, private sensorService: SensorService) {}
+  constructor(private store: Store, private activatedRoute: ActivatedRoute) {}
 
   onCloseClicked(): void {
     this.store.dispatch(selectSensor({ sensor: null }));

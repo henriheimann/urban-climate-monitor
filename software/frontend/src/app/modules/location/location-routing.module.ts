@@ -13,7 +13,10 @@ const routes: Routes = [
     children: [
       {
         path: 'visualisation',
-        component: VisualisationPageComponent
+        component: VisualisationPageComponent,
+        data: {
+          fullcontent: true
+        }
       },
       {
         path: 'sensors',

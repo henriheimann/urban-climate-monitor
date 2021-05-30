@@ -45,7 +45,8 @@
     "edit_rotation": "Edit Rotation",
     "save": "Save Changes",
     "revert": "Revert",
-    "loading_measurements": "Loading measurements..."
+    "loading_measurements": "Loading measurements...",
+    "no_measurements_for_selection": "No measurements are available for selection range."
   },
   "admin": {
     "users": {

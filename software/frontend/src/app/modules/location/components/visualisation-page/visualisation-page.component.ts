@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LocationService } from '../../../shared/services/location.service';
 import { filter, map, withLatestFrom } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -13,7 +13,10 @@ import { selectLocationState } from '../../store/location.selectors';
 import { selectSensor, setModifiedPosition, setModifiedRotation } from '../../store/location.actions';
 import { SensorModel } from '../../../shared/models/sensor.model';
 import { LocationState } from '../../store/location.reducer';
-import { Shader, Vector3 } from 'three';
+import { Vector3 } from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
 
 @Component({
   selector: 'ucm-visualisation-page',
@@ -43,6 +46,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private wrapper!: HTMLDivElement;
   private canvas!: HTMLCanvasElement;
   private renderer!: THREE.WebGLRenderer;
+  private composer!: EffectComposer;
   private camera!: THREE.PerspectiveCamera;
   private scene!: THREE.Scene;
   private orbitControls!: OrbitControls;
@@ -67,6 +71,9 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createScene(this.canvasWrapper, this.rendererCanvas);
     this.animate();
+
+    // Must be called to prevent right white space
+    setTimeout(() => this.resize(), 0);
 
     this.locationState$.subscribe((state) => {
       this.updateLocationModelShaderUniforms(state);
@@ -93,11 +100,13 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
         if (selectedSensorMesh && state.editingMode != 'none') {
           this.transformControls.attach(selectedSensorMesh);
           this.transformControls.mode = state.editingMode;
+          this.enableSAO(false);
           return;
         }
       }
 
       this.transformControls.detach();
+      this.enableSAO(true);
     });
   }
 
@@ -116,12 +125,13 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       alpha: true,
       antialias: true
     });
+    console.log(this.wrapper.clientWidth);
     this.renderer.setSize(this.wrapper.clientWidth, this.wrapper.clientHeight);
 
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(75, this.wrapper.clientWidth / this.wrapper.clientHeight, 0.1, 1000);
-    this.camera.position.z = 5;
+    this.camera.position.set(12, 12, 8);
     this.scene.add(this.camera);
 
     this.raycaster = new THREE.Raycaster();
@@ -267,6 +277,25 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
         this.scene.add(this.sensorsGroup);
       }
     });
+
+    this.composer = new EffectComposer(this.renderer);
+
+    const renderPass = new RenderPass(this.scene, this.camera);
+    this.composer.addPass(renderPass);
+
+    this.enableSAO(true);
+  }
+
+  private enableSAO(enable: boolean): void {
+    if (enable && this.composer.passes.length == 1) {
+      const saoPass = new SAOPass(this.scene, this.camera, false, true);
+      saoPass.params.saoScale = 300.0;
+      saoPass.params.saoIntensity = 0.2;
+      saoPass.params.saoBlur = 0.5;
+      this.composer.addPass(saoPass);
+    } else if (!enable && this.composer.passes.length == 2) {
+      this.composer.removePass(this.composer.passes[1]);
+    }
   }
 
   public animate(): void {
@@ -290,7 +319,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       this.render();
     });
 
-    this.renderer.render(this.scene, this.camera);
+    this.composer.render();
   }
 
   public resize(): void {
@@ -301,75 +330,78 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(width, height);
+    this.composer.setSize(width, height);
   }
 
   private updateLocationModelShaderUniforms(state: LocationState): void {
     if (state.loadedMeasurements != undefined) {
-      const measurements = state.loadedMeasurements.entries[state.selectedMeasurementsIndex].measurements;
+      const measurementOfIndex = state.loadedMeasurements.entries[state.selectedMeasurementsIndex];
+      if (measurementOfIndex) {
+        const measurements = measurementOfIndex.measurements;
+        const sensorData = [];
 
-      const sensorData = [];
+        const getColor = (measurement: number) => {
+          const c1 = new THREE.Color('#df3615');
+          const c2 = new THREE.Color('#ee732e');
+          const c3 = new THREE.Color('#48aaab');
+          const c4 = new THREE.Color('#048399');
 
-      const getColor = (measurement: number) => {
-        const c1 = new THREE.Color('#df3615');
-        const c2 = new THREE.Color('#ee732e');
-        const c3 = new THREE.Color('#48aaab');
-        const c4 = new THREE.Color('#048399');
+          const min = state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0;
+          const max = state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0;
 
-        const min = state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0;
-        const max = state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0;
+          const c1Value = max;
+          const c2Value = min + ((max - min) * 2.0) / 3.0;
+          const c3Value = min + (max - min) / 3.0;
+          const c4Value = min;
 
-        const c1Value = max;
-        const c2Value = min + ((max - min) * 2.0) / 3.0;
-        const c3Value = min + (max - min) / 3.0;
-        const c4Value = min;
+          const color = new THREE.Color();
 
-        const color = new THREE.Color();
+          const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
+            return (value - lowerBound) / (upperBound - lowerBound);
+          };
 
-        const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
-          return (value - lowerBound) / (upperBound - lowerBound);
+          if (measurement < c3Value) {
+            color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
+          } else if (measurement < c2Value) {
+            color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
+          } else {
+            color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
+          }
+
+          return color;
         };
 
-        if (measurement < c3Value) {
-          color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
-        } else if (measurement < c2Value) {
-          color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
-        } else {
-          color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
-        }
+        if (this.sensorsGroup?.children) {
+          for (const child of this.sensorsGroup.children) {
+            if (child instanceof SensorMesh) {
+              const id = child.getSensor().id;
+              if (id != null) {
+                let measurementsForSensor;
+                if (measurements[id]) {
+                  measurementsForSensor = measurements[id][state.selectedMeasurementsType];
+                } else {
+                  measurementsForSensor = undefined;
+                }
 
-        return color;
-      };
-
-      if (this.sensorsGroup?.children) {
-        for (const child of this.sensorsGroup.children) {
-          if (child instanceof SensorMesh) {
-            const id = child.getSensor().id;
-            if (id != null) {
-              let measurementsForSensor;
-              if (measurements[id]) {
-                measurementsForSensor = measurements[id][state.selectedMeasurementsType];
-              } else {
-                measurementsForSensor = undefined;
-              }
-
-              if (measurementsForSensor) {
-                sensorData.push({
-                  position: child.position,
-                  color: getColor(measurementsForSensor)
-                });
+                if (measurementsForSensor) {
+                  sensorData.push({
+                    position: child.position,
+                    color: getColor(measurementsForSensor)
+                  });
+                }
               }
             }
           }
         }
-      }
 
-      if (this.locationModelMaterial) {
-        const shader = this.locationModelMaterial.userData.shader;
-        if (shader) {
-          sensorData.forEach((value, index) => {
-            shader.uniforms['sensorData'].value[index] = value;
-          });
-          shader.uniforms['sensorCount'].value = sensorData.length;
+        if (this.locationModelMaterial) {
+          const shader = this.locationModelMaterial.userData.shader;
+          if (shader) {
+            sensorData.forEach((value, index) => {
+              shader.uniforms['sensorData'].value[index] = value;
+            });
+            shader.uniforms['sensorCount'].value = sensorData.length;
+          }
         }
       }
     }
@@ -384,7 +416,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   }
 
   onCanvasMouseUp($event: MouseEvent): void {
-    if (!this.mouseDragged) {
+    if (!this.mouseDragged && this.locationState?.editingMode == 'none') {
       const mouse = new THREE.Vector2();
       mouse.x = ($event.offsetX / this.canvas.width) * 2 - 1;
       mouse.y = -($event.offsetY / this.canvas.height) * 2 + 1;
@@ -397,7 +429,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
           if (firstIntersectObject instanceof SensorMesh) {
             this.store.dispatch(selectSensor({ sensor: firstIntersectObject.getSensor() }));
           }
-        } else if (this.locationState?.editingMode == 'none') {
+        } else {
           this.store.dispatch(selectSensor({ sensor: null }));
         }
       }
