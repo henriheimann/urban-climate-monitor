@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { LocationService } from '../../../shared/services/location.service';
 import { filter, map, withLatestFrom } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
@@ -13,10 +13,11 @@ import { selectLocationState } from '../../store/location.selectors';
 import { selectSensor, setModifiedPosition, setModifiedRotation } from '../../store/location.actions';
 import { SensorModel } from '../../../shared/models/sensor.model';
 import { LocationState } from '../../store/location.reducer';
-import { Vector3 } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
+import { LocationMaterial } from './shaders/location-material';
+import { LocationModel } from '../../../shared/models/location.model';
 
 @Component({
   selector: 'ucm-visualisation-page',
@@ -52,9 +53,12 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private orbitControls!: OrbitControls;
   private transformControls!: TransformControls;
   private raycaster!: THREE.Raycaster;
+  private objLoader = new OBJLoader();
 
+  private loadedLocationModelUrl: string | undefined;
   private locationModelGroup: THREE.Group | undefined;
-  private locationModelMaterial: THREE.MeshPhongMaterial | undefined;
+  private locationModelMaterial: LocationMaterial | undefined;
+
   private sensorsGroup: THREE.Group | undefined;
 
   private frameId: number | null = null;
@@ -75,39 +79,8 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     // Must be called to prevent right white space
     setTimeout(() => this.resize(), 0);
 
-    this.locationState$.subscribe((state) => {
-      this.updateLocationModelShaderUniforms(state);
-
-      const previousOrCurrentSelectedSensor = state.selectedSensor || this.locationState?.selectedSensor;
-      this.locationState = state;
-
-      if (previousOrCurrentSelectedSensor != null) {
-        const selectedSensorMesh = this.getSensorMeshForSensor(previousOrCurrentSelectedSensor);
-        if (selectedSensorMesh && state.modifiedPosition) {
-          selectedSensorMesh.position.x = state.modifiedPosition[0];
-          selectedSensorMesh.position.y = state.modifiedPosition[1];
-          selectedSensorMesh.position.z = state.modifiedPosition[2];
-        }
-        if (selectedSensorMesh && state.modifiedRotation) {
-          selectedSensorMesh.rotation.x = state.modifiedRotation[0];
-          selectedSensorMesh.rotation.y = state.modifiedRotation[1];
-          selectedSensorMesh.rotation.z = state.modifiedRotation[2];
-        }
-      }
-
-      if (state.selectedSensor != null) {
-        const selectedSensorMesh = this.getSensorMeshForSensor(state.selectedSensor);
-        if (selectedSensorMesh && state.editingMode != 'none') {
-          this.transformControls.attach(selectedSensorMesh);
-          this.transformControls.mode = state.editingMode;
-          this.enableSAO(false);
-          return;
-        }
-      }
-
-      this.transformControls.detach();
-      this.enableSAO(true);
-    });
+    this.location$.subscribe((location) => this.onLocationChange(location));
+    this.locationState$.subscribe((state) => this.onLocationStateChange(state));
   }
 
   public ngOnDestroy(): void {
@@ -123,10 +96,10 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
-      antialias: true
+      antialias: false
     });
-    console.log(this.wrapper.clientWidth);
     this.renderer.setSize(this.wrapper.clientWidth, this.wrapper.clientHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.scene = new THREE.Scene();
 
@@ -145,91 +118,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     directionalLight.position.z = 4;
     this.scene.add(directionalLight);
 
-    this.locationModelMaterial = new THREE.MeshPhongMaterial();
-    this.locationModelMaterial.onBeforeCompile = (shader) => {
-      shader.uniforms['sensorData'] = {
-        value: [
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          },
-          {
-            position: new Vector3(0, 0, 0),
-            color: new Vector3(0, 0, 0)
-          }
-        ]
-      };
-      shader.uniforms['sensorCount'] = {
-        value: 0
-      };
-
-      shader.vertexShader = `#define DISTANCE\nvarying vec3 vWorldPosition;\n` + shader.vertexShader;
-      shader.vertexShader = shader.vertexShader.replace(
-        '#include <envmap_vertex>',
-        `#include <envmap_vertex>\nvWorldPosition = worldPosition.xyz;\n`
-      );
-
-      shader.fragmentShader =
-        `
-        struct SensorData {
-          vec3 position;
-          vec3 color;
-        };
-        uniform SensorData sensorData[10];
-        uniform int sensorCount;
-
-        varying vec3 vWorldPosition;
-        ` + shader.fragmentShader;
-      shader.fragmentShader = shader.fragmentShader.replace(
-        `vec4 diffuseColor = vec4( diffuse, opacity );`,
-        `
-        vec3 accumulatedColor = diffuse;
-        for (int i = 0 ; i < sensorCount; ++i) {
-          vec3 difference = vWorldPosition - sensorData[i].position;
-          float distance = length(difference);
-          float distanceClamped = 1.0f - clamp(distance * 0.35f, 0.0f, 1.0f);
-          accumulatedColor = mix(accumulatedColor, sensorData[i].color, distanceClamped) + sensorData[i].color * distanceClamped;
-        }
-        vec4 diffuseColor = vec4(diffuse * accumulatedColor, opacity);
-        `
-      );
-
-      if (this.locationModelMaterial) {
-        this.locationModelMaterial.userData.shader = shader;
-      }
-    };
+    this.locationModelMaterial = new LocationMaterial();
 
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
@@ -240,49 +129,12 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.transformControls.addEventListener('change', () => {
       this.onTransformControlsChanged();
     });
-    //this.transformControls.setTranslationSnap(0.1);
-    //this.transformControls.setRotationSnap(1);
 
     this.scene.add(this.transformControls);
 
-    this.location$.subscribe((location) => {
-      if (this.locationModelGroup) {
-        this.scene.remove(this.locationModelGroup);
-      }
-      if (this.sensorsGroup) {
-        this.scene.remove(this.sensorsGroup);
-      }
-
-      // TODO: Dont reload OBJ if url has not changed
-      if (location) {
-        const loader = new OBJLoader();
-        loader.loadAsync(environment.backendUrl + location.model3d.url).then((group) => {
-          group.traverse((object) => {
-            if (object instanceof THREE.Mesh) {
-              object.material = this.locationModelMaterial;
-            }
-          });
-          this.locationModelGroup = group;
-          this.scene.add(this.locationModelGroup);
-        });
-
-        if (this.locationState) {
-          this.updateLocationModelShaderUniforms(this.locationState);
-        }
-
-        const sensorMeshes = location.sensors.map((sensor) => new SensorMesh(sensor));
-
-        this.sensorsGroup = new THREE.Group();
-        this.sensorsGroup.add(...sensorMeshes);
-        this.scene.add(this.sensorsGroup);
-      }
-    });
-
     this.composer = new EffectComposer(this.renderer);
-
     const renderPass = new RenderPass(this.scene, this.camera);
     this.composer.addPass(renderPass);
-
     this.enableSAO(true);
   }
 
@@ -331,6 +183,85 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
 
     this.renderer.setSize(width, height);
     this.composer.setSize(width, height);
+  }
+
+  private onLocationStateChange(state: LocationState): void {
+    this.updateLocationModelShaderUniforms(state);
+
+    const previousOrCurrentSelectedSensor = state.selectedSensor || this.locationState?.selectedSensor;
+    this.locationState = state;
+
+    if (previousOrCurrentSelectedSensor != null) {
+      const selectedSensorMesh = this.getSensorMeshForSensor(previousOrCurrentSelectedSensor);
+      if (selectedSensorMesh && state.modifiedPosition) {
+        selectedSensorMesh.position.x = state.modifiedPosition[0];
+        selectedSensorMesh.position.y = state.modifiedPosition[1];
+        selectedSensorMesh.position.z = state.modifiedPosition[2];
+      }
+      if (selectedSensorMesh && state.modifiedRotation) {
+        selectedSensorMesh.rotation.x = state.modifiedRotation[0];
+        selectedSensorMesh.rotation.y = state.modifiedRotation[1];
+        selectedSensorMesh.rotation.z = state.modifiedRotation[2];
+      }
+    }
+
+    if (state.selectedSensor != null) {
+      const selectedSensorMesh = this.getSensorMeshForSensor(state.selectedSensor);
+      if (selectedSensorMesh && state.editingMode != 'none') {
+        this.transformControls.attach(selectedSensorMesh);
+        this.transformControls.mode = state.editingMode;
+        this.enableSAO(false);
+        return;
+      }
+    }
+
+    this.transformControls.detach();
+    this.enableSAO(true);
+  }
+
+  private onLocationChange(location: LocationModel | undefined): void {
+    if (location === undefined) {
+      return;
+    }
+
+    // Only load location model if URL has changed
+    const locationModelUrl = environment.backendUrl + location.model3d.url;
+    if (this.loadedLocationModelUrl != locationModelUrl) {
+      this.loadedLocationModelUrl = locationModelUrl;
+      this.objLoader.loadAsync(environment.backendUrl + location.model3d.url).then((group) => {
+        // Remove old location model group
+        if (this.locationModelGroup) {
+          this.scene.remove(this.locationModelGroup);
+        }
+
+        // Apply location material to each object
+        group.traverse((object) => {
+          if (object instanceof THREE.Mesh) {
+            object.material = this.locationModelMaterial;
+          }
+        });
+
+        // Set new location model group
+        this.locationModelGroup = group;
+        this.scene.add(this.locationModelGroup);
+      });
+    }
+
+    // Remove old sensors group
+    if (this.sensorsGroup) {
+      this.scene.remove(this.sensorsGroup);
+    }
+
+    // Add new sensors
+    const sensorMeshes = location.sensors.map((sensor) => new SensorMesh(sensor));
+    this.sensorsGroup = new THREE.Group();
+    this.sensorsGroup.add(...sensorMeshes);
+    this.scene.add(this.sensorsGroup);
+
+    // If we already have an location state, update the shader uniforms
+    if (this.locationState) {
+      this.updateLocationModelShaderUniforms(this.locationState);
+    }
   }
 
   private updateLocationModelShaderUniforms(state: LocationState): void {
@@ -395,13 +326,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
         }
 
         if (this.locationModelMaterial) {
-          const shader = this.locationModelMaterial.userData.shader;
-          if (shader) {
-            sensorData.forEach((value, index) => {
-              shader.uniforms['sensorData'].value[index] = value;
-            });
-            shader.uniforms['sensorCount'].value = sensorData.length;
-          }
+          this.locationModelMaterial.updateUniforms(sensorData);
         }
       }
     }
@@ -418,8 +343,9 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   onCanvasMouseUp($event: MouseEvent): void {
     if (!this.mouseDragged && this.locationState?.editingMode == 'none') {
       const mouse = new THREE.Vector2();
-      mouse.x = ($event.offsetX / this.canvas.width) * 2 - 1;
-      mouse.y = -($event.offsetY / this.canvas.height) * 2 + 1;
+      mouse.x = ($event.offsetX / this.wrapper.clientWidth) * 2 - 1;
+      mouse.y = -($event.offsetY / this.wrapper.clientHeight) * 2 + 1;
+      console.log(mouse);
       this.raycaster.setFromCamera(mouse, this.camera);
 
       if (this.sensorsGroup?.children) {
@@ -436,7 +362,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private onTransformControlsChanged(): void {
+  onTransformControlsChanged(): void {
     if (this.locationState?.selectedSensor) {
       const sensorMesh = this.getSensorMeshForSensor(this.locationState?.selectedSensor);
       if (sensorMesh) {

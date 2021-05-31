@@ -3,7 +3,7 @@ import { SensorModel } from '../../../../shared/models/sensor.model';
 
 export class SensorMesh extends THREE.Mesh {
   constructor(private sensorModel: SensorModel) {
-    super(new THREE.BoxGeometry(0.1, 0.1, 0.02), new THREE.MeshPhongMaterial({ color: 0xffffff }));
+    super(new THREE.BoxGeometry(0.1, 0.1, 0.02), new THREE.MeshPhongMaterial({ color: 0x777777 }));
 
     this.position.x = sensorModel.position[0];
     this.position.y = sensorModel.position[1];
