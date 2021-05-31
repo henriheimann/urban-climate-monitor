@@ -4,11 +4,17 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ENTITY_METADATA_TOKEN } from '@ngrx/data';
 import { UserModel } from './models/user.model';
+import { MeasurementComponent } from './components/measurement/measurement.component';
+import { SensorModel } from './models/sensor.model';
+
+export function sortByName(a: SensorModel, b: SensorModel): number {
+  return a.name.localeCompare(b.name);
+}
 
 @NgModule({
-  declarations: [],
+  declarations: [MeasurementComponent],
   imports: [CommonModule, TranslateModule, ReactiveFormsModule],
-  exports: [TranslateModule, ReactiveFormsModule],
+  exports: [TranslateModule, ReactiveFormsModule, MeasurementComponent],
   providers: [
     {
       provide: ENTITY_METADATA_TOKEN,
@@ -22,7 +28,8 @@ import { UserModel } from './models/user.model';
           entityName: 'Location'
         },
         SensorModel: {
-          entityName: 'Sensor'
+          entityName: 'Sensor',
+          sortComparer: sortByName
         }
       }
     }

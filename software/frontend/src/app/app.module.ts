@@ -25,6 +25,7 @@ import { CommonModule } from '@angular/common';
 import { ImprintDataProtectionPageComponent } from './components/imprint-data-protection-page/imprint-data-protection-page.component';
 import { BackendNotAvailablePageComponent } from './components/backend-not-available-page/backend-not-available-page.component';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
+import { SharedModule } from './modules/shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
   ],
   imports: [
     CommonModule,
+    SharedModule,
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,

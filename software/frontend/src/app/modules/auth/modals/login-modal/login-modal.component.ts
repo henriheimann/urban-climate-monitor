@@ -29,6 +29,7 @@ export class LoginModalComponent implements OnInit {
   constructor(public modalRef: BsModalRef, private store: Store, private router: Router) {}
 
   ngOnInit(): void {
+    this.store.dispatch(clearAlertsForDestination({ destination: 'login' }));
     this.loggingIn$.subscribe((loggingIn) => (loggingIn ? this.loginForm.disable() : this.loginForm.enable()));
     this.isLoggedIn$.subscribe((isLoggedIn) => {
       if (isLoggedIn) {

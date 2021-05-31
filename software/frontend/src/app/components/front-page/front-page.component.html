@@ -12,18 +12,42 @@
     <h5 class="text-light">{{ 'front_page.no_locations' | translate }}</h5>
     <a [routerLink]="['admin', 'login']" class="text-light">{{ 'front_page.go_to_administration' | translate }}</a>
   </div>
-  <div
-    *ngFor="let location of locations$ | async"
-    class="card m-5"
-    style="width: 300px; height: 300px; border-radius: 10px"
-  >
-    <a [routerLink]="['location', location.id]">
-      <div class="card-body">
+  <div *ngFor="let location of locations$ | async" class="card m-5" style="width: 300px; height: 300px; border-radius: 10px">
+    <div class="card-body">
+      <a [routerLink]="['location', location.id]">
         <div class="d-flex justify-content-between align-items-center">
           <img height="50" [src]="getLocationIcon(location)" />
           <i class="bi bi-chevron-right text-dark" style="font-size: 2rem"></i>
         </div>
-      </div>
-    </a>
+      </a>
+      <table class="table table-sm table-borderless mb-0 mt-4">
+        <tbody>
+          <tr>
+            <td class="font-weight-bold">{{ 'front_page.sensors_online' | translate }}</td>
+            <td class="text-right">{{ getSensorsOnlineString(location) }}</td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'front_page.average_temperature' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="getAverageMeasurement(location, 'temperature')" unit="measurement.degrees_c"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'front_page.average_humidity' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement [value]="getAverageMeasurement(location, 'humidity')" unit="measurement.relative_humidity"></ucm-measurement>
+            </td>
+          </tr>
+          <tr>
+            <td class="font-weight-bold">{{ 'front_page.average_brightness_current' | translate }}</td>
+            <td class="text-right">
+              <ucm-measurement
+                [value]="getAverageMeasurement(location, 'brightness_current')"
+              ></ucm-measurement>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </ng-template>

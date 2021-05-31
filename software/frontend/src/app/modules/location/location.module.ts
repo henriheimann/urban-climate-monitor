@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { LocationRoutingModule } from './location-routing.module';
 import { SharedModule } from '../shared/shared.module';
 import { LastContactComponent } from './components/last-contact/last-contact.component';
-import { MeasurementComponent } from './components/measurement/measurement.component';
 import { FormsModule } from '@angular/forms';
 import { EffectsModule } from '@ngrx/effects';
 import { LocationEffects } from './store/location.effects';
@@ -22,7 +21,6 @@ import { VisualisationLegendComponent } from './components/visualisation-legend/
   declarations: [
     SensorListPageComponent,
     LastContactComponent,
-    MeasurementComponent,
     Vec3Component,
     VisualisationPageComponent,
     VisualisationSensorDetailComponent,

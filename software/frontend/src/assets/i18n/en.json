@@ -15,7 +15,11 @@
   "front_page": {
     "loading_locations": "Loading Locations...",
     "no_locations": "No locations have been added yet...",
-    "go_to_administration": "Go to Administration"
+    "go_to_administration": "Go to Administration",
+    "sensors_online": "Sensors Online",
+    "average_temperature": "Average Temperature",
+    "average_humidity": "Average Humidity",
+    "average_brightness_current": "Average Brightness"
   },
   "backend_not_available": {
     "title": "Backend not available...",
