@@ -1,4 +1,4 @@
-<div *ngIf="location$ | async; let location; else: loading" class="container-xxxl">
+<div *ngIf="sensors$ | async; let sensors; else: loading" class="container-xxxl">
   <table class="table bg-white rounded shadow-sm border-0">
     <thead>
       <tr>
@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let sensor of location.sensors">
+      <tr *ngFor="let sensor of sensors">
         <td>{{ sensor.name }}</td>
         <td>
           <ucm-last-contact [dateString]="sensor.measurements ? sensor.measurements['time'] : null"></ucm-last-contact>

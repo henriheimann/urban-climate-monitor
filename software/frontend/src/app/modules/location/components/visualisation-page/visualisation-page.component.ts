@@ -109,10 +109,10 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
 
     this.raycaster = new THREE.Raycaster();
 
-    const ambientLight = new THREE.AmbientLight(0x888888);
+    const ambientLight = new THREE.AmbientLight(0xaaaaaa);
     this.scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0x888888);
+    const directionalLight = new THREE.DirectionalLight(0x666666);
     directionalLight.position.x = 5;
     directionalLight.position.y = 3;
     directionalLight.position.z = 4;
@@ -211,6 +211,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
         this.transformControls.attach(selectedSensorMesh);
         this.transformControls.mode = state.editingMode;
         this.enableSAO(false);
+        console.log('attach ' + state.editingMode);
         return;
       }
     }
@@ -334,7 +335,9 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
 
   private getSensorMeshForSensor(sensor: SensorModel): SensorMesh | undefined {
     if (this.sensorsGroup?.children) {
-      return this.sensorsGroup.children.find((object3d) => object3d instanceof SensorMesh && object3d.getSensor() == sensor) as SensorMesh;
+      return this.sensorsGroup.children.find(
+        (object3d) => object3d instanceof SensorMesh && object3d.getSensor().id == sensor.id
+      ) as SensorMesh;
     } else {
       return undefined;
     }
