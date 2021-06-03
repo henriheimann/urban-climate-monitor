@@ -10,7 +10,6 @@ public class OAuthConfigurationProperties
 	private String resourceId;
 	private String clientId;
 	private String clientSecret;
-	private String signingKey;
 	private int tokenValiditySeconds;
 	private int refreshTokenValiditySeconds;
 }

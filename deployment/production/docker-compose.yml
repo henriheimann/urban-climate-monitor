@@ -105,7 +105,6 @@ services:
       - .env
     networks:
       - frontend-net
-      - backend-net
     restart: unless-stopped
   
   ucm-backend:

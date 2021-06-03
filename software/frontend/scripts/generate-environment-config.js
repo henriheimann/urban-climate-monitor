@@ -5,7 +5,7 @@ const targetPath = './src/environments/environment.ts';
 const envConfigFile = `export const environment = {
   production: ${process.env.UCM_FRONTEND_PRODUCTION},
   backendUrl: '${process.env.UCM_BACKEND_URL}',
-  oauthClientLogin: '${process.env.UCM_BACKEND_JWT_CLIENT_ID}:${process.env.UCM_BACKEND_JWT_CLIENT_SECRET}'
+  oauthClientLogin: '${process.env.UCM_BACKEND_OAUTH_CLIENT_ID}:${process.env.UCM_BACKEND_OAUTH_CLIENT_SECRET}'
 };
 `;
 
