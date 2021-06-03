@@ -52,8 +52,9 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private scene!: THREE.Scene;
   private orbitControls!: OrbitControls;
   private transformControls!: TransformControls;
-  private raycaster!: THREE.Raycaster;
+  private raycaster = new THREE.Raycaster();
   private objLoader = new OBJLoader();
+  private clock = new THREE.Clock();
 
   private loadedLocationModelUrl: string | undefined;
   private locationModelGroup: THREE.Group | undefined;
@@ -62,6 +63,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private sensorsGroup: THREE.Group | undefined;
 
   private frameId: number | null = null;
+  private elapsedTime = 0;
 
   private mouseDragged = false;
 
@@ -106,8 +108,6 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.camera = new THREE.PerspectiveCamera(75, this.wrapper.clientWidth / this.wrapper.clientHeight, 0.1, 1000);
     this.camera.position.set(12, 12, 8);
     this.scene.add(this.camera);
-
-    this.raycaster = new THREE.Raycaster();
 
     const ambientLight = new THREE.AmbientLight(0xaaaaaa);
     this.scene.add(ambientLight);
@@ -171,6 +171,17 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       this.render();
     });
 
+    const delta = this.clock.getDelta();
+    this.elapsedTime += delta;
+
+    if (this.locationState?.selectedSensor) {
+      const sensorMesh = this.getSensorMeshForSensor(this.locationState?.selectedSensor);
+      if (sensorMesh) {
+        const scale = Math.sin(this.elapsedTime * 4) * 0.2 + 1;
+        sensorMesh.scale.set(scale, scale, scale);
+      }
+    }
+
     this.composer.render();
   }
 
@@ -188,7 +199,8 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
   private onLocationStateChange(state: LocationState): void {
     this.updateLocationModelShaderUniforms(state);
 
-    const previousOrCurrentSelectedSensor = state.selectedSensor || this.locationState?.selectedSensor;
+    const previousSelectedSensor = this.locationState?.selectedSensor;
+    const previousOrCurrentSelectedSensor = state.selectedSensor || previousSelectedSensor;
     this.locationState = state;
 
     if (previousOrCurrentSelectedSensor != null) {
@@ -205,19 +217,24 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (state.selectedSensor != null) {
-      const selectedSensorMesh = this.getSensorMeshForSensor(state.selectedSensor);
-      if (selectedSensorMesh && state.editingMode != 'none') {
-        this.transformControls.attach(selectedSensorMesh);
-        this.transformControls.mode = state.editingMode;
-        this.enableSAO(false);
-        console.log('attach ' + state.editingMode);
-        return;
+    if (previousSelectedSensor != null && state.selectedSensor) {
+      const sensorMesh = this.getSensorMeshForSensor(state.selectedSensor);
+      if (sensorMesh) {
+        sensorMesh.scale.set(1, 1, 1);
       }
     }
 
-    this.transformControls.detach();
-    this.enableSAO(true);
+    if (state.editingMode != 'none' && state.selectedSensor != null) {
+      const selectedSensorMesh = this.getSensorMeshForSensor(state.selectedSensor);
+      if (selectedSensorMesh) {
+        this.transformControls.attach(selectedSensorMesh);
+        this.transformControls.mode = state.editingMode;
+      }
+      this.enableSAO(false);
+    } else {
+      this.transformControls.detach();
+      this.enableSAO(true);
+    }
   }
 
   private onLocationChange(location: LocationModel | undefined): void {
@@ -265,43 +282,41 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  private getColor(measurement: number, min: number, max: number) {
+    const c1 = new THREE.Color('#df3615');
+    const c2 = new THREE.Color('#ee732e');
+    const c3 = new THREE.Color('#48aaab');
+    const c4 = new THREE.Color('#048399');
+
+    const c1Value = max;
+    const c2Value = min + ((max - min) * 2.0) / 3.0;
+    const c3Value = min + (max - min) / 3.0;
+    const c4Value = min;
+
+    const color = new THREE.Color();
+
+    const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
+      return (value - lowerBound) / (upperBound - lowerBound);
+    };
+
+    if (measurement < c3Value) {
+      color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
+    } else if (measurement < c2Value) {
+      color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
+    } else {
+      color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
+    }
+
+    return color;
+  }
+
   private updateLocationModelShaderUniforms(state: LocationState): void {
-    if (state.loadedMeasurements != undefined) {
+    const uniformValues = [];
+
+    if (state.loadedMeasurements != undefined && state.editingMode == 'none') {
       const measurementOfIndex = state.loadedMeasurements.entries[state.selectedMeasurementsIndex];
       if (measurementOfIndex) {
         const measurements = measurementOfIndex.measurements;
-        const sensorData = [];
-
-        const getColor = (measurement: number) => {
-          const c1 = new THREE.Color('#df3615');
-          const c2 = new THREE.Color('#ee732e');
-          const c3 = new THREE.Color('#48aaab');
-          const c4 = new THREE.Color('#048399');
-
-          const min = state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0;
-          const max = state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0;
-
-          const c1Value = max;
-          const c2Value = min + ((max - min) * 2.0) / 3.0;
-          const c3Value = min + (max - min) / 3.0;
-          const c4Value = min;
-
-          const color = new THREE.Color();
-
-          const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
-            return (value - lowerBound) / (upperBound - lowerBound);
-          };
-
-          if (measurement < c3Value) {
-            color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
-          } else if (measurement < c2Value) {
-            color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
-          } else {
-            color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
-          }
-
-          return color;
-        };
 
         if (this.sensorsGroup?.children) {
           for (const child of this.sensorsGroup.children) {
@@ -316,20 +331,24 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
                 }
 
                 if (measurementsForSensor) {
-                  sensorData.push({
+                  uniformValues.push({
                     position: child.position,
-                    color: getColor(measurementsForSensor)
+                    color: this.getColor(
+                      measurementsForSensor,
+                      state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0,
+                      state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0
+                    )
                   });
                 }
               }
             }
           }
         }
-
-        if (this.locationModelMaterial) {
-          this.locationModelMaterial.updateUniforms(sensorData);
-        }
       }
+    }
+
+    if (this.locationModelMaterial) {
+      this.locationModelMaterial.updateUniforms(uniformValues);
     }
   }
 
@@ -348,7 +367,6 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       const mouse = new THREE.Vector2();
       mouse.x = ($event.offsetX / this.wrapper.clientWidth) * 2 - 1;
       mouse.y = -($event.offsetY / this.wrapper.clientHeight) * 2 + 1;
-      console.log(mouse);
       this.raycaster.setFromCamera(mouse, this.camera);
 
       if (this.sensorsGroup?.children) {

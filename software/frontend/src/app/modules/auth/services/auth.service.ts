@@ -10,9 +10,7 @@ import { UserModel } from '../../shared/models/user.model';
 })
 export class AuthService {
   private static LOCAL_STORAGE_AUTH_USER = 'auth.admin';
-
   private static LOCAL_STORAGE_AUTH_TOKEN = 'auth.token';
-
   private static LOCAL_STORAGE_AUTH_REFRESH_TOKEN = 'auth.refreshToken';
 
   constructor(private httpClient: HttpClient) {}

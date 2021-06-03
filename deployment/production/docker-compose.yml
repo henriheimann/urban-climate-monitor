@@ -101,8 +101,11 @@ services:
   ucm-frontend:
     image: ucm-frontend
     container_name: ucm-frontend
+    env_file:
+      - .env
     networks:
       - frontend-net
+      - backend-net
     restart: unless-stopped
   
   ucm-backend:

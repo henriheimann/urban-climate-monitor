@@ -25,27 +25,31 @@ ssh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}" 'mkdir -p ~/ucm'
 # build and upload frontend if not skipped
 if [ "${SKIP_FRONTEND_BUILD}" = "0" ]; then
     cd ../../software/frontend/
-    docker build -t ucm-frontend .
+    docker build -t ucm-frontend . --build-arg frontend_production=true --build-arg backend_url="${DEPLOYMENT_URL}/api" \
+    --build-arg backend_jwt_client_id=${UCM_BACKEND_JWT_CLIENT_ID} \
+    --build-arg backend_jwt_client_secret=${UCM_BACKEND_JWT_CLIENT_SECRET}
     docker save ucm-frontend > ucm-frontend.tar
     scp ucm-frontend.tar "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
     rm ucm-frontend.tar
+    cd ../../deployment/production/
 else
-    echo "skipping frontend build..."
+    echo "Skipping frontend build..."
 fi
 
 # build and upload backend if not skipped
 if [ "${SKIP_BACKEND_BUILD}" = "0" ]; then
-    cd ../backend/
+    cd ../../software/backend/
+    mvn clean package -DskipTests
     docker build -t ucm-backend .
     docker save ucm-backend > ucm-backend.tar
     scp ucm-backend.tar "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
     rm ucm-backend.tar
+    cd ../../deployment/production/
 else
-    echo "skipping backend build..."
+    echo "Skipping backend build..."
 fi
 
 # upload compose and configuration
-cd ../../deployment/production/
 rsync -aP docker-compose.yml telegraf.conf .env nginx grafana-provisioning ssl_renew.sh "${DEPLOYMENT_USER}@${DEPLOYMENT_HOST}:~/ucm"
 
 # load frontend

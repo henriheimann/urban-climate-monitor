@@ -147,13 +147,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logoutUserSuccess),
         tap(() => {
-          this.router.navigate(['/']).then(() => {
-            this.store.dispatch(
-              dispatchAlert({
-                alert: new Alert('alert.login_success')
-              })
-            );
-          });
+          this.router.navigate(['/']).then();
         })
       ),
     { dispatch: false }

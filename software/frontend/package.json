@@ -2,9 +2,10 @@
   "name": "ucm-frontend",
   "version": "0.0.0",
   "scripts": {
+    "config": "node scripts/generate-environment-config.js",
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "start": "npm run config && ng serve",
+    "build": "npm run config && ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
     "fix": "ng lint --fix",

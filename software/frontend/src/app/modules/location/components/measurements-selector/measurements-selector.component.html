@@ -30,7 +30,7 @@
               *ngFor="let measurementsType of measurementsTypes | keyvalue"
               class="dropdown-item"
               (click)="onTypeSelect(measurementsType.value)"
-              >{{ 'location.' + measurementsType.key.toLowerCase() | translate }}
+              >{{ 'location.' + measurementsType.key.toLowerCase() | translate }}k
             </a>
           </div>
         </div>
@@ -44,7 +44,7 @@
         >
         </ngx-slider>
         <ng-template #no_measurements>
-          {{ 'location.no_measurements_for_selection' }}
+          {{ 'location.no_measurements_for_selection' | translate }}
         </ng-template>
       </div>
     </div>
