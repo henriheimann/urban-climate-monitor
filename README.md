@@ -1,3 +1,5 @@
 # Urban Climate Monitor
 
-Documentation available at: https://henriheimann.github.io/urban-climate-monitor/
+![Promo](documentation/assets/promo.jpeg)
+
+Documentation: https://henriheimann.github.io/urban-climate-monitor/

@@ -33,6 +33,7 @@ include::hardware.adoc[]
 include::backend.adoc[]
 
 == Frontend
+include::frontend.adoc[]
 
 == Deployment
 include::deployment.adoc[]
