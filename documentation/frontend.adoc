@@ -1,7 +1,7 @@
 === Screens
 
 .Visualisation
-image::visualisation.svg[Visualisation]
+image::visualisation.png[Visualisation]
 
 .Sensor List
 image::sensor-list.png[Sensor List]
