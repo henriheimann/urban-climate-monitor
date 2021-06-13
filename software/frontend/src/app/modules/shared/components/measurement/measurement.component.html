@@ -1,4 +1,4 @@
-<span *ngIf="value; else no_value" style="white-space: nowrap">
+<span *ngIf="value !== undefined && value !== null; else no_value" style="white-space: nowrap">
   <span>
     {{ value | number: '1.2-2' }}
   </span>

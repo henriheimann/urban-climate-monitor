@@ -18,6 +18,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { SAOPass } from 'three/examples/jsm/postprocessing/SAOPass';
 import { LocationMaterial } from './shaders/location-material';
 import { LocationModel } from '../../../shared/models/location.model';
+import { MeasurementColorsService } from '../../services/measurement-colors.service';
+import { MeasurementsType } from '../../models/measurements-type';
 
 @Component({
   selector: 'ucm-visualisation-page',
@@ -58,7 +60,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
 
   private loadedLocationModelUrl: string | undefined;
   private locationModelGroup: THREE.Group | undefined;
-  private locationModelMaterial: LocationMaterial | undefined;
+  private locationModelMaterial = new LocationMaterial();
 
   private sensorsGroup: THREE.Group | undefined;
 
@@ -71,7 +73,8 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private locationService: LocationService,
     private activatedRoute: ActivatedRoute,
-    private store: Store
+    private store: Store,
+    private measurementColorsService: MeasurementColorsService
   ) {}
 
   ngOnInit(): void {
@@ -98,10 +101,10 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
-      antialias: false
+      antialias: true
     });
     this.renderer.setSize(this.wrapper.clientWidth, this.wrapper.clientHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.scene = new THREE.Scene();
 
@@ -117,8 +120,6 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     directionalLight.position.y = 3;
     directionalLight.position.z = 4;
     this.scene.add(directionalLight);
-
-    this.locationModelMaterial = new LocationMaterial();
 
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
@@ -282,34 +283,6 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getColor(measurement: number, min: number, max: number) {
-    const c1 = new THREE.Color('#df3615');
-    const c2 = new THREE.Color('#ee732e');
-    const c3 = new THREE.Color('#48aaab');
-    const c4 = new THREE.Color('#048399');
-
-    const c1Value = max;
-    const c2Value = min + ((max - min) * 2.0) / 3.0;
-    const c3Value = min + (max - min) / 3.0;
-    const c4Value = min;
-
-    const color = new THREE.Color();
-
-    const mapValueTo0To1Range = (value: number, lowerBound: number, upperBound: number) => {
-      return (value - lowerBound) / (upperBound - lowerBound);
-    };
-
-    if (measurement < c3Value) {
-      color.lerpColors(c4, c3, mapValueTo0To1Range(measurement, c4Value, c3Value));
-    } else if (measurement < c2Value) {
-      color.lerpColors(c3, c2, mapValueTo0To1Range(measurement, c3Value, c2Value));
-    } else {
-      color.lerpColors(c2, c1, mapValueTo0To1Range(measurement, c2Value, c1Value));
-    }
-
-    return color;
-  }
-
   private updateLocationModelShaderUniforms(state: LocationState): void {
     const uniformValues = [];
 
@@ -330,13 +303,14 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
                   measurementsForSensor = undefined;
                 }
 
-                if (measurementsForSensor) {
+                if (measurementsForSensor !== undefined) {
                   uniformValues.push({
                     position: child.position,
-                    color: this.getColor(
+                    color: this.measurementColorsService.getColor(
                       measurementsForSensor,
-                      state.loadedMeasurementsMin ? state.loadedMeasurementsMin[state.selectedMeasurementsType] : 0,
-                      state.loadedMeasurementsMax ? state.loadedMeasurementsMax[state.selectedMeasurementsType] : 0
+                      state.loadedMeasurementsMin![state.selectedMeasurementsType] || 0,
+                      state.loadedMeasurementsMax![state.selectedMeasurementsType] || 0,
+                      state.selectedMeasurementsType === MeasurementsType.BRIGHTNESS_CURRENT
                     )
                   });
                 }
@@ -347,9 +321,7 @@ export class VisualisationPageComponent implements OnInit, OnDestroy {
       }
     }
 
-    if (this.locationModelMaterial) {
-      this.locationModelMaterial.updateUniforms(uniformValues);
-    }
+    this.locationModelMaterial.updateUniforms(uniformValues);
   }
 
   private getSensorMeshForSensor(sensor: SensorModel): SensorMesh | undefined {

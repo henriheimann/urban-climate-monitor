@@ -21,8 +21,8 @@ export interface LocationState {
 
   loadingMeasurements: boolean;
   loadedMeasurements: LocationMeasurementsModel | undefined;
-  loadedMeasurementsMax: { [measurement_id: string]: number } | undefined;
-  loadedMeasurementsMin: { [measurement_id: string]: number } | undefined;
+  loadedMeasurementsMax: { [measurement_id: string]: number | undefined } | undefined;
+  loadedMeasurementsMin: { [measurement_id: string]: number | undefined } | undefined;
 }
 
 export const initialState: LocationState = {
@@ -114,11 +114,8 @@ export const reducer = createReducer(
   }),
 
   on(LocationActions.loadMeasurementsSuccess, (state, action) => {
-    let loadedMeasurementsMax: { [measurement_id: string]: number } | undefined = undefined;
-    let loadedMeasurementsMin: { [measurement_id: string]: number } | undefined = undefined;
-
-    loadedMeasurementsMin = {};
-    loadedMeasurementsMax = {};
+    const loadedMeasurementsMax: { [measurement_id: string]: number | undefined } = {};
+    const loadedMeasurementsMin: { [measurement_id: string]: number | undefined } = {};
 
     for (const type of Object.values(MeasurementsType)) {
       let min = Number.MAX_VALUE;
@@ -134,8 +131,8 @@ export const reducer = createReducer(
         }
       }
 
-      loadedMeasurementsMin[type] = min;
-      loadedMeasurementsMax[type] = max;
+      loadedMeasurementsMin[type] = min == Number.MAX_VALUE ? undefined : min;
+      loadedMeasurementsMax[type] = max == Number.MIN_VALUE ? undefined : max;
     }
 
     return {

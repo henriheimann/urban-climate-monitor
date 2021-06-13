@@ -48,10 +48,13 @@ export class LocationMaterial extends THREE.MeshPhongMaterial {
         `vec4 diffuseColor = vec4( diffuse, opacity );`,
         `
         vec3 accumulatedColor = diffuse;
-        for (int i = 0 ; i < sensorCount; ++i) {
+        for (int i = 0 ; i < ${LocationMaterial.MAX_SENSORS}; ++i) {
+          if (i >= sensorCount) {
+            break;
+          }
           vec3 difference = vWorldPosition - sensorData[i].position;
           float distance = length(difference);
-          float distanceClamped = 1.0f - clamp(distance * 0.35f, 0.0f, 1.0f);
+          float distanceClamped = 1.0 - clamp(distance * 0.35, 0.0, 1.0);
           accumulatedColor = mix(accumulatedColor, sensorData[i].color, distanceClamped) + sensorData[i].color * distanceClamped;
         }
         vec4 diffuseColor = vec4(diffuse * accumulatedColor, opacity);

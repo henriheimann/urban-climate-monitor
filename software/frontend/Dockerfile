@@ -2,12 +2,12 @@
 FROM node:lts-alpine as build
 ARG frontend_production
 ARG backend_url
-ARG backend_jwt_client_id
-ARG backend_jwt_client_secret
+ARG backend_oauth_client_id
+ARG backend_oauth_client_secret
 ENV UCM_FRONTEND_PRODUCTION=$frontend_production
 ENV UCM_BACKEND_URL=$backend_url
-ENV UCM_BACKEND_OAUTH_CLIENT_ID=$backend_jwt_client_id
-ENV UCM_BACKEND_OAUTH_CLIENT_SECRET=$backend_jwt_client_secret
+ENV UCM_BACKEND_OAUTH_CLIENT_ID=$backend_oauth_client_id
+ENV UCM_BACKEND_OAUTH_CLIENT_SECRET=$backend_oauth_client_secret
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
