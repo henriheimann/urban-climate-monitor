@@ -1,7 +1,32 @@
 === Screens
 
+==== Location Screens
+
+.Frontpage
+image::frontpage.png[Frontpage]
+
 .Visualisation
-image::visualisation.png[Visualisation]
+image::location_visualisation.png[Visualisation]
+
+.Show Sensor Detail 
+image::location_visualisation_sensor_detail.png[Show Sensor Detail]
+
+.Edit Sensor Position 
+image::location_visualisation_sensor_detail_edit.png[Edit Sensor Position]
 
 .Sensor List
 image::sensor-list.png[Sensor List]
+
+==== Administration Screens
+
+.Locations List
+image::admin_locations.png[Locations List]
+
+.Edit Location
+image::admin_locations_edit.png[Edit Location]
+
+.Sensors List
+image::admin_sensors.png[Sensors List]
+
+.Users List
+image::admin_users.png[Users List]
