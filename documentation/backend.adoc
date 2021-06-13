@@ -1,0 +1,4 @@
+The backend is implemented using the Spring Boot Framework. Spring Security is used for the token based OAuth2 authentication for protected resources. For interfacing with the The Things Network REST API, a Feign client is used. Integration tests have been written for most endpoints using Wiremock for mocking TTN API calls. These tests are automatically run when committing the the project's master branch.
+
+=== API Documentation
+The documentation of the REST API used by the frontend can be viewed using the `/swagger-ui.html` endpoint which is provided by the backend server. The raw API docs in Swagger format are available under `/api-docs`.

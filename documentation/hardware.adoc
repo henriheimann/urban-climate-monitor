@@ -52,5 +52,3 @@ image::hardware/plots/sensor-node-top.svg[Top Plot, 450]
 .Bottom
 image::hardware/plots/sensor-node-bottom.svg[Bottom Plot, 450]
 --
-
-=== Case

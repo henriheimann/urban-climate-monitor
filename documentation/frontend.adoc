@@ -1,3 +1,5 @@
+The frontend is implemented using version 11 of Angular. Three.js is used for the visualisation page, with a modified Three MeshPhongMaterial GLSL shader to overlay a location's 3d model with colours depending on the sensor's measurement values. NgRx and NgRxData are used to manage the application state. Bootstrap serves as underlying CSS framework. Support for localisation is build into the application using NgxTranslate and additional languages can be added by placing translations  in `src/assets/i18n`. The project is configured to use ESLint and Prettier for linting.
+
 === Location Screens
 
 Frontpage::
