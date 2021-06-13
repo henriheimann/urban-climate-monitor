@@ -1,32 +1,48 @@
-=== Screens
+=== Location Screens
 
-==== Location Screens
+Frontpage::
+The frontpage provides an overview of all locations, displaying the current average measurements and the number of sensors that have send new measurements in the last 10 minutes.
 
-.Frontpage
 image::frontpage.png[Frontpage]
 
-.Visualisation
+Visualisation::
+The main screen of the application shows a 3d-model of the location selected using the drop down on the upper left. On the upper right, the user can login and logout. The 3d model is coloured to display the values of the measurement and time selected using the dropdowns and sliders at the bottom of the page. A legend showing which colour maps to which value is displayed on the left. This scale adapts to the minimum and maximum values of the currently selected time range.
+
 image::location_visualisation.png[Visualisation]
 
-.Show Sensor Detail 
+Show Sensor Detail::
+When the user clicks on a single sensor, a new panel opens on the right, showing all measurements of the selected sensor and its battery voltage at the selected time. The time elapsed since the last contact with the sensor is also displayed. If the user is signed in and has the rights to edit the open location, the lower half of the panel allows translating and rotating of the selected sensor.
+
 image::location_visualisation_sensor_detail.png[Show Sensor Detail]
 
-.Edit Sensor Position 
+Edit Sensor Position::
+Clicking the 'Edit Position' button disables the measurements overlay and ambient occlusion rendering of the 3d model. Modification handles are attached to the sensor model and the user can use these and the numeric inputs to update the sensor's position. When finished, the user can save or revert the changes.
+
 image::location_visualisation_sensor_detail_edit.png[Edit Sensor Position]
 
-.Sensor List
+Sensor List::
+In addition to the visualisation screen, the sensor list screen provides a detailed overview of the current state of a location's sensors. It displays the most recent measurements and battery voltage of each sensor.
+
 image::sensor-list.png[Sensor List]
 
-==== Administration Screens
+=== Administration Screens
 
-.Locations List
+Locations List::
+If the user is logged in as administrator, the dropdown on the upper left provides access to the administration area of the application. The location list shows all created locations and is used to edit, delete or create locations.
+
 image::admin_locations.png[Locations List]
 
-.Edit Location
+Edit Location::
+For example, clicking on the edit button of a single location opens the following popup, letting the user change the location's name, icon and 3d-model. Newly uploaded icons must be .png files and 3d-models must be .obj files.
+
 image::admin_locations_edit.png[Edit Location]
 
-.Sensors List
+Sensors List::
+The sensors list of the administration area shows all sensors of all locations and also unassigned ones. It automatically syncs with configured The Things Network application. It also used to retrieve the keys required to program new sensor nodes.
+
 image::admin_sensors.png[Sensors List]
 
-.Users List
+Users List::
+The users list shows all of the application and their permissions. Users can either be administrators, which means they can access the administration area of the application and edit the sensors of all locations, or have privileges to edit the sensors of only specific locations.
+
 image::admin_users.png[Users List]

@@ -1,6 +1,6 @@
-=== TTN Setup
+=== The Things Network Setup
 
-The system requires a The Things Network application.
+The system requires a The Things Network application. To do so create a TTN account and use the https://console.cloud.thethings.network/[TTN cloud console]. You will require the region, the id and the EUI of the application later. An access key with read and write privileges must also be generated and noted down. Lastly setup the decoder function for the created TTN application using the following Javascript code:
 
 .TTN Payload Decoder Function
 [source,javascript]
@@ -29,18 +29,130 @@ function Decoder(bytes, port) {
 
 === Development Environment
 
-For Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range.
+The setup of the local development environment requires quite a few steps. First and foremost, for Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range. A good gateway for getting started which is available for less than 100€ is the https://www.thethingsnetwork.org/docs/gateways/thethingsindoor/[TTN Indoor Gateway].
+
+==== local-dev Deployment
+
+To start the required services (PostgreSQL database, Telegraf and InfluxDB) to get the backend and frontend up and running use the local-dev deployment stage. Create an `.env` file using the following content, save it as `deployment/local-dev/.env` and execute `deployment/local-dev/deploy-local-dev.sh` afterwards:
+
+.local-dev Deployment Example .env FIle
+[source]
+----
+INFLUXDB_HOST=ucm-influxdb          # Used for inter-container connections, unreachable from host
+INFLUXDB_PORT=8086
+INFLUXDB_DB=metrics
+INFLUXDB_TEST_DB=metricstest
+INFLUXDB_ADMIN_USER=admin
+INFLUXDB_ADMIN_PASSWORD=password    # For the setup of the local dev environment, use the worst password possible
+INFLUXDB_USER=user
+INFLUXDB_USER_PASSWORD=password
+
+TELEGRAF_HOST=ucm-telegraf          # Used for inter-container connections, unreachable from host
+
+TTN_REGION=                         # Fill using the values of your TTN app
+TTN_APP_ID=                         # Fill using the values of your TTN app
+TTN_APP_ACCESS_KEY=                 # Fill using the values of your TTN app
+
+POSTGRES_HOST=::1                   # Used to access from the host machine
+POSTGRES_PORT=5432
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=ucm
+POSTGRES_TEST_DB=ucmtest
+----
+
 
 ==== Backend
 
-Environment variables:: Make sure to export the following environment variables before starting the backend.
+Environment variables:: Make sure to export the following environment variables or set them up in your IDE before starting the backend.
 
 [cols="1,~,~"]
 |===
-|Variable |Example Value |Description 
+|Variable |Value |Description 
+
+|POSTGRES_HOST
+|::1
+|Host under which the backend can reach the PostgreSQL instance running.
+
+|POSTGRES_PORT
+|5432
+|Port under which the backend can reach the PostgreSQL instance running.
+
+|POSTGRES_DB
+|ucm
+|Name of the PostgreSQL database used.
+
+|POSTGRES_USER
+|user
+|User to access the PostgreSQL database.
+
+|POSTGRES_PASSWORD
+|password
+|Password to access the PostgreSQL database.
+
+|INFLUXDB_HOST
+|localhost
+|Host under which the backend can reach the InfluxDB instance running, different from the internal host configured in the .env file!
+
+|INFLUXDB_PORT
+|8086
+|Port under which the backend can reach the InfluxDB instance running.
+
+|INFLUXDB_DB
+|metrics
+|Name of the InfluxDB database used.
+
+|INFLUXDB_USER
+|user
+|User to access the InfluxDB database.
+
+|INFLUXDB_USER_PASSWORD
+|password
+|Password to access the InfluxDB database.
+
+|UCM_BACKEND_ADMIN_USERNAME
+|admin
+|The username of the default admin created when starting the backend.
+
+|UCM_BACKEND_ADMIN_PASSWORD
+|password
+|The password of the default admin created when starting the backend.
+
+|UCM_BACKEND_OAUTH_CLIENT_ID
+|ucm-client
+|The client used by the frontend when requesting tokens.
+
+|UCM_BACKEND_OAUTH_CLIENT_SECRET
+|secret
+|The password used by the frontend when requesting tokens.
+
+|TTN_REGION
+|
+|Region of your TTN app.
+
+|TTN_APP_ID
+|
+|ID of your TTN app.
+
+|TTN_APP_ACCESS_KEY
+|
+|Access key of your TTN app.
+
+|TTN_APP_EUI
+|
+|EUI of your TTN app EUI.
+
+|TTN_DEVICE_ID_PREFIX
+|26011
+|Different for all regions, for eu use 26011.
+
+|DEPLOYMENT_URL
+|http://locahost:4200
+|The URL under which the frontend will be run, required for CORS configuration.
+
 |===
 
-Running the backend:: `TODO`
+Running the backend:: You can use maven to compile and run the backend using `mvn clean install` and `mvn spring-boot:run`.
 
 
 ==== Frontend
@@ -49,12 +161,33 @@ Environment variables:: Make sure to export the following environment variables 
 
 [cols="1,~,~"]
 |===
-|Variable |Example Value |Description 
+|Variable |Value |Description 
+
+|UCM_BACKEND_URL
+|http://localhost:8080
+|The url under which the frontend expects the backend.
+
+|UCM_BACKEND_OAUTH_CLIENT_ID
+|ucm-client
+|The client used when requesting tokens.
+
+|UCM_BACKEND_OAUTH_CLIENT_SECRET
+|secret
+|The password used when requesting tokens.
+
+|UCM_FRONTEND_PRODUCTION
+|false
+|Only used to enable production builds.
+
 |===
 
-Running the frontend:: `TODO`
+Running the frontend:: Install the required packages using `npm install` and run the frontend with `npm run start`. It should now accessible using the browser of your choice under http://localhost:4200.
 
 === Hardware Fabrication
+
+Export Gerber files:: You can use KiCAD to export Geber files under File > Plot. Use the settings required by your manufacturer.
+Fabrication:: The existing sensor nodes have been fabricated by https://aisler.net/[Aisler] as 'Beautiful Boards Budget' with a thickness of 1,6mm.
+Assembly:: See <<Bill of Materials>> for a detailed list of all parts required for the assembly of a sensor node board. The surface mount components of the existing sensor nodes have been assembled using solder paste and a stencil manufactured also by Aisler. 
 
 === Embedded Software
 

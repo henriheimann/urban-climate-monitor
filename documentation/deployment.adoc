@@ -20,7 +20,7 @@ Four different stages are provided for the development, testing and deployment o
 
 === Environment Variables
 
-The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding `.env` file.
+The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding `.env` file. During local-dev deployments additional variables might be required when executing the frontend and backend on their own, see <<Quick Start>> section.
 
 [cols="2,2,3,1,1,1,1"]
 |===
@@ -95,6 +95,102 @@ The following table describes all environment variables used by the deployments,
 |Host used to access Telegraf, must be set to ucm-telegraf to mirror Docker Compose container name.
 |✓
 |✓
+|✓
+|✓
+
+|GF_HOST
+|ucm-grafana
+|Host used to access Grafana, must be set to ucm-grafana to mirror Docker Compose container name.
+|✕
+|✕
+|✓
+|✓
+
+|GF_PORT
+|3000
+|Port of the Grafana instance.
+|✕
+|✕
+|✓
+|✓
+
+|GF_SECURITY_ADMIN_USER
+|
+|Username of the admin user that can be used to access Grafana.
+|✕
+|✕
+|✓
+|✓
+
+|GF_SECURITY_ADMIN_PASSWORD
+|
+|Password of the admin user that can be used to access Grafana.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_FRONTEND_HOST
+|ucm-frontend
+|Host used to access the frontend by the reverse proxy, must be set to ucm-frontend to mirror Docker Compose container name.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_FRONTEND_PORT
+|80
+|Port under which the frontend is running.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_HOST
+|ucm-backend
+|Host used to access the backend by the reverse proxy, must be set to ucm-backend to mirror Docker Compose container name.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_PORT
+|8080
+|Port under which the backend is running.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_ADMIN_USERNAME
+|
+|The username of the default admin created when starting the backend.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_ADMIN_PASSWORD
+|
+|The password of the default admin created when starting the backend.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_OAUTH_CLIENT_ID
+|
+|The client used by the frontend when requesting tokens.
+|✕
+|✕
+|✓
+|✓
+
+|UCM_BACKEND_OAUTH_CLIENT_SECRET
+|
+|The password used by the frontend when requesting tokens.
+|✕
+|✕
 |✓
 |✓
 
@@ -185,5 +281,37 @@ The following table describes all environment variables used by the deployments,
 |✓
 |✕
 |✕
+
+|DEPLOYMENT_USER
+|
+|User used to access the server during deployment.
+|✕
+|✕
+|✕
+|✓
+
+|DEPLOYMENT_HOST
+|
+|The domain under which the application will be deployed.
+|✕
+|✕
+|✕
+|✓
+
+|DEPLOYMENT_URL
+|
+|The complete URL (including https://) under which the application will be deployed.
+|✕
+|✕
+|✓
+|✓
+
+|LETS_ENCRYPT_EMAIL
+|
+|E-Mail used when requesting the Let's Encrypt certificate.
+|✕
+|✕
+|✕
+|✓
 
 |===
