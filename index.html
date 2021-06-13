@@ -88,7 +88,7 @@ mark {
 
 code, kbd, pre, samp {
     font-family: monospace;
-    font-size: 1em
+    font-size: 0.8em
 }
 
 pre {
@@ -579,7 +579,7 @@ h1 strong, h2 strong, h3 strong, #toctitle strong, .sidebarblock>.content>.title
 }
 
 pre, pre>code {
-    line-height: 1.45;
+    line-height: 1;
     color: rgba(0, 0, 0, .9);
     font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
     font-weight: 400;
@@ -2009,7 +2009,7 @@ p {
 <li><a href="#_introduction">Introduction</a></li>
 <li><a href="#_quick_start">Quick Start</a>
 <ul class="sectlevel2">
-<li><a href="#_ttn_setup">TTN Setup</a></li>
+<li><a href="#_the_things_network_setup">The Things Network Setup</a></li>
 <li><a href="#_development_environment">Development Environment</a></li>
 <li><a href="#_hardware_fabrication">Hardware Fabrication</a></li>
 <li><a href="#_embedded_software">Embedded Software</a></li>
@@ -2021,12 +2021,14 @@ p {
 <li><a href="#_schematics">Schematics</a></li>
 <li><a href="#_bill_of_materials">Bill of Materials</a></li>
 <li><a href="#_plots">Plots</a></li>
+<li><a href="#_case">Case</a></li>
 </ul>
 </li>
 <li><a href="#_backend_2">Backend</a></li>
 <li><a href="#_frontend_2">Frontend</a>
 <ul class="sectlevel2">
-<li><a href="#_screens">Screens</a></li>
+<li><a href="#_location_screens">Location Screens</a></li>
+<li><a href="#_administration_screens">Administration Screens</a></li>
 </ul>
 </li>
 <li><a href="#_deployment">Deployment</a>
@@ -2063,9 +2065,9 @@ p {
 <h2 id="_quick_start">Quick Start</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ttn_setup">TTN Setup</h3>
+<h3 id="_the_things_network_setup">The Things Network Setup</h3>
 <div class="paragraph">
-<p>The system requires a The Things Network application.</p>
+<p>The system requires a The Things Network application. To do so create a TTN account and use the <a href="https://console.cloud.thethings.network/">TTN cloud console</a>. You will require the region, the id and the EUI of the application later. An access key with read and write privileges must also be generated and noted down. Lastly setup the decoder function for the created TTN application using the following Javascript code:</p>
 </div>
 <div class="listingblock">
 <div class="title">TTN Payload Decoder Function</div>
@@ -2096,7 +2098,39 @@ function Decoder(bytes, port) {
 <div class="sect2">
 <h3 id="_development_environment">Development Environment</h3>
 <div class="paragraph">
-<p>For Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range.</p>
+<p>The setup of the local development environment requires quite a few steps. First and foremost, for Sensor Nodes to be able to actively communicate their measurements to the backend, they require a The Things Network gateway in LoRA communications range. A good gateway for getting started which is available for less than 100€ is the <a href="https://www.thethingsnetwork.org/docs/gateways/thethingsindoor/">TTN Indoor Gateway</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="_local_dev_deployment">local-dev Deployment</h4>
+<div class="paragraph">
+<p>To start the required services (PostgreSQL database, Telegraf and InfluxDB) to get the backend and frontend up and running use the local-dev deployment stage. Create an <code>.env</code> file using the following content, save it as <code>deployment/local-dev/.env</code> and execute <code>deployment/local-dev/deploy-local-dev.sh</code> afterwards:</p>
+</div>
+<div class="listingblock">
+<div class="title">local-dev Deployment Example .env FIle</div>
+<div class="content">
+<pre class="highlight"><code>INFLUXDB_HOST=ucm-influxdb          # Used for inter-container connections, unreachable from host
+INFLUXDB_PORT=8086
+INFLUXDB_DB=metrics
+INFLUXDB_TEST_DB=metricstest
+INFLUXDB_ADMIN_USER=admin
+INFLUXDB_ADMIN_PASSWORD=password    # For the setup of the local dev environment, use the worst password possible
+INFLUXDB_USER=user
+INFLUXDB_USER_PASSWORD=password
+
+TELEGRAF_HOST=ucm-telegraf          # Used for inter-container connections, unreachable from host
+
+TTN_REGION=                         # Fill using the values of your TTN app
+TTN_APP_ID=                         # Fill using the values of your TTN app
+TTN_APP_ACCESS_KEY=                 # Fill using the values of your TTN app
+
+POSTGRES_HOST=::1                   # Used to access from the host machine
+POSTGRES_PORT=5432
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=ucm
+POSTGRES_TEST_DB=ucmtest</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_backend">Backend</h4>
@@ -2104,7 +2138,7 @@ function Decoder(bytes, port) {
 <dl>
 <dt class="hdlist1">Environment variables</dt>
 <dd>
-<p>Make sure to export the following environment variables before starting the backend.</p>
+<p>Make sure to export the following environment variables or set them up in your IDE before starting the backend.</p>
 </dd>
 </dl>
 </div>
@@ -2114,11 +2148,113 @@ function Decoder(bytes, port) {
 <col>
 <col>
 </colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Variable</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Example Value</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">::1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host under which the backend can reach the PostgreSQL instance running.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5432</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port under which the backend can reach the PostgreSQL instance running.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the PostgreSQL database used.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_USER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User to access the PostgreSQL database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">POSTGRES_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password to access the PostgreSQL database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">localhost</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host under which the backend can reach the InfluxDB instance running, different from the internal host configured in the .env file!</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8086</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port under which the backend can reach the InfluxDB instance running.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_DB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metrics</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the InfluxDB database used.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_USER</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User to access the InfluxDB database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">INFLUXDB_USER_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password to access the InfluxDB database.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_ADMIN_USERNAME</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">admin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username of the default admin created when starting the backend.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_ADMIN_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password of the default admin created when starting the backend.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_ID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-client</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client used by the frontend when requesting tokens.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_SECRET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password used by the frontend when requesting tokens.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_REGION</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Region of your TTN app.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of your TTN app.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_ACCESS_KEY</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Access key of your TTN app.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_APP_EUI</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EUI of your TTN app EUI.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TTN_DEVICE_ID_PREFIX</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26011</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Different for all regions, for eu use 26011.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DEPLOYMENT_URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://locahost:4200" class="bare">http://locahost:4200</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The URL under which the frontend will be run, required for CORS configuration.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2126,7 +2262,7 @@ function Decoder(bytes, port) {
 <dl>
 <dt class="hdlist1">Running the backend</dt>
 <dd>
-<p><code>TODO</code></p>
+<p>You can use maven to compile and run the backend using <code>mvn clean install</code> and <code>mvn spring-boot:run</code>.</p>
 </dd>
 </dl>
 </div>
@@ -2147,11 +2283,33 @@ function Decoder(bytes, port) {
 <col>
 <col>
 </colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable</th>
+<th class="tableblock halign-left valign-top">Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Variable</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Example Value</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://localhost:8080" class="bare">http://localhost:8080</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The url under which the frontend expects the backend.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_ID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-client</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client used when requesting tokens.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_SECRET</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">secret</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password used when requesting tokens.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_FRONTEND_PRODUCTION</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Only used to enable production builds.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2159,7 +2317,7 @@ function Decoder(bytes, port) {
 <dl>
 <dt class="hdlist1">Running the frontend</dt>
 <dd>
-<p><code>TODO</code></p>
+<p>Install the required packages using <code>npm install</code> and run the frontend with <code>npm run start</code>. It should now accessible using the browser of your choice under <a href="http://localhost:4200" class="bare">http://localhost:4200</a>.</p>
 </dd>
 </dl>
 </div>
@@ -2167,7 +2325,22 @@ function Decoder(bytes, port) {
 </div>
 <div class="sect2">
 <h3 id="_hardware_fabrication">Hardware Fabrication</h3>
-
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Export Gerber files</dt>
+<dd>
+<p>You can use KiCAD to export Geber files under File &gt; Plot. Use the settings required by your manufacturer.</p>
+</dd>
+<dt class="hdlist1">Fabrication</dt>
+<dd>
+<p>The existing sensor nodes have been fabricated by <a href="https://aisler.net/">Aisler</a> as 'Beautiful Boards Budget' with a thickness of 1,6mm.</p>
+</dd>
+<dt class="hdlist1">Assembly</dt>
+<dd>
+<p>See <a href="#_bill_of_materials">Bill of Materials</a> for a detailed list of all parts required for the assembly of a sensor node board. The surface mount components of the existing sensor nodes have been assembled using solder paste and a stencil manufactured also by Aisler.</p>
+</dd>
+</dl>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_embedded_software">Embedded Software</h3>
@@ -2339,7 +2512,202 @@ function Decoder(bytes, port) {
 </div>
 <div class="sect2">
 <h3 id="_bill_of_materials">Bill of Materials</h3>
-
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reference</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Value</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Manufacturer #</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comment</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AE1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ANT-868-CHP-T</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linx 868 Mhz Antenna</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BT1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2468</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Keystone 2xAAA battery holder</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.7pF</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C12</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15pF</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C2 C4 C5 C6 C7 C8 C9 C10 C13 C14 C15 C16</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100nF</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C1 C3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10uF</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BPV10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Vishay Photodiode</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FB1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">742792040</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wurth Elektronik Ferrite Bead</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">J1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CONUFL001-SMD-T</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Linx connector required only for antenna matching</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">J2</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SHF-105-01-L-D-TH</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Samtec connector for SWD 2x5 1.27mm</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">L1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.7uH</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Q1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PMV250EPEA</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Nexpreia P-channel MOSFET</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R11 R12</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.7k</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R13</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R5 R6 R7 R14</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10k</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">330k</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R3 R4 R10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100k</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1M</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">R9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">33k</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U1</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TLV61225DCKR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Texas Instruments voltage regulator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U2</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TPS27081ADDCR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Texas Instruments switch for reverse voltage protection</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U3</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SHT31-DIS-F2.5kS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sensirion temperature and humidity sensor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U4</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">24LC32AT-I/SN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Microchip EEPROM</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U5</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MLX90614ESF-BCC-000-TU</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Optional Melexis IR temperature sensor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U6</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ADG633YRUZ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Analog Devices CMOS switch</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U7</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TSV911RILT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STMicroelectronics operational amplifier</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U8</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RFM95W-868</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HopeRF LoRA module</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">U9</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STM32L412KBT6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">STMicroelectronics microcontroller</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CSH-SGFB-100-UFFR</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional equipment: Linx cable for antenna matching</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ADP-SMAM-SMAM-G</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Additional equipment: Linx adapter for antenna matching</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect2">
 <h3 id="_plots">Plots</h3>
@@ -2360,6 +2728,10 @@ function Decoder(bytes, port) {
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_case">Case</h3>
+
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2372,65 +2744,125 @@ function Decoder(bytes, port) {
 <h2 id="_frontend_2">Frontend</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_screens">Screens</h3>
-<div class="sect3">
-<h4 id="_location_screens">Location Screens</h4>
+<h3 id="_location_screens">Location Screens</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Frontpage</dt>
+<dd>
+<p>The frontpage provides an overview of all locations, displaying the current average measurements and the number of sensors that have send new measurements in the last 10 minutes.</p>
+</dd>
+</dl>
+</div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/frontpage.png" alt="Frontpage">
 </div>
-<div class="title">Figure 5. Frontpage</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Visualisation</dt>
+<dd>
+<p>The main screen of the application shows a 3d-model of the location selected using the drop down on the upper left. On the upper right, the user can login and logout. The 3d model is coloured to display the values of the measurement and time selected using the dropdowns and sliders at the bottom of the page. A legend showing which colour maps to which value is displayed on the left. This scale adapts to the minimum and maximum values of the currently selected time range.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/location_visualisation.png" alt="Visualisation">
 </div>
-<div class="title">Figure 6. Visualisation</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Show Sensor Detail</dt>
+<dd>
+<p>When the user clicks on a single sensor, a new panel opens on the right, showing all measurements of the selected sensor and its battery voltage at the selected time. The time elapsed since the last contact with the sensor is also displayed. If the user is signed in and has the rights to edit the open location, the lower half of the panel allows translating and rotating of the selected sensor.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/location_visualisation_sensor_detail.png" alt="Show Sensor Detail">
 </div>
-<div class="title">Figure 7. Show Sensor Detail</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Edit Sensor Position</dt>
+<dd>
+<p>Clicking the 'Edit Position' button disables the measurements overlay and ambient occlusion rendering of the 3d model. Modification handles are attached to the sensor model and the user can use these and the numeric inputs to update the sensor&#8217;s position. When finished, the user can save or revert the changes.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/location_visualisation_sensor_detail_edit.png" alt="Edit Sensor Position">
 </div>
-<div class="title">Figure 8. Edit Sensor Position</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Sensor List</dt>
+<dd>
+<p>In addition to the visualisation screen, the sensor list screen provides a detailed overview of the current state of a location&#8217;s sensors. It displays the most recent measurements and battery voltage of each sensor.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/sensor-list.png" alt="Sensor List">
 </div>
-<div class="title">Figure 9. Sensor List</div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_administration_screens">Administration Screens</h4>
+<div class="sect2">
+<h3 id="_administration_screens">Administration Screens</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Locations List</dt>
+<dd>
+<p>If the user is logged in as administrator, the dropdown on the upper left provides access to the administration area of the application. The location list shows all created locations and is used to edit, delete or create locations.</p>
+</dd>
+</dl>
+</div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/admin_locations.png" alt="Locations List">
 </div>
-<div class="title">Figure 10. Locations List</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Edit Location</dt>
+<dd>
+<p>For example, clicking on the edit button of a single location opens the following popup, letting the user change the location&#8217;s name, icon and 3d-model. Newly uploaded icons must be .png files and 3d-models must be .obj files.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/admin_locations_edit.png" alt="Edit Location">
 </div>
-<div class="title">Figure 11. Edit Location</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Sensors List</dt>
+<dd>
+<p>The sensors list of the administration area shows all sensors of all locations and also unassigned ones. It automatically syncs with configured The Things Network application. It also used to retrieve the keys required to program new sensor nodes.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/admin_sensors.png" alt="Sensors List">
 </div>
-<div class="title">Figure 12. Sensors List</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Users List</dt>
+<dd>
+<p>The users list shows all of the application and their permissions. Users can either be administrators, which means they can access the administration area of the application and edit the sensors of all locations, or have privileges to edit the sensors of only specific locations.</p>
+</dd>
+</dl>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="https://github.com/henriheimann/urban-climate-monitor/raw/gh-pages/assets/admin_users.png" alt="Users List">
-</div>
-<div class="title">Figure 13. Users List</div>
 </div>
 </div>
 </div>
@@ -2472,7 +2904,7 @@ function Decoder(bytes, port) {
 <div class="sect2">
 <h3 id="_environment_variables">Environment Variables</h3>
 <div class="paragraph">
-<p>The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding <code>.env</code> file.</p>
+<p>The following table describes all environment variables used by the deployments, showing which stage required which variable to be set in the corresponding <code>.env</code> file. During local-dev deployments additional variables might be required when executing the frontend and backend on their own, see <a href="#_quick_start">Quick Start</a> section.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -2578,6 +3010,114 @@ function Decoder(bytes, port) {
 <td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GF_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-grafana</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used to access Grafana, must be set to ucm-grafana to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GF_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port of the Grafana instance.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GF_SECURITY_ADMIN_USER</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username of the admin user that can be used to access Grafana.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GF_SECURITY_ADMIN_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Password of the admin user that can be used to access Grafana.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_FRONTEND_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-frontend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used to access the frontend by the reverse proxy, must be set to ucm-frontend to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_FRONTEND_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">80</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port under which the frontend is running.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_HOST</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ucm-backend</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Host used to access the backend by the reverse proxy, must be set to ucm-backend to mirror Docker Compose container name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_PORT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Port under which the backend is running.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_ADMIN_USERNAME</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The username of the default admin created when starting the backend.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_ADMIN_PASSWORD</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password of the default admin created when starting the backend.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_ID</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client used by the frontend when requesting tokens.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UCM_BACKEND_OAUTH_CLIENT_SECRET</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password used by the frontend when requesting tokens.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">TTN_REGION</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">eu (for Europe)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The TTN region prefix of the TTN application.</p></td>
@@ -2676,6 +3216,42 @@ function Decoder(bytes, port) {
 <td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DEPLOYMENT_USER</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">User used to access the server during deployment.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DEPLOYMENT_HOST</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The domain under which the application will be deployed.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DEPLOYMENT_URL</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The complete URL (including https://) under which the application will be deployed.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LETS_ENCRYPT_EMAIL</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">E-Mail used when requesting the Let&#8217;s Encrypt certificate.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✕</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">✓</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -2684,7 +3260,7 @@ function Decoder(bytes, port) {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-13 11:55:24 UTC
+Last updated 2021-06-13 13:55:18 UTC
 </div>
 </div>
 </body>
